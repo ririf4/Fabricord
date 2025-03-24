@@ -55,4 +55,8 @@ object GroupManager {
 	interface C {
 		fun register(dispatcher: CommandDispatcher<ServerCommandSource>)
 	}
+
+	object Tables {
+
+	}
 }
