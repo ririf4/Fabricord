@@ -17,6 +17,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT }}
           GITHUB_EVENT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
+          set -e
+        
           EVENT_TYPE="${{ github.event_name }}"
           if [[ "$EVENT_TYPE" == "push" ]]; then
             EVENT_TYPE="commit"
@@ -25,12 +27,12 @@ jobs:
           elif [[ "$EVENT_TYPE" == "issues" ]]; then
             EVENT_TYPE="issues"
           fi
-
-          MSG="${GITHUB_EVENT_MESSAGE:-}"
+        
+          MSG="$(jq -r '.head_commit.message // "No commit message"' <<< '${{ toJson(github.event) }}')"
           if [ -z "$MSG" ]; then
             MSG="No commit message"
           fi
-
+        
           PAYLOAD=$(jq -n \
             --arg repo "${{ github.repository }}" \
             --arg branch "${{ github.ref_name }}" \
@@ -40,7 +42,7 @@ jobs:
             --arg author "${{ github.actor }}" \
             '{repo_name: $repo, branch_name: $branch, event_type: $event, commit_sha: $sha, commit_message: $msg, commit_author: $author}'
           )
-
+        
           gh workflow run github-to-discord.yml \
             --repo ririf4/Actions \
             --ref main \

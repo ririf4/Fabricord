@@ -54,6 +54,10 @@ dependencies {
 }
 
 loom {
+	serverOnlyMinecraftJar()
+
+	splitEnvironmentSourceSets()
+
 	accessWidenerPath = file("src/main/resources/fabricord.accesswidener")
 }
 

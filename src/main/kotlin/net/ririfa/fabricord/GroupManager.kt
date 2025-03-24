@@ -1,6 +1,5 @@
 package net.ririfa.fabricord
 
-import com.mojang.brigadier.Command
 import com.mojang.brigadier.CommandDispatcher
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
