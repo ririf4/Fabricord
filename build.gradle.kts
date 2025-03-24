@@ -36,6 +36,9 @@ dependencies {
 	modApi("org.yaml:snakeyaml:2.3")
 	modApi("net.kyori:adventure-text-serializer-gson:4.17.0")
 	modApi("net.ririfa:langman:1.4.3")
+	modApi("org.jetbrains.exposed:exposed-core:0.60.0")
+	modApi("org.jetbrains.exposed:exposed-dao:0.60.0")
+	modApi("org.jetbrains.exposed:exposed-jdbc:0.60.0")
 
 	modCompileOnly("org.apache.logging.log4j:log4j-api:+")
 	modCompileOnly("org.apache.logging.log4j:log4j-core:+")
@@ -114,4 +117,9 @@ tasks.withType<Jar> {
 			.filter { it.exists() && !it.name.startsWith("kotlin") }
 			.map { if (it.isDirectory) it else project.zipTree(it) }
 	})
+
+	exclude("net/dv8tion/jda/api/audio/**")
+	exclude("net/dv8tion/jda/internal/audio/**")
+	exclude("tomp2p/**")
+	exclude("com/sun/jna/**")
 }

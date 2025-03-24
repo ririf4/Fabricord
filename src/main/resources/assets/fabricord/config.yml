@@ -60,7 +60,7 @@ ServerStartMessage: ""
 ServerStopMessage: ""
 
 # The message that appears when a player joins the server.
-# You can use the "% player%" placeholder.
+# You can use the "%player%" placeholder.
 # It will be replaced with the player's name.
 # If blank, the message will use the default message.
 PlayerJoinMessage: ""

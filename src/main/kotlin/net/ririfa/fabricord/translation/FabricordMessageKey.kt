@@ -7,8 +7,6 @@ import net.ririfa.langman.MessageKey
 sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
 	sealed class System : FabricordMessageKey() {
 		sealed class Initialization : System() {
-			object JDANotInitialized : Initialization()
-
 			object FailedToCheckOrCreateRequiredDirOrFileBySec : Initialization()
 			object FailedToCheckOrCreateRequiredDirOrFileByIO : Initialization()
 			object FailedToCheckOrCreateRequiredDirOrFile : Initialization()
@@ -82,10 +80,17 @@ sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
 			}
 		}
 
+		sealed class Group : Command() {
+			sealed class Create : Group() {
+				object GroupAlreadyExists : Create()
+				object Success : Create()
+			}
+		}
+
 		@Suppress("unused")
 		sealed class Help : Command() {
 			sealed class Group : Help() {
-				// /grp create <name|str> <open|bool> [players|ServerPlayerEntity]
+				// /grp create <name|str> <open|bool> [(OPTIONAL) players|ServerPlayerEntity]
 				@Indexed(1)
 				sealed class Create : Group() {
 					object About : Create()
@@ -127,7 +132,7 @@ sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
 					object Usage : JoinedList()
 				}
 
-				// /grp pendingList <[OPTIONAL] name or ID|str>
+				// /grp pendingList <(OPTIONAL) name or ID|str>
 				@Indexed(7)
 				sealed class PendingList : Group() {
 					object About : PendingList()
@@ -169,14 +174,14 @@ sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
 					object Usage : Kick()
 				}
 
-				// /grp /grp acceptrequest <pendingID|str>
+				// /grp /grp acceptRequest <pendingID|str>
 				@Indexed(13)
 				sealed class AcceptRequest : Group() {
 					object About : AcceptRequest()
 					object Usage : AcceptRequest()
 				}
 
-				// /grp /grp denyrequest <pendingID|str>
+				// /grp /grp denyRequest <pendingID|str>
 				@Indexed(14)
 				sealed class DenyRequest : Group() {
 					object About : DenyRequest()

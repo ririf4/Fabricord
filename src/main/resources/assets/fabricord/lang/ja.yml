@@ -63,7 +63,7 @@ Command:
     Group:
       Create:
         About: "グループチャットを作成します。"
-        Usage: "/grp create <Str/グループ名> <Str/公開かどうか> [任意|Bool/MCID/UUID]"
+        Usage: "/grp create <Str/グループ名> <Bool/公開かどうか> [任意-初期メンバー|Players]"
 
       Delete:
         About: "グループチャットを削除します。"
@@ -83,11 +83,11 @@ Command:
 
       JoinedList:
         About: "参加済みのグループチャットの一覧を表示します。"
-        Usage: "/grp joinedlist"
+        Usage: "/grp joinedList"
 
       PendingList:
         About: "自分がオーナーであるグループの中で、承認待ちのユーザーの一覧を表示します。"
-        Usage: "/grp pendinglist [任意|Str/グループ名かID]"
+        Usage: "/grp pendingList [任意|Str/グループ名かID]"
 
       Info:
         About: "グループチャットの情報を表示します。"
@@ -95,7 +95,7 @@ Command:
 
       SetDefaultGrp:
         About: "デフォルトのグループを設定します。複数個設定できず、2回目以降の設定では、以前の設定が上書きされます。"
-        Usage: "/grp setdefault <Str/グループ名かID>"
+        Usage: "/grp setDefault <Str/グループ名かID>"
 
       Switch:
         About: "デフォルトグループが設定されている場合、そのグループとグローバルチャットを切り替えます。\n 設定されていない場合は引数が必要です。"
@@ -111,16 +111,16 @@ Command:
 
       AcceptRequest:
         About: "グループチャットへの参加申請を承認します。"
-        Usage: "/grp acceptrequest <Str/申請ID('pendinglist'で確認できます)>"
+        Usage: "/grp acceptRequest <Str/申請ID('pendingList'で確認できます)>"
 
       DenyRequest:
         About: "グループチャットへの参加申請を拒否します。"
-        Usage: "/grp denyrequest <Str/申請ID('pendinglist'で確認できます)>"
+        Usage: "/grp denyRequest <Str/申請ID('pendingList'で確認できます)>"
 
       SetPublic:
         About: "グループチャットの公開設定を変更します。"
-        Usage: "/grp setpublic <Str/グループ名かID> <Bool/公開かどうか>"
+        Usage: "/grp setPublic <Str/グループ名かID> <Bool/公開かどうか>"
 
       TransferOwner:
         About: "グループチャットのオーナーを譲渡します。"
-        Usage: "/grp transferowner <Str/グループ名かID> <Str/MCID/UUID>"
+        Usage: "/grp transferOwner <Str/グループ名かID> <Str/MCID/UUID>"

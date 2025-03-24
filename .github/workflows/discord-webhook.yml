@@ -14,9 +14,10 @@ jobs:
     steps:
       - name: Trigger Discord Webhook
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GITHUB_EVENT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
-          EVENT_TYPE=${{ github.event_name }}
+          EVENT_TYPE="${{ github.event_name }}"
           if [[ "$EVENT_TYPE" == "push" ]]; then
             EVENT_TYPE="commit"
           elif [[ "$EVENT_TYPE" == "pull_request" ]]; then
@@ -25,16 +26,22 @@ jobs:
             EVENT_TYPE="issues"
           fi
 
+          MSG="${GITHUB_EVENT_MESSAGE:-}"
+          if [ -z "$MSG" ]; then
+            MSG="No commit message"
+          fi
+
           PAYLOAD=$(jq -n \
             --arg repo "${{ github.repository }}" \
             --arg branch "${{ github.ref_name }}" \
             --arg event "$EVENT_TYPE" \
             --arg sha "${{ github.sha }}" \
-            --arg msg "${{ github.event.head_commit.message }}" \
+            --arg msg "$MSG" \
             --arg author "${{ github.actor }}" \
             '{repo_name: $repo, branch_name: $branch, event_type: $event, commit_sha: $sha, commit_message: $msg, commit_author: $author}'
           )
 
           gh workflow run github-to-discord.yml \
             --repo ririf4/Actions \
+            --ref main \
             -f payload="$PAYLOAD"

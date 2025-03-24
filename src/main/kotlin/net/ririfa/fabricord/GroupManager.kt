@@ -1,9 +1,7 @@
 package net.ririfa.fabricord
 
+import com.mojang.brigadier.Command
 import com.mojang.brigadier.CommandDispatcher
-import com.mojang.brigadier.arguments.IntegerArgumentType
-import net.minecraft.server.command.CommandManager.argument
-import net.minecraft.server.command.CommandManager.literal
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
@@ -13,9 +11,10 @@ import net.ririfa.fabricord.translation.adapt
 import kotlin.reflect.full.findAnnotation
 
 //TODO: Creation of files for storing default groups, reading and writing data and maintaining status.
+// maybe 5.1.0
 object GroupManager {
 	fun registerAll(dispatcher: CommandDispatcher<ServerCommandSource>) {
-		Commands.entries.forEach { it.register(dispatcher) }
+
 	}
 
 	fun showHelpToPlayer(source: ServerCommandSource, page: Int) {
@@ -54,44 +53,7 @@ object GroupManager {
 		}
 	}
 
-	private enum class Commands(val register: (dispatcher: CommandDispatcher<ServerCommandSource>) -> Unit) {
-		HELP({ dispatcher ->
-			dispatcher.register(
-				literal("grp")
-					.then(
-						literal("help")
-							.then(
-								argument("number", IntegerArgumentType.integer(1, 100))
-									.executes { context ->
-										val page = IntegerArgumentType.getInteger(context, "number")
-										showHelpToPlayer(context.source, page)
-										1
-									}
-							)
-					)
-			)
-		}),
-
-		CREATE({ dispatcher ->
-			dispatcher.register(
-				literal("grp")
-					.then(
-						literal("create")
-
-					)
-			)
-		}),
-
-		DELETE({ dispatcher ->
-
-		}),
-
-		JOIN({ dispatcher ->
-
-		}),
-
-		LEAVE({ dispatcher ->
-
-		}),
+	interface C {
+		fun register(dispatcher: CommandDispatcher<ServerCommandSource>)
 	}
 }
