@@ -79,10 +79,6 @@ object DiscordBotManager {
 				botIsInitialized = true
 				Logger.info(LM.getSysMessage(FabricordMessageKey.Discord.Bot.BotNowOnline, jda?.selfUser?.name ?: "Bot"))
 				Config.serverStartMessage?.let { sendToDiscord(it) }
-
-				if (!validateConfigForModernSecond()) {
-					Logger.error(LM.getSysMessage(FabricordMessageKey.Discord.Bot.WebHookNotInitialized))
-				}
 			} catch (e: LoginException) {
 				Logger.error(LM.getSysMessage(FabricordMessageKey.Discord.Bot.CannotLoginToBot), e)
 			} catch (e: Exception) {
@@ -216,14 +212,23 @@ object DiscordBotManager {
 			}
 		}
 
-		private fun getTPS(): Double {
-			val tickTimes = Server.tickTimes
-			val avgTickTime = Arrays.stream(tickTimes).average().orElse(0.0) / 1_000_000.0
-			return 20.0.coerceAtMost(1000.0 / avgTickTime)
-		}
+//		private fun getTPS(): Double {
+//			val tickTimes = Server.tickTimes
+//			val avgTickTime = Arrays.stream(tickTimes).average().orElse(0.0) / 1_000_000.0
+//			return 20.0.coerceAtMost(1000.0 / avgTickTime)
+//		}
+//
+//		private fun getMSPT(): Double {
+//			return Server.averageTickTime.toDouble()
+//		}
 
 		private fun getMSPT(): Double {
-			return Server.averageTickTime.toDouble()
+			return Server.tickTime.toDouble()
+		}
+
+		private fun getTPS(): Double {
+			val mspt = Server.tickTime.toDouble()
+			return 20.0.coerceAtMost(1000.0 / mspt)
 		}
 
 		private fun getMemoryUsage(): String {
@@ -268,24 +273,7 @@ object DiscordBotManager {
 
 	private fun validateConfigForModernFirst(): Boolean {
 		if (Config.messageStyle == "modern") {
-			return !Config.webHookId.isNullOrBlank()
-		}
-		return true
-	}
-
-	private fun validateConfigForModernSecond(): Boolean {
-		if (Config.messageStyle == "modern") {
-			val id = Config.webHookId ?: return false
-
-			val future = CompletableFuture<Webhook?>()
-			jda?.retrieveWebhookById(id)?.queue({ webhook ->
-				webHook = webhook
-				future.complete(webhook)
-			}, {
-				future.complete(null)
-			})
-
-			return future.get(10, TimeUnit.SECONDS) != null
+			return webHook != null
 		}
 		return true
 	}

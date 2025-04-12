@@ -26,16 +26,7 @@ object DiscordPlayerEventHandler {
 	}
 
 	private fun modernStyle(player: ServerPlayerEntity, message: String) {
-		if (Config.webHookId.isNullOrBlank()) {
-			Logger.error(LM.getSysMessage(FabricordMessageKey.Discord.Config.WebHookIdIsBlank))
-		}
-
 		try {
-			val webHookClient = DiscordBotManager.webHook ?: run {
-				Logger.error(LM.getSysMessage(FabricordMessageKey.Discord.Bot.WebHookNotInitialized))
-				return
-			}
-
 			val data = MessageCreateBuilder()
 				.setContent(message)
 
@@ -43,10 +34,10 @@ object DiscordPlayerEventHandler {
 				data.setAllowedMentions(emptySet())
 			}
 
-			webHookClient.sendMessage(data.build())
-				.setUsername(player.name.string)
-				.setAvatarUrl("https://visage.surgeplay.com/face/256/${player.uuid}")
-				.queue()
+			DiscordBotManager.webHook?.sendMessage(data.build())
+				?.setUsername(player.name.string)
+				?.setAvatarUrl("https://visage.surgeplay.com/face/256/${player.uuid}")
+				?.queue()
 
 		} catch (e: Exception) {
 			Logger.error(LM.getSysMessage(FabricordMessageKey.System.Discord.ErrorDuringSendingModernMessage), e)

@@ -1,4 +1,4 @@
-Version: "1.0.1"
+Version: "1.0.2"
 
 # Thank you for installing this mod!
 # Now let's put a portal on Discord and the Minecraft server chat!
@@ -43,10 +43,6 @@ BotOnlineStatus: ""
 # "classic", "modern" are available.
 # If blank, "classic" is automatically selected.
 MessageStyle: ""
-
-# If MessageStyle is "modern", you have to set the Webhook URL.
-# To get a Webhook URL -> https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
-WebhookUrl: ""
 
 # Whether to allow pings like @everyone to be sent from Minecraft to Discord.
 AllowMentions: false

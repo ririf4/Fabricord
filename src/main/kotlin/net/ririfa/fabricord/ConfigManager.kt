@@ -3,7 +3,6 @@ package net.ririfa.fabricord
 import net.ririfa.fabricord.annotations.Required
 import net.ririfa.fabricord.translation.FabricordMessageKey
 import net.ririfa.fabricord.util.copyResourceToFile
-import net.ririfa.fabricord.util.extractWebhookIdFromUrl
 import net.ririfa.fabricord.util.isOlderVersion
 import net.ririfa.fabricord.util.toBooleanOrNull
 import org.jetbrains.annotations.Nullable
@@ -13,6 +12,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import kotlin.io.path.notExists
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
@@ -71,7 +71,7 @@ object ConfigManager {
 	private fun updateConfigFile() {
 		try {
 			Fabricord::class.java.getResourceAsStream("/assets/fabricord/config.yml")?.use { inputStream ->
-				Files.copy(inputStream, configFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+				Files.copy(inputStream, configFile, StandardCopyOption.REPLACE_EXISTING)
 			}
 
 			val newConfigText = Files.readString(configFile)
@@ -212,7 +212,6 @@ object ConfigManager {
 				botActivityStatus = lc("BotActivityStatus"),
 				botOnlineStatus = lc("BotOnlineStatus"),
 				messageStyle = lc("MessageStyle"),
-				webHookId = extractWebhookIdFromUrl(lc("WebhookUrl")),
 				serverStartMessage = lc("ServerStartMessage"),
 				serverStopMessage = lc("ServerStopMessage"),
 				playerJoinMessage = lc("PlayerJoinMessage"),
@@ -249,8 +248,6 @@ object ConfigManager {
 		var botOnlineStatus: String? = null,
 		@JvmField
 		var messageStyle: String? = null,
-		@JvmField
-		val webHookId: String? = null,
 		@JvmField
 		var serverStartMessage: String? = null,
 		@JvmField

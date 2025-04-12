@@ -31,8 +31,6 @@ sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
 			object BotNowOnline : Bot()
 			object BotNowOffline : Bot()
 
-			object WebHookNotInitialized : Bot()
-
 			object CannotStartBot : Bot()
 			object CannotStopBot : Bot()
 			object TimedOutForStoppingBot : Bot()
@@ -73,11 +71,6 @@ sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
 
 		sealed class LC : Command() {
 			object SwitchedLocalChatState : LC()
-
-			sealed class State : LC() {
-				object True : State()
-				object False : State()
-			}
 		}
 
 		sealed class Group : Command() {
