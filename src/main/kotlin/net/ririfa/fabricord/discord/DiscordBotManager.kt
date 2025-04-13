@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import javax.security.auth.login.LoginException
-import kotlin.io.path.absolutePathString
 
 object DiscordBotManager {
 	var jda: JDA? = null

@@ -10,7 +10,6 @@ import net.ririfa.fabricord.Server
 import net.ririfa.fabricord.util.playSoundToPlayerMaster
 import net.ririfa.fabricord.util.replaceUUIDsWithMCIDs
 import java.awt.Color
-import java.net.URI
 
 object DiscordMessageHandler {
 	fun handleDiscordMessage(event: MessageReceivedEvent) {

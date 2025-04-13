@@ -24,7 +24,6 @@ import net.ririfa.fabricord.util.isOlderVersion
 import net.ririfa.langman.InitType
 import net.ririfa.langman.LangMan
 import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.core.LoggerContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
