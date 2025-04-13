@@ -1,9 +1,11 @@
 package net.ririfa.fabricord.mixin;
 
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.network.packet.c2s.play.ClientSettingsC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.ririfa.fabricord.AliasKt;
+import net.ririfa.fabricord.FabricordLanguageCache;
 import net.ririfa.fabricord.discord.DiscordBotManager;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,17 +21,22 @@ public abstract class ServerPlayNetworkHandlerMixin {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
-    private void interceptChatMessage(@NotNull ChatMessageC2SPacket packet, CallbackInfo ci) {
-        if (!DiscordBotManager.botIsInitialized || AliasKt.getConfig().logChannelIDIsNotSet || Boolean.TRUE.equals(AliasKt.getConfig().dontSendChatToDiscord))
-            return;
+    @Inject(method = "onClientSettings", at = @At("HEAD"))
+    private void onClientSettings(ClientSettingsC2SPacket packet, CallbackInfo ci) {
+        FabricordLanguageCache.set(this.player, packet.language());
+    }
 
-        ServerPlayNetworkHandler handler = (ServerPlayNetworkHandler) (Object) this;
-        ServerPlayerEntity player = handler.player;
-        UUID playerUUID = player.getUuid();
-        String message = packet.chatMessage();
-
-        //TODO: Implement group chat
+//    @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
+//    private void interceptChatMessage(@NotNull ChatMessageC2SPacket packet, CallbackInfo ci) {
+//        if (!DiscordBotManager.botIsInitialized || AliasKt.getConfig().logChannelIDIsNotSet || Boolean.TRUE.equals(AliasKt.getConfig().dontSendChatToDiscord))
+//            return;
+//
+//        ServerPlayNetworkHandler handler = (ServerPlayNetworkHandler) (Object) this;
+//        ServerPlayerEntity player = handler.player;
+//        UUID playerUUID = player.getUuid();
+//        String message = packet.chatMessage();
+//
+//        //TODO: Implement group chat
 //        if (GroupManager.playerInGroupedChat.containsKey(playerUUID)) {
 //            ci.cancel();
 //
@@ -49,5 +56,5 @@ public abstract class ServerPlayNetworkHandlerMixin {
 //                }
 //            });
 //        }
-    }
+//    }
 }

@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "net.ririfa"
-version = "4.2.1"
+version = "4.2.2-1.20.2"
 
 repositories {
 	mavenCentral()
@@ -45,12 +45,12 @@ dependencies {
 
 	compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
 
-	includeInJar("net.dv8tion:JDA:5.3.0") {
-		exclude("net.java.dev.jna", "jna")
-	}
-	includeInJar("org.yaml:snakeyaml:2.3")
-	includeInJar("net.kyori:adventure-text-serializer-gson:4.17.0")
-	includeInJar("net.ririfa:langman:1.4.3")
+//	includeInJar("net.dv8tion:JDA:5.3.0") {
+//		exclude("net.java.dev.jna", "jna")
+//	}
+//	includeInJar("org.yaml:snakeyaml:2.3")
+//	includeInJar("net.kyori:adventure-text-serializer-gson:4.17.0")
+//	includeInJar("net.ririfa:langman:1.4.3")
 }
 
 loom {
