@@ -178,7 +178,7 @@ object ConfigManager {
 		val clazz = config::class
 		val properties = clazz.memberProperties
 
-		Logger.debug("Found ${properties.size} properties in Config class.")
+		Logger.info("Found ${properties.size} properties in Config class.")
 
 		for (property in properties) {
 			val requiredAnnotation = property.findAnnotation<Required>()
@@ -205,8 +205,8 @@ object ConfigManager {
 			}
 
 			config = Config(
-				botToken = lc("BotToken"),
-				logChannelID = lc("LogChannelID"),
+				botToken = lc<String>("BotToken")?.trim(),
+				logChannelID = lc<String>("LogChannelID")?.trim(),
 				dontSendChatToDiscord = lc("DontSendChatToDiscord"),
 				botActivityMessage = lc("BotActivityMessage"),
 				botActivityStatus = lc("BotActivityStatus"),
