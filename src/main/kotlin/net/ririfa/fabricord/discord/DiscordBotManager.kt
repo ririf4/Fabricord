@@ -45,23 +45,12 @@ object DiscordBotManager {
 	fun start(platform: Platform) {
 		when (platform) {
 			Platform.FABRIC -> startForFabric()
-			Platform.VELOCITY -> startForVelocity()
 		}
 	}
 
 	private fun startForFabric() {
 		FT {
 			try {
-				if (!validateConfigForModernFirst()) {
-					Logger.error(
-						LM.getSysMessage(
-							FabricordMessageKey.Exception.Config.WebHookUrlIsNotConfiguredOrInvalid,
-							Config.getFile().absolutePathString()
-						)
-					)
-					return@FT
-				}
-
 				jda = JDABuilder.createDefault(Config.botToken)
 					.addEventListeners(discordListener)
 					.setStatus(onlineStatus())
@@ -70,6 +59,22 @@ object DiscordBotManager {
 					.enableIntents(intents)
 					.build()
 					.awaitReady()
+
+				val textChannel = jda?.getTextChannelById(Config.logChannelID ?: return@FT)
+				textChannel?.retrieveWebhooks()?.queue({ webhooks ->
+					webHook = webhooks.firstOrNull { it.name == "Fabricord" }
+
+					if (webHook == null) {
+						textChannel.createWebhook("Fabricord").queue { created ->
+							webHook = created
+							Logger.info("Created webhook: ${created.name}")
+						}
+					} else {
+						Logger.info("Using existing webhook: ${webHook?.name}")
+					}
+				}, { error ->
+					Logger.warn("Could not retrieve webhook: ${error.message}")
+				})
 
 				jda?.updateCommands()?.addCommands(
 					Commands.slash("playerlist", "Get a list of online players"),
@@ -85,10 +90,6 @@ object DiscordBotManager {
 				Logger.error(LM.getSysMessage(FabricordMessageKey.Discord.Bot.CannotStartBot), e)
 			}
 		}
-	}
-
-	private fun startForVelocity() {
-
 	}
 
 	fun stop() {
@@ -212,16 +213,6 @@ object DiscordBotManager {
 			}
 		}
 
-//		private fun getTPS(): Double {
-//			val tickTimes = Server.tickTimes
-//			val avgTickTime = Arrays.stream(tickTimes).average().orElse(0.0) / 1_000_000.0
-//			return 20.0.coerceAtMost(1000.0 / avgTickTime)
-//		}
-//
-//		private fun getMSPT(): Double {
-//			return Server.averageTickTime.toDouble()
-//		}
-
 		private fun getMSPT(): Double {
 			return Server.tickTime.toDouble()
 		}
@@ -269,13 +260,6 @@ object DiscordBotManager {
 			"competing" -> Activity.competing(activityMessage!!)
 			else -> Activity.playing(activityMessage!!)
 		}
-	}
-
-	private fun validateConfigForModernFirst(): Boolean {
-		if (Config.messageStyle == "modern") {
-			return webHook != null
-		}
-		return true
 	}
 
 	private fun findMentionedPlayers(messageContent: String, players: List<ServerPlayerEntity>): Pair<List<ServerPlayerEntity>, Boolean> {

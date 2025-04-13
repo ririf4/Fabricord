@@ -48,7 +48,7 @@ object DiscordEmbed {
 	fun sendPlayerDeathEmbed(player: ServerPlayerEntity, deathMessage: Text) {
 		val uuid = player.uuid.toString()
 		val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
-		sendEmbedToDiscord(Color.BLACK, deathMessage.string, imageUrl)
+		sendEmbedToDiscord(Color.BLACK, deathMessage.asTruncatedString(512), imageUrl)
 	}
 
 	@JvmStatic

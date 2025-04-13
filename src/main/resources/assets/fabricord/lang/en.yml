@@ -17,7 +17,6 @@ System:
 Discord:
   Config:
     LogChannelIDIsBlank: "The channel ID for logging messages is blank."
-    WebHookIdIsBlank: "The Webhook ID is blank."
 
   Bot:
     BotNowOnline: "Bot is now online: %s"

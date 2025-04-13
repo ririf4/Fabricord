@@ -10,6 +10,7 @@ import net.ririfa.fabricord.Server
 import net.ririfa.fabricord.util.playSoundToPlayerMaster
 import net.ririfa.fabricord.util.replaceUUIDsWithMCIDs
 import java.awt.Color
+import java.net.URI
 
 object DiscordMessageHandler {
 	fun handleDiscordMessage(event: MessageReceivedEvent) {
@@ -78,8 +79,6 @@ object DiscordMessageHandler {
 				it.withColor(0x55CDFC)
 					.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(guildName)))
 					.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.com/channels/${event.guild.id}/${event.channel.id}"))
-//					.withHoverEvent(HoverEvent.ShowText(Text.of(guildName)))
-//					.withClickEvent(ClickEvent.OpenUrl(URI.create("https://discord.com/channels/${event.guild.id}/${event.channel.id}")))
 			}
 
 		val roleText = roleName?.let {
@@ -88,8 +87,6 @@ object DiscordMessageHandler {
 					it.withColor(roleTextColor)
 						.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("ID: $rId")))
 						.withClickEvent(ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, rIdSuggest))
-//						.withHoverEvent(HoverEvent.ShowText(Text.of("ID: $rId")))
-//						.withClickEvent(ClickEvent.SuggestCommand(rIdSuggest))
 				}
 		}
 
@@ -98,8 +95,6 @@ object DiscordMessageHandler {
 				it.withColor(0xFFFFFF)
 					.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("ID: $memberId")))
 					.withClickEvent(ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, idSuggest))
-//					.withHoverEvent(HoverEvent.ShowText(Text.of("ID: $memberId")))
-//					.withClickEvent(ClickEvent.SuggestCommand(idSuggest))
 			}
 
 		val messageContent = updatedContent ?: event.message.contentDisplay
@@ -142,8 +137,6 @@ object DiscordMessageHandler {
 						.withUnderline(true)
 						.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(url)))
 						.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, url))
-//						.withClickEvent(ClickEvent.OpenUrl(URI.create(url)))
-//						.withHoverEvent(HoverEvent.ShowText(Text.of(url)))
 				}
 
 			text.append(clickableUrl)

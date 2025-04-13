@@ -35,7 +35,7 @@ BotActivityStatus: ""
 BotActivityMessage: ""
 
 # The bot's online status can be changed.
-# "ONLINE", "IDLE" and "DO_NOT_DISTURB" are available.
+# "ONLINE", "IDLE", "INVISIBLE" and "DO_NOT_DISTURB" are available.
 # If blank, "ONLINE" is automatically selected.
 BotOnlineStatus: ""
 
@@ -62,7 +62,7 @@ ServerStopMessage: ""
 PlayerJoinMessage: ""
 
 # The message that appears when a player leaves the server.
-# You can use the "% player%" placeholder.
+# You can use the "%player%" placeholder.
 # It will be replaced with the player's name.
 # If blank, the message will use the default message.
 PlayerLeaveMessage: ""

@@ -8,7 +8,7 @@ import org.apache.logging.log4j.core.layout.PatternLayout
 
 class ConsoleTrackerAppender(name: String) : AbstractAppender(name, null, PatternLayout.createDefaultLayout(), false, emptyArray()) {
 	init {
-		start()
+	    start()
 	}
 
 	override fun append(event: LogEvent) {

@@ -10,7 +10,7 @@ import net.ririfa.fabricord.translation.adapt
 import kotlin.reflect.full.findAnnotation
 
 //TODO: Creation of files for storing default groups, reading and writing data and maintaining status.
-// maybe 5.1.0
+// maybe 5.0.0
 object GroupManager {
 	fun registerAll(dispatcher: CommandDispatcher<ServerCommandSource>) {
 

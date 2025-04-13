@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit
 
 val JDA by lazy { DiscordBotManager.jda }
 val LM: LangMan<FabricordMessageProvider, Text> by lazy { Fabricord.langMan }
+@JvmField
 val Logger: Logger = Fabricord.logger
 val Server: MinecraftServer by lazy { Fabricord.server }
 val Loader: FabricLoader = Fabricord.loader

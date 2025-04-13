@@ -24,6 +24,7 @@ import net.ririfa.fabricord.util.isOlderVersion
 import net.ririfa.langman.InitType
 import net.ririfa.langman.LangMan
 import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.core.LoggerContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
@@ -75,6 +76,7 @@ class Fabricord : DedicatedServerModInitializer {
 			consoleAppender = ConsoleTrackerAppender("FabricordConsoleTracker")
 			val rootLogger = LogManager.getRootLogger() as org.apache.logging.log4j.core.Logger
 			rootLogger.addAppender(consoleAppender!!)
+			Logger.info("Started console tracking")
 		}
 
 		CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
@@ -90,9 +92,6 @@ class Fabricord : DedicatedServerModInitializer {
 		ServerLifecycleEvents.SERVER_STOPPING.register { server ->
 			if (DiscordBotManager.botIsInitialized) {
 				DiscordBotManager.stop()
-			}
-			if (consoleAppender != null && Config.enableConsoleLog == true) {
-				consoleAppender!!.stop()
 			}
 		}
 

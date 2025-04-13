@@ -187,7 +187,7 @@ object ConfigManager {
 				val value = property.getter.call(config) as? String
 				if (value.isNullOrBlank()) {
 					if (requiredAnnotation.soft && requiredAnnotation.named == "logChannelID") {
-						Logger.warn(LM.getSysMessage(FabricordMessageKey.Exception.Config.RequiredPropertyIsNotConfigured, configFile, property.name))
+						Logger.error(LM.getSysMessage(FabricordMessageKey.Exception.Config.RequiredPropertyIsNotConfigured, configFile, property.name))
 						config.logChannelIDIsNotSet = true
 					} else {
 						Logger.error(LM.getSysMessage(FabricordMessageKey.Exception.Config.SoftRequiredPropertyIsNotConfigured, configFile, property.name))
