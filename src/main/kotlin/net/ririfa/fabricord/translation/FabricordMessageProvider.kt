@@ -1,7 +1,5 @@
 package net.ririfa.fabricord.translation
 
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.network.packet.c2s.play.ClientSettingsC2SPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.ririfa.fabricord.FabricordLanguageCache

@@ -1,6 +1,9 @@
 package net.ririfa.fabricord.mixin;
 
-import net.minecraft.advancement.*;
+import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementDisplay;
+import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.ririfa.fabricord.AliasKt;
 import net.ririfa.fabricord.discord.DiscordBotManager;

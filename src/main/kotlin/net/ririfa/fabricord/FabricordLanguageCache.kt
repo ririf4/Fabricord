@@ -1,7 +1,7 @@
 package net.ririfa.fabricord
 
 import net.minecraft.server.network.ServerPlayerEntity
-import java.util.UUID
+import java.util.*
 
 object FabricordLanguageCache {
     private val playerLangs = mutableMapOf<UUID, String>()
