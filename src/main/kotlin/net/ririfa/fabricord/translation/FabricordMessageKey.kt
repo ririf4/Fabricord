@@ -19,6 +19,10 @@ sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
 		sealed class Discord : System() {
 			object ErrorDuringSendingModernMessage : Discord()
 		}
+
+		sealed class GRP : System() {
+			object GroupedChatMessageBase : GRP()
+		}
 	}
 
 	sealed class Discord : FabricordMessageKey() {

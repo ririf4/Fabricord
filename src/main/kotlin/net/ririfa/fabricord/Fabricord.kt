@@ -78,7 +78,7 @@ class Fabricord : DedicatedServerModInitializer {
 		}
 
 		CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
-			//			GroupManager.registerAll(dispatcher)
+			GroupManager.registerAll(dispatcher)
 			registerLCCommand(dispatcher)
 		}
 		ServerLifecycleEvents.SERVER_STARTED.register { server ->
@@ -90,9 +90,6 @@ class Fabricord : DedicatedServerModInitializer {
 		ServerLifecycleEvents.SERVER_STOPPING.register { server ->
 			if (DiscordBotManager.botIsInitialized) {
 				DiscordBotManager.stop()
-			}
-			if (consoleAppender != null && Config.enableConsoleLog == true) {
-				consoleAppender!!.stop()
 			}
 		}
 
@@ -118,8 +115,6 @@ class Fabricord : DedicatedServerModInitializer {
 				if (DiscordBotManager.botIsInitialized && Config.dontSendChatToDiscord == false) {
 					val uuid = sender.uuid
 
-					//TODO: Also consider group chats -> [GroupManager]
-					// But probably controllable via Mixin.
 					if (uuid in localChatToggled) return@register
 
 					val content = message.content.string

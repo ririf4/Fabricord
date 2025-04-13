@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import javax.security.auth.login.LoginException
-import kotlin.io.path.absolutePathString
 
 object DiscordBotManager {
 	var jda: JDA? = null
@@ -45,23 +44,12 @@ object DiscordBotManager {
 	fun start(platform: Platform) {
 		when (platform) {
 			Platform.FABRIC -> startForFabric()
-			Platform.VELOCITY -> startForVelocity()
 		}
 	}
 
 	private fun startForFabric() {
 		FT {
 			try {
-				if (!validateConfigForModernFirst()) {
-					Logger.error(
-						LM.getSysMessage(
-							FabricordMessageKey.Exception.Config.WebHookUrlIsNotConfiguredOrInvalid,
-							Config.getFile().absolutePathString()
-						)
-					)
-					return@FT
-				}
-
 				jda = JDABuilder.createDefault(Config.botToken)
 					.addEventListeners(discordListener)
 					.setStatus(onlineStatus())
@@ -85,10 +73,6 @@ object DiscordBotManager {
 				Logger.error(LM.getSysMessage(FabricordMessageKey.Discord.Bot.CannotStartBot), e)
 			}
 		}
-	}
-
-	private fun startForVelocity() {
-
 	}
 
 	fun stop() {
@@ -124,30 +108,39 @@ object DiscordBotManager {
 
 	private val discordListener = object : ListenerAdapter() {
 		override fun onMessageReceived(event: MessageReceivedEvent) {
-			if (event.channel == Config.logChannelID?.let { jda?.getTextChannelById(it) }) {
-				FT {
-					val (mentionedPlayers, foundUUID) = findMentionedPlayers(event.message.contentRaw, Server.playerManager.playerList)
-					if (mentionedPlayers.isNotEmpty()) {
-						DiscordMessageHandler.handleMentionedDiscordMessage(event, mentionedPlayers, foundUUID)
-					} else {
-						DiscordMessageHandler.handleDiscordMessage(event)
+			val logChannel = Config.logChannelID?.let { jda?.getTextChannelById(it) }
+			val consoleChannel = Config.consoleLogChannelID?.let { jda?.getTextChannelById(it) }
+
+			when (event.channel) {
+				logChannel -> {
+					FT {
+						val (mentionedPlayers, foundUUID) = findMentionedPlayers(
+							event.message.contentRaw,
+							Server.playerManager.playerList
+						)
+						if (mentionedPlayers.isNotEmpty()) {
+							DiscordMessageHandler.handleMentionedDiscordMessage(event, mentionedPlayers, foundUUID)
+						} else {
+							DiscordMessageHandler.handleDiscordMessage(event)
+						}
 					}
 				}
-			} else if (event.channel == Config.consoleLogChannelID?.let { jda?.getTextChannelById(it) }) {
-				if (!event.author.isBot) {
-					val command = event.message.contentRaw
-					Server.execute {
-						Server.commandManager.executeWithPrefix(Server.commandSource, command)
+
+				consoleChannel -> {
+					if (!event.author.isBot) {
+						val command = event.message.contentRaw
+						Server.execute {
+							Server.commandManager.executeWithPrefix(Server.commandSource, command)
+						}
 					}
 				}
 			}
 		}
 
 		override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
-			if (event.name == "playerlist") {
-				handlePlayerList(event)
-			} else if (event.name == "status") {
-				handleStatus(event)
+			when (event.name) {
+				"playerlist" -> handlePlayerList(event)
+				"status" -> handleStatus(event)
 			}
 		}
 
@@ -212,23 +205,14 @@ object DiscordBotManager {
 			}
 		}
 
-//		private fun getTPS(): Double {
-//			val tickTimes = Server.tickTimes
-//			val avgTickTime = Arrays.stream(tickTimes).average().orElse(0.0) / 1_000_000.0
-//			return 20.0.coerceAtMost(1000.0 / avgTickTime)
-//		}
-//
-//		private fun getMSPT(): Double {
-//			return Server.averageTickTime.toDouble()
-//		}
-
-		private fun getMSPT(): Double {
-			return Server.tickTime.toDouble()
+		private fun getTPS(): Double {
+			val tickTimes = Server.tickTimes
+			val avgTickTime = Arrays.stream(tickTimes).average().orElse(0.0) / 1_000_000.0
+			return 20.0.coerceAtMost(1000.0 / avgTickTime)
 		}
 
-		private fun getTPS(): Double {
-			val mspt = Server.tickTime.toDouble()
-			return 20.0.coerceAtMost(1000.0 / mspt)
+		private fun getMSPT(): Double {
+			return Server.averageTickTime.toDouble()
 		}
 
 		private fun getMemoryUsage(): String {
@@ -269,13 +253,6 @@ object DiscordBotManager {
 			"competing" -> Activity.competing(activityMessage!!)
 			else -> Activity.playing(activityMessage!!)
 		}
-	}
-
-	private fun validateConfigForModernFirst(): Boolean {
-		if (Config.messageStyle == "modern") {
-			return webHook != null
-		}
-		return true
 	}
 
 	private fun findMentionedPlayers(messageContent: String, players: List<ServerPlayerEntity>): Pair<List<ServerPlayerEntity>, Boolean> {

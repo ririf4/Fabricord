@@ -4,16 +4,34 @@ import com.mojang.brigadier.CommandDispatcher
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
+import net.ririfa.fabricord.GroupManager.Commands.GrpHelpCommand
 import net.ririfa.fabricord.annotations.Indexed
 import net.ririfa.fabricord.translation.FabricordMessageKey
 import net.ririfa.fabricord.translation.adapt
+import net.ririfa.fabricord.util.ShortUUID
+import net.ririfa.fabricord.util.literal
+import java.util.*
 import kotlin.reflect.full.findAnnotation
 
-//TODO: Creation of files for storing default groups, reading and writing data and maintaining status.
-// maybe 5.1.0
 object GroupManager {
-	fun registerAll(dispatcher: CommandDispatcher<ServerCommandSource>) {
+	@JvmField
+	val playerInGroupedChat: MutableMap<UUID, ShortUUID> = mutableMapOf()
 
+	val allGroupCommands = listOf(
+		GrpHelpCommand
+	)
+
+	fun registerAll(dispatcher: CommandDispatcher<ServerCommandSource>) {
+		allGroupCommands.forEach { it.register(dispatcher) }
+	}
+
+	@JvmStatic
+	fun getGroupById(id: ShortUUID): Group {
+		return Group(
+			ShortUUID.generate(),
+			"A",
+			listOf()
+		)
 	}
 
 	fun showHelpToPlayer(source: ServerCommandSource, page: Int) {
@@ -59,4 +77,30 @@ object GroupManager {
 	object Tables {
 
 	}
+
+	object Commands {
+		object GrpHelpCommand : C {
+			override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
+				dispatcher.register(
+					literal("grp")
+						.then(
+							literal("help")
+								.executes { context ->
+									showHelpToPlayer(context.source, page = 1)
+									1
+								}
+						)
+				)
+			}
+		}
+	}
+
+	data class Group(
+		@JvmField
+		val id: ShortUUID,
+		@JvmField
+		val name: String,
+		@JvmField
+		val members: List<UUID>
+	)
 }
