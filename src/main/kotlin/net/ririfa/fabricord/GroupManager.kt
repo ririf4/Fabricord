@@ -56,6 +56,7 @@ object GroupManager {
 
 	@JvmField
 	val playerInGroupedChat: MutableMap<UUID, ShortUUID> = mutableMapOf()
+
 	@JvmField
 	val idGroupMap: MutableMap<ShortUUID, Group> = mutableMapOf()
 
@@ -156,33 +157,37 @@ object GroupManager {
 		object GrpCreateCommand : C {
 			override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
 				dispatcher.registerCommand("grp") {
-					then(literal("create")
-						.then(argument("name", StringArgumentType.string())
-							.then(argument("open", BoolArgumentType.bool())
-								.executes { context ->
-									val name = StringArgumentType.getString(context, "name")
-									val open = BoolArgumentType.getBool(context, "open")
-									val source = context.source
-
-									// プレイヤー指定なしバージョン
-									// 実際のグループ作成処理ここに書く
-
-
-									1
-								}
-								.then(argument("players", EntityArgumentType.players())
+					then(
+						literal("create")
+						.then(
+							argument("name", StringArgumentType.string())
+							.then(
+								argument("open", BoolArgumentType.bool())
 									.executes { context ->
 										val name = StringArgumentType.getString(context, "name")
 										val open = BoolArgumentType.getBool(context, "open")
-										val players = EntityArgumentType.getPlayers(context, "players")
 										val source = context.source
 
-										// プレイヤー指定ありバージョン
+										// プレイヤー指定なしバージョン
+										// 実際のグループ作成処理ここに書く
 
 
 										1
 									}
-								)
+									.then(
+										argument("players", EntityArgumentType.players())
+											.executes { context ->
+												val name = StringArgumentType.getString(context, "name")
+												val open = BoolArgumentType.getBool(context, "open")
+												val players = EntityArgumentType.getPlayers(context, "players")
+												val source = context.source
+
+												// プレイヤー指定ありバージョン
+
+
+												1
+											}
+									)
 							)
 						)
 					)
@@ -193,17 +198,19 @@ object GroupManager {
 		object GrpDeleteCommand : C {
 			override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
 				dispatcher.registerCommand("grp") {
-					then(literal("delete")
-						.then(argument("target", StringArgumentType.string())
-							.executes { context ->
-								val target = StringArgumentType.getString(context, "target")
-								val source = context.source
+					then(
+						literal("delete")
+						.then(
+							argument("target", StringArgumentType.string())
+								.executes { context ->
+									val target = StringArgumentType.getString(context, "target")
+									val source = context.source
 
-								// グループ削除処理をここに
+									// グループ削除処理をここに
 
 
-								1
-							}
+									1
+								}
 						)
 					)
 				}
