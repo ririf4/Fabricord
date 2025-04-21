@@ -1,0 +1,126 @@
+Version: "1.0.1"
+
+System:
+  Initialization:
+    JDANotInitialized: "JDAが初期化されていません"
+
+    FailedToCheckOrCreateRequiredDirOrFileBySec: "セキュリティエラーにより、必要なファイル/ディレクトリのチェックまたは作成に失敗しました。"
+    FailedToCheckOrCreateRequiredDirOrFileByIO: "I/Oエラーにより、必要なファイル/ディレクトリのチェックまたは作成に失敗しました。"
+    FailedToCheckOrCreateRequiredDirOrFile: "不明なエラーにより、必要なファイル/ディレクトリのチェックまたは作成に失敗しました。"
+
+    DirectoriesAndFiles:
+      ModDirDoesNotExist: "Modディレクトリが %s に存在しないため、作成します。"
+
+  Discord:
+    ErrorDuringSendingModernMessage: "'modern'メッセージの送信中にエラーが発生しました。"
+
+Discord:
+  Config:
+    LogChannelIDIsBlank: "メインログを出力するチャンネルIDが空です。"
+    WebHookIdIsBlank: "Webhook ID が空です。"
+
+  Bot:
+    BotNowOnline: "Botがオンラインになりました: %s"
+    BotNowOffline: "Botがオフラインになりました: %s"
+
+    WebHookNotInitialized: "Webhook Client が初期化されていません。"
+
+    CannotStartBot: "不明なエラーにより、Botへの接続に失敗しました。"
+    CannotStopBot: "不明なエラーにより、Botの停止に失敗しました。"
+    TimedOutForStoppingBot: "Botの停止がタイムアウトしたため、強制的に停止します。"
+
+    CannotLoginToBot: "ログインエラーにより、Botに接続できません。"
+
+  Embed:
+    PlayerList:
+      Title: "オンラインのプレイヤー"
+      Description: "現在、%s人のプレイヤーがオンラインです。\n\n"
+
+      ThereAreNoPlayersOnline: "現在、オンラインのプレイヤーはいません。"
+
+    ServerStatus:
+      Title: "サーバーステータス"
+
+      Description:
+        MemoryUsage: "メモリ使用量"
+
+Exception:
+  Config:
+    RequiredPropertyIsNotConfigured: "設定ファイル (%s) に必須プロパティ(%s)が設定されていません。"
+    SoftRequiredPropertyIsNotConfigured: "設定ファイル (%s) に推奨プロパティ(%s)が設定されていません。Modは引き続き動作します。"
+
+    WebHookUrlIsNotConfiguredOrInvalid: "Webhook URL が設定ファイル (%s) に正しく設定されていません。"
+
+Command:
+  ThisCommandIsPlayerOnly: "このコマンドはプレイヤーのみ実行可能です。"
+
+  Page: "ページ"
+
+  LC:
+    SwitchedLocalChatState: "ローカルチャットの状態を %s にしました"
+
+  Help:
+    Group:
+      Create:
+        About: "グループチャットを作成します。"
+        Usage: "/grp create <Str/グループ名> <Bool/公開かどうか> [任意-初期メンバー|Players]"
+
+      Delete:
+        About: "グループチャットを削除します。"
+        Usage: "/grp delete <Str/グループ名かID>"
+
+      Join:
+        About: "グループチャットに参加します。公開グループではない場合、申請が送信されます。"
+        Usage: "/grp join <Str/グループ名かID>"
+
+      Leave:
+        About: "グループチャットから退出します。"
+        Usage: "/grp leave <Str/グループ名かID>"
+
+      List:
+        About: "グループチャットの一覧を表示します。"
+        Usage: "/grp list"
+
+      JoinedList:
+        About: "参加済みのグループチャットの一覧を表示します。"
+        Usage: "/grp joinedList"
+
+      PendingList:
+        About: "自分がオーナーであるグループの中で、承認待ちのユーザーの一覧を表示します。"
+        Usage: "/grp pendingList [任意|Str/グループ名かID]"
+
+      Info:
+        About: "グループチャットの情報を表示します。"
+        Usage: "/grp info <Str/グループ名かID>"
+
+      SetDefaultGrp:
+        About: "デフォルトのグループを設定します。複数個設定できず、2回目以降の設定では、以前の設定が上書きされます。"
+        Usage: "/grp setDefault <Str/グループ名かID>"
+
+      Switch:
+        About: "デフォルトグループが設定されている場合、そのグループとグローバルチャットを切り替えます。\n 設定されていない場合は引数が必要です。"
+        Usage: "/grp switch [任意|Str/グループ名かID]"
+
+      Invite:
+        About: "グループチャットにユーザーを招待します。"
+        Usage: "/grp invite <Str/グループ名かID> <Str/MCID/UUID>"
+
+      Kick:
+        About: "グループチャットからユーザーをキックします。"
+        Usage: "/grp kick <Str/グループ名かID> <Str/MCID/UUID>"
+
+      AcceptRequest:
+        About: "グループチャットへの参加申請を承認します。"
+        Usage: "/grp acceptRequest <Str/申請ID('pendingList'で確認できます)>"
+
+      DenyRequest:
+        About: "グループチャットへの参加申請を拒否します。"
+        Usage: "/grp denyRequest <Str/申請ID('pendingList'で確認できます)>"
+
+      SetPublic:
+        About: "グループチャットの公開設定を変更します。"
+        Usage: "/grp setPublic <Str/グループ名かID> <Bool/公開かどうか>"
+
+      TransferOwner:
+        About: "グループチャットのオーナーを譲渡します。"
+        Usage: "/grp transferOwner <Str/グループ名かID> <Str/MCID/UUID>"

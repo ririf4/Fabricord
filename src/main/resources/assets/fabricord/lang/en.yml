@@ -1,0 +1,126 @@
+Version: "1.0.1"
+
+System:
+  Initialization:
+    JDANotInitialized: "JDA has not been initialized."
+
+    FailedToCheckOrCreateRequiredDirOrFileBySec: "Failed to check or create the required file/directory due to a security error."
+    FailedToCheckOrCreateRequiredDirOrFileByIO: "Failed to check or create the required file/directory due to an I/O error."
+    FailedToCheckOrCreateRequiredDirOrFile: "Failed to check or create the required file/directory due to an unknown error."
+
+    DirectoriesAndFiles:
+      ModDirDoesNotExist: "The mod directory does not exist at %s. Creating it now."
+
+  Discord:
+    ErrorDuringSendingModernMessage: "An error occurred while sending a 'modern' message."
+
+Discord:
+  Config:
+    LogChannelIDIsBlank: "The channel ID for logging messages is blank."
+    WebHookIdIsBlank: "The Webhook ID is blank."
+
+  Bot:
+    BotNowOnline: "Bot is now online: %s"
+    BotNowOffline: "Bot is now offline: %s"
+
+    WebHookNotInitialized: "Webhook client has not been initialized."
+
+    CannotStartBot: "Failed to connect to the bot due to an unknown error."
+    CannotStopBot: "Failed to stop the bot due to an unknown error."
+    TimedOutForStoppingBot: "Bot shutdown timed out. Forcing stop."
+
+    CannotLoginToBot: "Login error: Unable to connect to the bot."
+
+  Embed:
+    PlayerList:
+      Title: "Online Players"
+      Description: "There are currently %s players online.\n\n"
+
+      ThereAreNoPlayersOnline: "There are no players online at the moment."
+
+    ServerStatus:
+      Title: "Server Status"
+
+      Description:
+        MemoryUsage: "Memory Usage"
+
+Exception:
+  Config:
+    RequiredPropertyIsNotConfigured: "The required property (%s) is not configured in the settings file (%s)."
+    SoftRequiredPropertyIsNotConfigured: "The recommended property (%s) is not set in the settings file (%s). Mod will continue to work."
+
+    WebHookUrlIsNotConfiguredOrInvalid: "The Webhook URL is not properly configured in the settings file (%s)."
+
+Command:
+  ThisCommandIsPlayerOnly: "This command can only be executed by players."
+
+  Page: "Page"
+
+  LC:
+    SwitchedLocalChatState: "Local chat state switched to %s."
+
+  Help:
+    Group:
+      Create:
+        About: "Creates a group chat."
+        Usage: "/grp create <Str/GroupName> <Str/PublicStatus> [Optional|Bool/MCID/UUID]"
+
+      Delete:
+        About: "Deletes a group chat."
+        Usage: "/grp delete <Str/GroupNameOrID>"
+
+      Join:
+        About: "Joins a group chat. If the group is private, a request will be sent."
+        Usage: "/grp join <Str/GroupNameOrID>"
+
+      Leave:
+        About: "Leaves a group chat."
+        Usage: "/grp leave <Str/GroupNameOrID>"
+
+      List:
+        About: "Displays a list of available group chats."
+        Usage: "/grp list"
+
+      JoinedList:
+        About: "Displays a list of group chats you have joined."
+        Usage: "/grp joinedList"
+
+      PendingList:
+        About: "Displays a list of pending join requests for groups you own."
+        Usage: "/grp pendingList [Optional|Str/GroupNameOrID]"
+
+      Info:
+        About: "Displays information about a group chat."
+        Usage: "/grp info <Str/GroupNameOrID>"
+
+      SetDefaultGrp:
+        About: "Sets a default group chat. Only one default group can be set at a time; setting a new one will overwrite the previous."
+        Usage: "/grp setDefault <Str/GroupNameOrID>"
+
+      Switch:
+        About: "Toggles between the default group chat and global chat if a default group is set.\n If no default is set, an argument is required."
+        Usage: "/grp switch [Optional|Str/GroupNameOrID]"
+
+      Invite:
+        About: "Invites a user to a group chat."
+        Usage: "/grp invite <Str/GroupNameOrID> <Str/MCID/UUID>"
+
+      Kick:
+        About: "Kicks a user from a group chat."
+        Usage: "/grp kick <Str/GroupNameOrID> <Str/MCID/UUID>"
+
+      AcceptRequest:
+        About: "Approves a join request for a group chat."
+        Usage: "/grp acceptRequest <Str/RequestID> (Check 'pendingList' for request IDs.)"
+
+      DenyRequest:
+        About: "Denies a join request for a group chat."
+        Usage: "/grp denyRequest <Str/RequestID> (Check 'pendingList' for request IDs.)"
+
+      SetPublic:
+        About: "Changes the group's public/private status."
+        Usage: "/grp setPublic <Str/GroupNameOrID> <Bool/PublicStatus>"
+
+      TransferOwner:
+        About: "Transfers ownership of a group chat."
+        Usage: "/grp transferOwner <Str/GroupNameOrID> <Str/MCID/UUID>"

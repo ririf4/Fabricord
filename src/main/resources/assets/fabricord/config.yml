@@ -1,0 +1,83 @@
+Version: "1.0.2"
+
+# Thank you for installing this mod!
+# Now let's put a portal on Discord and the Minecraft server chat!
+
+# Click here for various links↓.
+# GitHub -> https://github.com/ririf4/Fabricord
+# Modrinth -> https://modrinth.com/mod/fabricord
+# Community Server -> https://discord.swiftstorm.dev
+
+# BotToken for use with Discord.
+# To get a BotToken -> https://discord.com/developers/applications
+BotToken: ""
+
+# Channel for sending Minecraft logs.
+# If Blank, the mod will not send Minecraft Server General Chat to Discord.
+# To get a Channel ID -> https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID
+LogChannelID: ""
+
+# When true, all player chats are no longer comprehensively bridged.
+DontSendChatToDiscord: false
+
+# If you want to disable even the server startup logs, set `LogChannelID` to empty;
+# if you want to disable chat only, set `dontSendChatToDiscord` to true
+
+# >----- Advanced Settings -----< #
+
+# The bot's activity can be changed.
+# "PLAYING", "STREAMING", "LISTENING" and "WATCHING" are available.
+# If blank, "PLAYING" is automatically selected.
+BotActivityStatus: ""
+
+# The bot's activity text can be changed.
+# If blank, "Minecraft" is automatically selected.
+BotActivityMessage: ""
+
+# The bot's online status can be changed.
+# "ONLINE", "IDLE" and "DO_NOT_DISTURB" are available.
+# If blank, "ONLINE" is automatically selected.
+BotOnlineStatus: ""
+
+# The Log Style can be changed.
+# "classic", "modern" are available.
+# If blank, "classic" is automatically selected.
+MessageStyle: ""
+
+# Whether to allow pings like @everyone to be sent from Minecraft to Discord.
+AllowMentions: false
+
+# The message that appears when the server starts.
+# If blank, the message will use the default message.
+ServerStartMessage: ""
+
+# The message that appears when the server stops.
+# If blank, the message will use the default message.
+ServerStopMessage: ""
+
+# The message that appears when a player joins the server.
+# You can use the "%player%" placeholder.
+# It will be replaced with the player's name.
+# If blank, the message will use the default message.
+PlayerJoinMessage: ""
+
+# The message that appears when a player leaves the server.
+# You can use the "% player%" placeholder.
+# It will be replaced with the player's name.
+# If blank, the message will use the default message.
+PlayerLeaveMessage: ""
+
+# This setting allows Minecraft and Discord consoles to work together.
+# Each message interacts with each other and the console can be run from the Discord side.
+EnableConsoleLog: false
+
+# Enter the channel ID of the target channel to be linked.
+# ***Please enter ID carefully to avoid mistakes.***
+ConsoleLogChannelID: ""
+# >-----------------------------< #
+
+# >----- Experimental Settings -----< #
+
+# There are no experimental settings available at this time ;)
+
+# >--------------------------------< #

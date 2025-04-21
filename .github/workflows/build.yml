@@ -1,8 +1,7 @@
 name: build
 on:
   push:
-    branches:
-      - v2
+    branches: [ '**' ]
   pull_request:
     types: [ opened, synchronize, reopened ]
 
