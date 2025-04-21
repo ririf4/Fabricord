@@ -1,0 +1,80 @@
+name: Trigger Discord Webhook (Actions Repo)
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    types: [ opened, synchronize, closed ]
+  issues:
+    types: [ opened, edited, closed ]
+
+jobs:
+  trigger-actions-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Discord Webhook
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        run: |
+          set -e
+
+          EVENT_TYPE="${{ github.event_name }}"
+          if [[ "$EVENT_TYPE" == "push" ]]; then
+            EVENT_TYPE="commit"
+          elif [[ "$EVENT_TYPE" == "pull_request" ]]; then
+            EVENT_TYPE="pull-request"
+          elif [[ "$EVENT_TYPE" == "issues" ]]; then
+            EVENT_TYPE="issues"
+          fi
+
+          EVENT_JSON='${{ toJson(github.event) }}'
+
+          PAYLOAD=$(jq -n \
+            --arg repo "${{ github.repository }}" \
+            --arg branch "${{ github.ref_name }}" \
+            --arg event "$EVENT_TYPE" \
+            --arg sha "${{ github.sha }}" \
+            --arg msg "$(jq -r '.head_commit.message // .pull_request.title // .issue.title // "No message"' <<< "$EVENT_JSON")" \
+            --arg author "${{ github.actor }}" \
+            --arg pr_title "$(jq -r '.pull_request.title // ""' <<< "$EVENT_JSON")" \
+            --arg pr_body "$(jq -r '.pull_request.body // ""' <<< "$EVENT_JSON")" \
+            --arg pr_number "$(jq -r '.pull_request.number // 0' <<< "$EVENT_JSON")" \
+            --arg pr_url "$(jq -r '.pull_request.html_url // ""' <<< "$EVENT_JSON")" \
+            --arg pr_author "$(jq -r '.pull_request.user.login // ""' <<< "$EVENT_JSON")" \
+            --arg pr_state "$(jq -r '.pull_request.state // ""' <<< "$EVENT_JSON")" \
+            --arg pr_merged "$(jq -r '.pull_request.merged // false' <<< "$EVENT_JSON")" \
+            --arg issue_title "$(jq -r '.issue.title // ""' <<< "$EVENT_JSON")" \
+            --arg issue_body "$(jq -r '.issue.body // ""' <<< "$EVENT_JSON")" \
+            --arg issue_number "$(jq -r '.issue.number // 0' <<< "$EVENT_JSON")" \
+            --arg issue_url "$(jq -r '.issue.html_url // ""' <<< "$EVENT_JSON")" \
+            --arg issue_author "$(jq -r '.issue.user.login // ""' <<< "$EVENT_JSON")" \
+            --arg issue_state "$(jq -r '.issue.state // ""' <<< "$EVENT_JSON")" \
+            '{
+              repo_name: $repo,
+              branch_name: $branch,
+              event_type: $event,
+              commit_sha: $sha,
+              commit_message: $msg,
+              commit_author: $author,
+              pr_title: $pr_title,
+              pr_body: $pr_body,
+              pr_number: ($pr_number | tonumber),
+              pr_url: $pr_url,
+              pr_author: $pr_author,
+              pr_state: $pr_state,
+              pr_merged: ($pr_merged | test("true")),
+              issue_title: $issue_title,
+              issue_body: $issue_body,
+              issue_number: ($issue_number | tonumber),
+              issue_url: $issue_url,
+              issue_author: $issue_author,
+              issue_state: $issue_state
+            }'
+          )
+          
+          ENCODED_PAYLOAD=$(echo "$PAYLOAD" | base64 -w 0)
+
+          gh workflow run github-to-discord.yml \
+            --repo ririf4/Actions \
+            --ref main \
+            -f payload="$ENCODED_PAYLOAD"

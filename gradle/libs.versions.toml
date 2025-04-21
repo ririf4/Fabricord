@@ -9,10 +9,11 @@ fabric-loader="0.16.13"
 fabric-api="0.120.0+1.21.5"
 fabric-kotlin="1.13.2+kotlin.2.1.20"
 
-jda="5.3.2"
+jda = "5.4.0"
 yaml="2.4"
 langman="1.4.4"
 exposed="0.61.0"
+gson = "2.13.0"
 
 [plugins]
 kotlin={ id="org.jetbrains.kotlin.jvm", version.ref="kotlin" }
@@ -32,7 +33,8 @@ langman={ module="net.ririfa:langman", version.ref="langman" }
 exposed-core={ module="org.jetbrains.exposed:exposed-core", version.ref="exposed" }
 exposed-dao={ module="org.jetbrains.exposed:exposed-dao", version.ref="exposed" }
 exposed-jdbc={ module="org.jetbrains.exposed:exposed-jdbc", version.ref="exposed" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
 [bundles]
 fabrics = ["fabric-loader", "fabric-api", "fabric-kotlin"]
-fabricord = ["yaml", "langman", "exposed-core", "exposed-dao", "exposed-jdbc"]
+fabricord = ["yaml", "langman", "exposed-core", "exposed-dao", "exposed-jdbc", "gson", "jda"]
