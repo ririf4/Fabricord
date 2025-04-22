@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.entities.Message.MentionType
 import net.dv8tion.jda.api.entities.Webhook
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -280,10 +281,30 @@ object DiscordBotManager {
     fun sendToDiscord(message: String) {
         if (Config.logChannelIDIsNotSet) return
         FT {
-            Config.logChannelID?.let {
-                val messageAction = jda?.getTextChannelById(it)?.sendMessage(message)
+            Config.logChannelID?.let { channelId ->
+                val mentionedUserIds = "<@!?([0-9]+)>".toRegex()
+                    .findAll(message)
+                    .map { it.groupValues[1] }
+                    .toSet()
+                val mentionedRoleIds = "<@&([0-9]+)>".toRegex()
+                    .findAll(message)
+                    .map { it.groupValues[1] }
+                    .toSet()
+
+                val allowedMentionUserIds = mentionedUserIds.filterNot { id ->
+                    Config.mentionBlockedUserID?.contains(id) == true
+                }
+                val allowedMentionRoleIds = mentionedRoleIds.filterNot { id ->
+                    Config.mentionBlockedRoleID?.contains(id) == true
+                }
+
+                val messageAction = jda?.getTextChannelById(channelId)?.sendMessage(message)
                 if (Config.allowMentions == false) {
                     messageAction?.setAllowedMentions(emptySet())
+                } else {
+                    messageAction?.setAllowedMentions(listOf(MentionType.USER, MentionType.ROLE))
+                    messageAction?.mentionUsers(*allowedMentionUserIds.toTypedArray())
+                    messageAction?.mentionRoles(*allowedMentionRoleIds.toTypedArray())
                 }
                 messageAction?.queue()
             }

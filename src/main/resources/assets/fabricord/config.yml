@@ -44,8 +44,23 @@ BotOnlineStatus: ""
 # If blank, "classic" is automatically selected.
 MessageStyle: ""
 
-# Whether to allow pings like @everyone to be sent from Minecraft to Discord.
-AllowMentions: false
+# Whether to allow mentions such as @everyone and @role from Minecraft to Discord.
+# If false, all mentions will be disabled regardless of permission settings.
+allowMentions: false
+
+# Whether to restrict mention permissions based on the player's Minecraft permission node.
+# This only applies if `allowMentions` is true.
+# If true, only players with the permission `fabricord.mention` can send mentions via chat.
+UseUserPermissionForMentions: false
+
+# A list of Discord User IDs who should not be pinged,
+# even if they are mentioned explicitly in Minecraft messages.
+# Mentions targeting these users will be sent as plain text instead of actual pings.
+blockedUserIDs: [ ]
+
+# A list of Discord Role IDs that should not be pinged from Minecraft.
+# Useful for preventing pings to roles like @everyone or @admins.
+blockedRoleIDs: [ ]
 
 # The message that appears when the server starts.
 # If blank, the message will use the default message.
@@ -62,7 +77,7 @@ ServerStopMessage: ""
 PlayerJoinMessage: ""
 
 # The message that appears when a player leaves the server.
-# You can use the "% player%" placeholder.
+# You can use the "%player%" placeholder.
 # It will be replaced with the player's name.
 # If blank, the message will use the default message.
 PlayerLeaveMessage: ""
