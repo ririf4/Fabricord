@@ -45,7 +45,7 @@ jobs:
 
       - name: Build Project (Push Only)
         if: github.event_name == 'push'
-        run: ./gradlew build
+        run: ./gradlew remapJar
 
       - name: Capture Build Artifacts
         if: github.event_name == 'push' && matrix.java == 21
