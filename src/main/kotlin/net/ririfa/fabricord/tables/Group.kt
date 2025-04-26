@@ -26,11 +26,10 @@ class Player(id: EntityID<String>) : Entity<String>(id) {
     }
 
 
-
     fun to(): GroupData = GroupData(
         uuid = id.value,
 
-    )
+        )
 }
 
 fun GroupData.insert(): Player {
