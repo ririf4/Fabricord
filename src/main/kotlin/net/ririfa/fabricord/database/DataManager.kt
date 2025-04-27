@@ -1,7 +1,12 @@
-package net.ririfa.fabricord
+package net.ririfa.fabricord.database
 
-import net.ririfa.fabricord.tables.Groups
+import net.ririfa.fabricord.Logger
+import net.ririfa.fabricord.ModDir
+import net.ririfa.fabricord.database.tables.Group
+import net.ririfa.fabricord.database.tables.Groups
+import net.ririfa.fabricord.util.DB
 import net.ririfa.fabricord.util.DBAll
+import net.ririfa.fabricord.util.DBFile
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import java.io.File
@@ -21,6 +26,7 @@ object DataManager {
             memDb = Database.connect(memoryDbUrl, driver = "org.h2.Driver", user = "sa", password = "")
 
             createRequiredTables()
+            initialSyncFromFileToMemory()
             true
         } catch (e: Exception) {
             Logger.error("Failed to start H2 database: ${e.message}")
@@ -40,6 +46,17 @@ object DataManager {
     private fun createRequiredTables() {
         DBAll {
             SchemaUtils.create(Groups)
+        }
+    }
+
+    private fun initialSyncFromFileToMemory() {
+        DBFile {
+            Group.all().forEach { group ->
+                val data = group.toData()
+                DB {
+                    Group.from(data)
+                }
+            }
         }
     }
 }

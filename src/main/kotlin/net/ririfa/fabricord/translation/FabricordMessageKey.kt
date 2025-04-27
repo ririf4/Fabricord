@@ -76,8 +76,33 @@ sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
 
         sealed class Group : Command() {
             sealed class Create : Group() {
-                object GroupAlreadyExists : Create()
                 object Success : Create()
+                object SuccessWithMembers : Create()
+            }
+
+            sealed class Delete : Group() {
+                object Success : Delete()
+                object Failure : Delete()
+
+                object UseIDForDelete : Delete()
+            }
+
+            //TODO
+            sealed class Join : Group() {
+                object Success : Join()
+                object Failure : Join()
+                object UseIDForJoin : Join()
+                object ClosedGroup : Join()
+                object AlreadyJoined : Join()
+            }
+
+            //TODO
+            sealed class Leave : Group() {
+                object Success : Leave()
+                object Failure : Leave()
+                object NotMember : Leave()
+                object OwnerCannotLeave : Leave()
+                object UseIDForLeave : Leave()
             }
         }
 

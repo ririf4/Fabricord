@@ -59,6 +59,15 @@ Command:
   LC:
     SwitchedLocalChatState: "Local chat state switched to %s."
 
+  Group:
+    Create:
+      Success: "Group '%target%' created successfully."
+      SuccessWithMembers: "Group '%name%' created with %size% members."
+    Delete:
+      Success: "Group '%target%' deleted successfully."
+      Failure: "Group '%target%' not found or you're not the owner."
+      UseIDForDelete: "Found multiple groups with the same name. Please use the group ID to delete."
+
   Help:
     Group:
       Create:
