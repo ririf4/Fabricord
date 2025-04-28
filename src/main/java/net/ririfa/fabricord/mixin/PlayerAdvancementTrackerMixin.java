@@ -21,7 +21,7 @@ public abstract class PlayerAdvancementTrackerMixin {
 
     @Inject(method = "grantCriterion", at = @At("RETURN"))
     public void onAdvancementGranted(AdvancementEntry advancementEntry, String string, @NotNull CallbackInfoReturnable<Boolean> cir) {
-        if (!DiscordBotManager.isBotInitialized || AliasKt.getConfig().logChannelIDIsNotSet) return;
+        if (!DiscordBotManager.isBotInitialized || AliasKt.getConfig().isLogChannelIDNotSet) return;
 
         if (cir.getReturnValue()) {
             Advancement advancement = advancementEntry.value();

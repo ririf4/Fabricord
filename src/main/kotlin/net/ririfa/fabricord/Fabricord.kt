@@ -14,11 +14,7 @@ import net.ririfa.fabricord.translation.FabricordMessageProvider
 import net.ririfa.fabricord.util.isOlderVersion
 import net.ririfa.langman.InitType
 import net.ririfa.langman.LangMan
-import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.core.LoggerContext
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory
-import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
@@ -37,7 +33,8 @@ class Fabricord : DedicatedServerModInitializer {
         lateinit var langMan: LangMan<FabricordMessageProvider, Text>
         var consoleAppender: ConsoleTrackerAppender? = null
 
-        val logger: Logger = LoggerFactory.getLogger(Fabricord::class.simpleName)
+        val logger: Logger
+            get() = LoggerFactory.getLogger(Fabricord::class.simpleName)
         val loader: FabricLoader = FabricLoader.getInstance()
         val serverDir: Path = loader.gameDir
         val modDir: Path = serverDir.resolve(MOD_ID)
@@ -46,13 +43,10 @@ class Fabricord : DedicatedServerModInitializer {
 
         val thread: ScheduledExecutorService = Executors.newScheduledThreadPool(2)
         val availableLang = listOf<String>("en", "ja")
-
-        private var logSetupDone = false
     }
 
     override fun onInitializeServer() {
         if (Files.notExists(logDir)) Files.createDirectories(logDir)
-        setupLog4j2FileLogging()
         LanguageAutoUpdater.checkForUpdatesAndExtract()
         langMan = LangMan.createNew(
             { Text.of(it) },
@@ -115,7 +109,7 @@ class Fabricord : DedicatedServerModInitializer {
             Logger.debug("SERVER_STOPPING: ScheduledExecutorService shut down")
         }
 
-        if (!Config.logChannelIDIsNotSet) {
+        if (!Config.isLogChannelIDNotSet) {
             Logger.debug("registerServerEvents: logChannelID is set, registering JOIN and DISCONNECT events")
             ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
                 val player = handler.player
@@ -163,44 +157,6 @@ class Fabricord : DedicatedServerModInitializer {
         }
 
         Logger.debug("registerServerEvents: finished")
-    }
-
-    fun setupLog4j2FileLogging() {
-        if (logSetupDone) return
-
-        if (Files.notExists(logDir)) {
-            Files.createDirectories(logDir)
-        }
-
-        val logFilePath = logDir.resolve("fabricord.log").toString()
-        val builder = ConfigurationBuilderFactory.newConfigurationBuilder()
-
-        val layout = builder.newLayout("PatternLayout")
-            .addAttribute("pattern", "[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%level] %logger{36} - %msg%n")
-
-        val fileAppender = builder.newAppender("logFile", "File")
-            .addAttribute("fileName", logFilePath)
-            .addAttribute("append", true)
-            .add(layout)
-
-        builder.add(fileAppender)
-
-        builder.add(
-            builder.newRootLogger(Level.DEBUG)
-                .add(builder.newAppenderRef("logFile"))
-        )
-
-        val ctx = LogManager.getContext(false) as LoggerContext
-        ctx.stop()
-
-        val oldConfig = ctx.configuration
-        oldConfig.appenders.forEach { (_, appender) -> appender.stop() }
-
-        val config = builder.build() as BuiltConfiguration
-        ctx.start(config)
-
-        Logger.debug("Log4j2 file logging setup completed: $logFilePath (level=DEBUG)")
-        logSetupDone = true
     }
 
     object LanguageAutoUpdater {

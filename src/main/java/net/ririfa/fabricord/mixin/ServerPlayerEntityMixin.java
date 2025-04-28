@@ -21,7 +21,7 @@ public abstract class ServerPlayerEntityMixin {
             )
     )
     public void onPlayerDeath(DamageSource source, CallbackInfo ci) {
-        if (!DiscordBotManager.isBotInitialized || AliasKt.getConfig().logChannelIDIsNotSet) return;
+        if (!DiscordBotManager.isBotInitialized || AliasKt.getConfig().isLogChannelIDNotSet) return;
 
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         Text message = player.getDamageTracker().getDeathMessage();

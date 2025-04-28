@@ -10,6 +10,7 @@ import net.ririfa.fabricord.translation.FabricordMessageKey
 
 object DiscordPlayerEventHandler {
     fun handleMCMessage(player: ServerPlayerEntity, message: String) {
+        Logger.debug("handleMCMessage called! player=${player.name.string}, message=$message")
         FT {
             when (Config.messageStyle) {
                 "modern" -> modernStyle(player, message)

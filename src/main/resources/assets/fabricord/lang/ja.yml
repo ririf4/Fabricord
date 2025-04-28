@@ -1,4 +1,4 @@
-Version: "1.0.1"
+version: "1.0.1"
 
 System:
   Initialization:
@@ -58,6 +58,15 @@ Command:
 
   LC:
     SwitchedLocalChatState: "ローカルチャットの状態を %s にしました"
+
+  Group:
+    Create:
+      Success: "グループ、%target%' を作成しました。ID: %id%"
+      SuccessWithMembers: "グループ、%target%' を %size% 人のメンバーとともに作成しました。 ID: %id%"
+    Delete:
+      Success: "グループ、%target%' を削除しました。"
+      Failure: "グループ、%target% の削除に失敗しました"
+      UseIDForDelete: "同じ名前で複数のグループを発見しました。削除するにはIDを使用してください"
 
   Help:
     Group:

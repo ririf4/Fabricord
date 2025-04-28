@@ -14,6 +14,7 @@ yaml="2.4"
 langman="1.4.4"
 exposed="0.61.0"
 gson = "2.13.0"
+h2 = "2.3.232"
 
 [plugins]
 kotlin={ id="org.jetbrains.kotlin.jvm", version.ref="kotlin" }
@@ -34,6 +35,7 @@ exposed-core={ module="org.jetbrains.exposed:exposed-core", version.ref="exposed
 exposed-dao={ module="org.jetbrains.exposed:exposed-dao", version.ref="exposed" }
 exposed-jdbc={ module="org.jetbrains.exposed:exposed-jdbc", version.ref="exposed" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+h2 = { module = "com.h2database:h2", version.ref = "h2" }
 
 [bundles]
 fabrics = ["fabric-loader", "fabric-api", "fabric-kotlin"]

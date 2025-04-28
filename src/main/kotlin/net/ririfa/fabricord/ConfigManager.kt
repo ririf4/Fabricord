@@ -188,7 +188,9 @@ object ConfigManager {
                 if (value.isNullOrBlank()) {
                     if (requiredAnnotation.soft && requiredAnnotation.named == "logChannelID") {
                         Logger.warn(LM.getMessage(FabricordMessageKey.Exception.Config.RequiredPropertyIsNotConfigured, configFile, property.name))
-                        config.logChannelIDIsNotSet = true
+                        config.isLogChannelIDNotSet = true
+                        // Overwrite with null
+                        config.logChannelID = null
                     } else {
                         Logger.error(LM.getMessage(FabricordMessageKey.Exception.Config.SoftRequiredPropertyIsNotConfigured, configFile, property.name))
                         isErrorOccurred = true
@@ -287,16 +289,15 @@ object ConfigManager {
             if (useUserPermissionForMentions == null) useUserPermissionForMentions = false
             if (mentionBlockedUserID == null) mentionBlockedUserID = emptySet()
             if (mentionBlockedRoleID == null) mentionBlockedRoleID = emptySet()
-        }
 
-        fun getFile(): Path {
-            return configFile
+            if (enableConsoleLog == null) enableConsoleLog = false
+            if (consoleLogChannelID.isNullOrBlank()) consoleLogChannelID = null
         }
 
         /**
          * If this true, [net.ririfa.fabricord.discord.DiscordBotManager.sendToDiscord] will not do anything
          */
         @JvmField
-        var logChannelIDIsNotSet = false
+        var isLogChannelIDNotSet = false
     }
 }

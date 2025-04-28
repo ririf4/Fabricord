@@ -16,6 +16,7 @@ class ShortUUID internal constructor(
          * It contains a random UUID.
          * @return A new ShortUUID instance.
          */
+        @JvmStatic
         fun generate(): ShortUUID = ShortUUID(UUID.randomUUID())
 
         /**
@@ -23,6 +24,7 @@ class ShortUUID internal constructor(
          * @param uuidString The UUID string.
          * @return A new ShortUUID instance.
          */
+        @JvmStatic
         fun fromUUID(uuidString: String): ShortUUID = ShortUUID(UUID.fromString(uuidString))
 
         /**
@@ -30,6 +32,7 @@ class ShortUUID internal constructor(
          * @param uuid The UUID.
          * @return A new ShortUUID instance.
          */
+        @JvmStatic
         fun fromUUID(uuid: UUID): ShortUUID = ShortUUID(uuid)
 
         /**
@@ -38,6 +41,7 @@ class ShortUUID internal constructor(
          * @return A new ShortUUID instance.
          * @throws IllegalArgumentException if the short string is invalid.
          */
+        @JvmStatic
         fun fromShortString(shortString: String): ShortUUID {
             require(isValidShortString(shortString)) { "Invalid short string for UUID" }
             val bytes = Base64.getUrlDecoder().decode(shortString)
@@ -52,6 +56,7 @@ class ShortUUID internal constructor(
          * @param shortString The short string to validate.
          * @return True if the short string is valid, false otherwise.
          */
+        @JvmStatic
         fun isValidShortString(shortString: String): Boolean = try {
             Base64.getUrlDecoder().decode(shortString).size == 16
         } catch (e: IllegalArgumentException) {

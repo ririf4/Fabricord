@@ -36,14 +36,16 @@ dependencies {
     modImplementation(libs.bundles.fabricord) {
         exclude(group = "net.java.dev.jna", module = "jna")
     }
+    modRuntimeOnly(libs.h2)
 
     shade(libs.bundles.fabricord) {
         exclude(group = "net.java.dev.jna", module = "jna")
     }
+    shade(libs.h2)
 }
 
 val minecraftVersionCompatibility = "1.21.5"
-val fabricLoaderVersionCompatibility = ""
+val fabricLoaderVersionCompatibility = "0.16.13"
 val fabricLanguageKotlinVersionCompatibility = ""
 
 fun generateFabricModJson(): String {
@@ -73,12 +75,13 @@ fun generateFabricModJson(): String {
             "fabric-language-kotlin" to fabricLanguageKotlinVersionCompatibility
         )
     )
-    return GsonBuilder().setPrettyPrinting().create().toJson(json)
+    return GsonBuilder()
+        .setPrettyPrinting()
+        .create()
+        .toJson(json)
 }
 
 tasks.named<RemapJarTask>("remapJar") {
-    dependsOn("clean")
-    mustRunAfter("clean")
     finalizedBy("finalJar")
 }
 
@@ -111,4 +114,7 @@ tasks.register<ShadowJar>("finalJar") {
     exclude("org/jetbrains/kotlin/**")
     exclude("kotlinx/**")
     exclude("club/minnced/opus/**")
+    exclude("com/fasterxml/jackson/**")
+    exclude("org/apache/commons/**")
+    exclude("org/slf4j/**")
 }

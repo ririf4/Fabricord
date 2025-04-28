@@ -53,6 +53,22 @@ object DiscordBotManager {
                     .build()
                     .awaitReady()
 
+                val textChannel = jda?.getTextChannelById(Config.logChannelID ?: return@FT)
+                textChannel?.retrieveWebhooks()?.queue({ webhooks ->
+                    webHook = webhooks.firstOrNull { it.name == "Fabricord" }
+
+                    if (webHook == null) {
+                        textChannel.createWebhook("Fabricord").queue { created ->
+                            webHook = created
+                            Logger.info("Created webhook: ${created.name}")
+                        }
+                    } else {
+                        Logger.info("Using existing webhook: ${webHook?.name}")
+                    }
+                }, { error ->
+                    Logger.warn("Could not retrieve webhook: ${error.message}")
+                })
+
                 jda?.updateCommands()?.addCommands(
                     Commands.slash("playerlist", "Get a list of online players"),
                     Commands.slash("status", "Get the status of the server")
@@ -279,7 +295,7 @@ object DiscordBotManager {
     }
 
     fun sendToDiscord(message: String) {
-        if (Config.logChannelIDIsNotSet) return
+        if (Config.isLogChannelIDNotSet) return
         FT {
             Config.logChannelID?.let { channelId ->
                 val mentionedUserIds = "<@!?([0-9]+)>".toRegex()
