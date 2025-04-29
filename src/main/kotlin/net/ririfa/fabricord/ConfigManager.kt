@@ -155,8 +155,8 @@ object ConfigManager {
             Char::class -> (value as? String)?.singleOrNull() as? T
             BigInteger::class -> value?.toString()?.let { BigInteger(it) } as? T
             BigDecimal::class -> value?.toString()?.let { BigDecimal(it) } as? T
-            List::class -> (value as? List<*>)?.filterIsInstance<T>() as? T
-            Set::class -> (value as? List<*>)?.filterIsInstance<T>()?.toSet() as? T
+            List::class -> value as? List<*> as? T
+            Set::class -> (value as? List<*>)?.toSet() as? T
             else -> value as? T
         }
     }
@@ -209,21 +209,21 @@ object ConfigManager {
             config = Config(
                 botToken = lc<String>("BotToken")?.trim(),
                 logChannelID = lc<String>("LogChannelID")?.trim(),
-                dontSendChatToDiscord = lc("DontSendChatToDiscord"),
-                botActivityMessage = lc("BotActivityMessage"),
-                botActivityStatus = lc("BotActivityStatus"),
-                botOnlineStatus = lc("BotOnlineStatus"),
-                messageStyle = lc("MessageStyle"),
-                serverStartMessage = lc("ServerStartMessage"),
-                serverStopMessage = lc("ServerStopMessage"),
-                playerJoinMessage = lc("PlayerJoinMessage"),
-                playerLeaveMessage = lc("PlayerLeaveMessage"),
-                allowMentions = lc("AllowMentions"),
-                useUserPermissionForMentions = lc("UseUserPermissionForMentions"),
-                mentionBlockedUserID = lc("blockedUserIDs"),
-                mentionBlockedRoleID = lc("blockedRoleIDs"),
-                enableConsoleLog = lc("EnableConsoleLog"),
-                consoleLogChannelID = lc("ConsoleLogChannelID")
+                dontSendChatToDiscord = lc<Boolean?>("DontSendChatToDiscord"),
+                botActivityMessage = lc<String?>("BotActivityMessage"),
+                botActivityStatus = lc<String?>("BotActivityStatus"),
+                botOnlineStatus = lc<String?>("BotOnlineStatus"),
+                messageStyle = lc<String?>("MessageStyle"),
+                serverStartMessage = lc<String?>("ServerStartMessage"),
+                serverStopMessage = lc<String?>("ServerStopMessage"),
+                playerJoinMessage = lc<String?>("PlayerJoinMessage"),
+                playerLeaveMessage = lc<String?>("PlayerLeaveMessage"),
+                useUserPermissionForMention = lc<Boolean?>("UseUserPermissionForMention"),
+                allowMentions = lc<Boolean?>("AllowMentions"),
+                mentionBlockedUserID = lc<Set<String>?>("blockedUserIDs"),
+                mentionBlockedRoleID = lc<Set<String>?>("blockedRoleIDs"),
+                enableConsoleLog = lc<Boolean?>("EnableConsoleLog"),
+                consoleLogChannelID = lc<String?>("ConsoleLogChannelID")
             )
         } catch (e: Exception) {
             Logger.error("Failed to load config: ${e.message}", e)
@@ -260,9 +260,9 @@ object ConfigManager {
         var playerLeaveMessage: String? = null,
 
         @JvmField
-        var allowMentions: Boolean? = true,
+        var useUserPermissionForMention: Boolean? = false,
         @JvmField
-        var useUserPermissionForMentions: Boolean? = false,
+        var allowMentions: Boolean? = true,
         @JvmField
         var mentionBlockedUserID: Set<String>? = emptySet(),
         @JvmField
@@ -286,7 +286,6 @@ object ConfigManager {
             if (playerLeaveMessage.isNullOrBlank()) playerLeaveMessage = "%player% left the server"
 
             if (allowMentions == null) allowMentions = true
-            if (useUserPermissionForMentions == null) useUserPermissionForMentions = false
             if (mentionBlockedUserID == null) mentionBlockedUserID = emptySet()
             if (mentionBlockedRoleID == null) mentionBlockedRoleID = emptySet()
 

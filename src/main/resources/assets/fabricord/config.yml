@@ -48,9 +48,8 @@ MessageStyle: ""
 # If false, all mentions will be disabled regardless of permission settings.
 allowMentions: false
 
-# Whether to restrict mention permissions based on the player's Minecraft permission node.
-# This only applies if `allowMentions` is true.
-# If true, only players with the permission `fabricord.mention` can send mentions via chat.
+# Whether to restrict mention permissions based on the Discord user's permissions.
+# If true, only users with the required Discord permission can send mentions via chat.
 UseUserPermissionForMentions: false
 
 # A list of Discord User IDs who should not be pinged,

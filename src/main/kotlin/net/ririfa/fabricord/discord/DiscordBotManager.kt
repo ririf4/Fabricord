@@ -298,30 +298,37 @@ object DiscordBotManager {
         if (Config.isLogChannelIDNotSet) return
         FT {
             Config.logChannelID?.let { channelId ->
+                val blockedUserIds = Config.mentionBlockedUserID ?: emptyList()
+                val blockedRoleIds = Config.mentionBlockedRoleID ?: emptyList()
+
                 val mentionedUserIds = "<@!?([0-9]+)>".toRegex()
                     .findAll(message)
                     .map { it.groupValues[1] }
                     .toSet()
+
                 val mentionedRoleIds = "<@&([0-9]+)>".toRegex()
                     .findAll(message)
                     .map { it.groupValues[1] }
                     .toSet()
 
-                val allowedMentionUserIds = mentionedUserIds.filterNot { id ->
-                    Config.mentionBlockedUserID?.contains(id) == true
-                }
-                val allowedMentionRoleIds = mentionedRoleIds.filterNot { id ->
-                    Config.mentionBlockedRoleID?.contains(id) == true
-                }
+                val allowedMentionUserIds = mentionedUserIds.filterNot { it in blockedUserIds }
+                val allowedMentionRoleIds = mentionedRoleIds.filterNot { it in blockedRoleIds }
 
-                val messageAction = jda?.getTextChannelById(channelId)?.sendMessage(message)
+                val sanitizedMessage = message
+                    .replace(Regex("<@!?(${blockedUserIds.joinToString("|")})>"), "@\u200Buser")
+                    .replace(Regex("<@&(${blockedRoleIds.joinToString("|")})>"), "@\u200Brole")
+
+                val messageAction = jda?.getTextChannelById(channelId)?.sendMessage(sanitizedMessage)
+
                 if (Config.allowMentions == false) {
                     messageAction?.setAllowedMentions(emptySet())
                 } else {
-                    messageAction?.setAllowedMentions(listOf(MentionType.USER, MentionType.ROLE))
-                    messageAction?.mentionUsers(*allowedMentionUserIds.toTypedArray())
-                    messageAction?.mentionRoles(*allowedMentionRoleIds.toTypedArray())
+                    messageAction
+                        ?.setAllowedMentions(listOf(MentionType.USER, MentionType.ROLE))
+                        ?.mentionUsers(*allowedMentionUserIds.toTypedArray())
+                        ?.mentionRoles(*allowedMentionRoleIds.toTypedArray())
                 }
+
                 messageAction?.queue()
             }
         }

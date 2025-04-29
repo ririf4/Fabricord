@@ -71,4 +71,8 @@ sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
             object SwitchedLocalChatState : LC()
         }
     }
+
+    sealed class Chat : FabricordMessageKey() {
+        object LinkDiscordAccountFirst : Chat()
+    }
 }
