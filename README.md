@@ -3,7 +3,7 @@
 **If you have any feature suggestions, feel free to reach out via Issues, PR, or Discord!**
 **For bug reports or improvements, submit feedback on [GitHub](https://github.com/ririf4/Fabricord/issues)!**
 
-> **The next major update (v5.0.0) will introduce full support for all Fabric versions. This will be an LTS release!**
+> **The next major update (v5.0.0 | LTS-1.0) will introduce full support for all Fabric versions. This will be an LTS release!**
 
 ### ⚠️ **This project is NOT affiliated with the Fabricord mod on CurseForge.**
 

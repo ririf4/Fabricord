@@ -5,22 +5,6 @@ import net.minecraft.registry.Registries
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvent
-import net.ririfa.fabricord.Fabricord
-import net.ririfa.fabricord.Logger
-import java.io.InputStream
-import java.nio.file.Files
-import java.nio.file.Path
-
-fun isOlderVersion(current: String, latest: String): Boolean {
-    val currentParts = current.split(".").map { it.toIntOrNull() ?: 0 }
-    val latestParts = latest.split(".").map { it.toIntOrNull() ?: 0 }
-
-    val maxLength = maxOf(currentParts.size, latestParts.size)
-    val paddedCurrent = currentParts + List(maxLength - currentParts.size) { 0 }
-    val paddedLatest = latestParts + List(maxLength - latestParts.size) { 0 }
-
-    return (0 until maxLength).any { paddedCurrent[it] < paddedLatest[it] }
-}
 
 fun ServerPlayerEntity.playSoundToPlayerMaster(soundEvent: SoundEvent, f: Float, g: Float) {
     this.networkHandler.sendPacket(
@@ -35,25 +19,6 @@ fun ServerPlayerEntity.playSoundToPlayerMaster(soundEvent: SoundEvent, f: Float,
             this.random.nextLong()
         )
     )
-}
-
-fun String.toBooleanOrNull(): Boolean? {
-    return when (this.trim().lowercase()) {
-        "true", "1", "t" -> true
-        "false", "0", "f" -> false
-        else -> null
-    }
-}
-
-fun copyResourceToFile(resourcePath: String, outputPath: Path) {
-    val fullPath = "/$resourcePath"
-    val inputStream: InputStream? = Fabricord::class.java.getResourceAsStream(fullPath)
-    if (inputStream == null) {
-        Logger.error("Resource $fullPath not found in Jar")
-        return
-    }
-    Files.copy(inputStream, outputPath)
-    Logger.info("Copied resource $fullPath to $outputPath")
 }
 
 fun replaceUUIDsWithMCIDs(message: String, players: List<ServerPlayerEntity>): Pair<String, List<ServerPlayerEntity>> {

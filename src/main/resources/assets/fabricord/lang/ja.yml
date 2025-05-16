@@ -34,7 +34,7 @@ Discord:
   Embed:
     PlayerList:
       Title: "オンラインのプレイヤー"
-      Description: "現在、%s人のプレイヤーがオンラインです。\n\n"
+      Description: "現在、%playerCount%人のプレイヤーがオンラインです。\n\n"
 
       ThereAreNoPlayersOnline: "現在、オンラインのプレイヤーはいません。"
 

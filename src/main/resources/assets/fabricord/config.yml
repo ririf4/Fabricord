@@ -1,4 +1,4 @@
-Version: "1.0.2"
+version: "1.0.2"
 
 # Thank you for installing this mod!
 # Now let's put a portal on Discord and the Minecraft server chat!
@@ -55,11 +55,11 @@ UseUserPermissionForMentions: false
 # A list of Discord User IDs who should not be pinged,
 # even if they are mentioned explicitly in Minecraft messages.
 # Mentions targeting these users will be sent as plain text instead of actual pings.
-blockedUserIDs: [ ]
+BlockedUserIDs: [ ]
 
 # A list of Discord Role IDs that should not be pinged from Minecraft.
 # Useful for preventing pings to roles like @everyone or @admins.
-blockedRoleIDs: [ ]
+BlockedRoleIDs: [ ]
 
 # The message that appears when the server starts.
 # If blank, the message will use the default message.

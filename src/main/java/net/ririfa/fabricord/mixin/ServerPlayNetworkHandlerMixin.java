@@ -27,7 +27,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
     private void interceptChatMessage(@NotNull ChatMessageC2SPacket packet, CallbackInfo ci) {
-        if (!DiscordBotManager.isBotInitialized || AliasKt.getConfig().isLogChannelIDNotSet || Boolean.TRUE.equals(AliasKt.getConfig().dontSendChatToDiscord))
+        if (!DiscordBotManager.isBotInitialized || AliasKt.getConfig().isLogChannelIDNotSet || AliasKt.getConfig().dontSendChatToDiscord)
             return;
 
         ServerPlayNetworkHandler handler = (ServerPlayNetworkHandler) (Object) this;
@@ -36,7 +36,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         UUID playerUUID = player.getUuid();
 
         if (!DiscordMinecraftLink.isUserLinked(playerUUID) && Boolean.TRUE.equals(AliasKt.getConfig().useUserPermissionForMention)) {
-            // Discordユーザー権限を使用する設定にも関わらずりんくされていない場合はリンクしてくださいという旨のメッセージを送信。
+            // Discordユーザー権限を使用する設定にも関わらずLinkされていない場合はリンクしてくださいという旨のメッセージを送信。
             ci.cancel();
             var message = ap.getMessage(FabricordMessageKey.Chat.LinkDiscordAccountFirst.INSTANCE);
             player.sendMessage(message);

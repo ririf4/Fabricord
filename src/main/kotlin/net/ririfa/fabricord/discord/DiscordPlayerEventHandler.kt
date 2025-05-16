@@ -41,7 +41,7 @@ object DiscordPlayerEventHandler {
                 ?.queue()
 
         } catch (e: Exception) {
-            Logger.error(LM.getMessage(FabricordMessageKey.System.Discord.ErrorDuringSendingModernMessage), e)
+            Logger.error(LM.getMessage(FabricordMessageKey.System.Discord.ErrorDuringSendingModernMessage).string, e)
         }
     }
 }

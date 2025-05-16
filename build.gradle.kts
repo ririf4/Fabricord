@@ -36,6 +36,7 @@ dependencies {
     modImplementation(libs.bundles.fabricord) {
         exclude(group = "net.java.dev.jna", module = "jna")
     }
+    modCompileOnly(libs.bundles.ririfa)
     modRuntimeOnly(libs.h2)
 
     shade(libs.bundles.fabricord) {
@@ -46,7 +47,7 @@ dependencies {
 
 val minecraftVersionCompatibility = "1.21.5"
 val fabricLoaderVersionCompatibility = "0.16.13"
-val fabricLanguageKotlinVersionCompatibility = ""
+val fabricLanguageKotlinVersionCompatibility = "1.13.2+kotlin.2.1.20"
 
 fun generateFabricModJson(): String {
     val json = mapOf(
@@ -103,7 +104,6 @@ tasks.register<ShadowJar>("finalJar") {
 
     relocate("net.dv8tion.jda", "net.ririfa.shadowed.jda")
     relocate("net.java.dev.jna", "net.ririfa.shadowed.jna")
-    relocate("org.yaml.snakeyaml", "net.ririfa.shadowed.yaml")
     relocate("org.jetbrains.exposed", "net.ririfa.shadowed.exposed")
 
     exclude("net/dv8tion/jda/api/audio/**")

@@ -10,9 +10,11 @@ fabric-api="0.120.0+1.21.5"
 fabric-kotlin="1.13.2+kotlin.2.1.20"
 
 jda = "5.4.0"
-yaml="2.4"
-langman="1.4.4"
-exposed="0.61.0"
+yacla-core = "1.1.0-20250516.054653-2"
+yacla-yaml = "1.0.2"
+langman-core = "2.0.0-20250516.130929-8"
+langman-yaml = "2.0.0-20250516.024615-4"
+exposed = "0.61.0"
 gson = "2.13.0"
 h2 = "2.3.232"
 
@@ -29,8 +31,10 @@ fabric-api={ module="net.fabricmc.fabric-api:fabric-api", version.ref="fabric-ap
 fabric-kotlin={ module="net.fabricmc:fabric-language-kotlin", version.ref="fabric-kotlin" }
 
 jda={ module="net.dv8tion:JDA", version.ref="jda" }
-yaml={ module="org.yaml:snakeyaml", version.ref="yaml" }
-langman={ module="net.ririfa:langman", version.ref="langman" }
+yacla-core = { module = "net.ririfa:yacla-core", version.ref = "yacla-core" }
+yacla-yaml = { module = "net.ririfa:yacla-yaml", version.ref = "yacla-yaml" }
+langman-core = { module = "net.ririfa:langman-core", version.ref = "langman-core" }
+langman-yaml = { module = "net.ririfa:langman-ext.yaml", version.ref = "langman-yaml" }
 exposed-core={ module="org.jetbrains.exposed:exposed-core", version.ref="exposed" }
 exposed-dao={ module="org.jetbrains.exposed:exposed-dao", version.ref="exposed" }
 exposed-jdbc={ module="org.jetbrains.exposed:exposed-jdbc", version.ref="exposed" }
@@ -39,4 +43,5 @@ h2 = { module = "com.h2database:h2", version.ref = "h2" }
 
 [bundles]
 fabrics = ["fabric-loader", "fabric-api", "fabric-kotlin"]
-fabricord = ["yaml", "langman", "exposed-core", "exposed-dao", "exposed-jdbc", "gson", "jda"]
+fabricord = ["exposed-core", "exposed-dao", "exposed-jdbc", "gson", "jda"]
+ririfa = ["yacla-core", "yacla-yaml", "langman-core", "langman-yaml"]

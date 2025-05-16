@@ -75,18 +75,18 @@ object DiscordBotManager {
                 )?.queue()
 
                 isBotInitialized = true
-                Logger.info(LM.getMessage(FabricordMessageKey.Discord.Bot.BotNowOnline, jda?.selfUser?.name ?: "Bot"))
-                Config.serverStartMessage?.let { sendToDiscord(it) }
+                Logger.info(LM.getMessage(FabricordMessageKey.Discord.Bot.BotNowOnline, jda?.selfUser?.name ?: "Bot").string)
+                sendToDiscord(Config.serverStartMessage)
             } catch (e: LoginException) {
-                Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotLoginToBot), e)
+                Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotLoginToBot).string, e)
             } catch (e: Exception) {
-                Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotStartBot), e)
+                Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotStartBot).string, e)
             }
         }
     }
 
     fun stop() {
-        Config.serverStopMessage?.let { sendToDiscord(it) }
+        sendToDiscord(Config.serverStopMessage)
 
         try {
             isBotInitialized = false
@@ -102,14 +102,14 @@ object DiscordBotManager {
 
                 try {
                     shutdownFuture.get(7500, TimeUnit.MILLISECONDS)
-                    Logger.info(LM.getMessage(FabricordMessageKey.Discord.Bot.BotNowOffline, instance.selfUser.name))
+                    Logger.info(LM.getMessage(FabricordMessageKey.Discord.Bot.BotNowOffline, instance.selfUser.name).string)
                 } catch (_: TimeoutException) {
-                    Logger.warn(LM.getMessage(FabricordMessageKey.Discord.Bot.TimedOutForStoppingBot))
+                    Logger.warn(LM.getMessage(FabricordMessageKey.Discord.Bot.TimedOutForStoppingBot).string)
                     instance.shutdownNow()
                 }
             }
         } catch (e: Exception) {
-            Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotStopBot), e)
+            Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotStopBot).string, e)
             e.printStackTrace()
         }
     }
@@ -157,14 +157,15 @@ object DiscordBotManager {
                 val discordUserLang = event.userLocale.locale
                 val onlinePlayers = Server.playerManager.playerList
                 val playerCount = onlinePlayers.size
+                val ac = mapOf("playerCount" to playerCount.toString())
 
                 val embedBuilder = EmbedBuilder()
-                    .setTitle(LM.getMessageByLangCode(FabricordMessageKey.Discord.Embed.PlayerList.Title, lang = discordUserLang))
+                    .setTitle(LM.getMessage(FabricordMessageKey.Discord.Embed.PlayerList.Title, lang = discordUserLang).string)
                     .setColor(Color.GREEN)
                     .setDescription(
-                        LM.getMessageByLangCode(
-                            FabricordMessageKey.Discord.Embed.PlayerList.Description, args = arrayOf(playerCount), lang = discordUserLang
-                        )
+                        LM.getMessage(
+                            FabricordMessageKey.Discord.Embed.PlayerList.Description, argsComplete = ac, lang = discordUserLang
+                        ).string
                     )
 
                 if (playerCount > 0) {
@@ -172,7 +173,7 @@ object DiscordBotManager {
                     embedBuilder.setDescription(embedBuilder.descriptionBuilder.append(playerList).toString())
                 } else {
                     embedBuilder.setDescription(
-                        LM.getMessageByLangCode(FabricordMessageKey.Discord.Embed.PlayerList.ThereAreNoPlayersOnline, lang = discordUserLang)
+                        LM.getMessage(FabricordMessageKey.Discord.Embed.PlayerList.ThereAreNoPlayersOnline, lang = discordUserLang).string
                     )
                 }
 
@@ -193,10 +194,10 @@ object DiscordBotManager {
                 val memoryUsage = getMemoryUsage()
                 val playerInfo = getPlayerInfo()
 
-                val memUsage = LM.getMessageByLangCode(FabricordMessageKey.Discord.Embed.ServerStatus.Description.MemoryUsage, lang = discordUserLang)
+                val memUsage = LM.getMessage(FabricordMessageKey.Discord.Embed.ServerStatus.Description.MemoryUsage, lang = discordUserLang)
 
                 val embedBuilder = EmbedBuilder()
-                    .setTitle(LM.getMessageByLangCode(FabricordMessageKey.Discord.Embed.ServerStatus.Title, lang = discordUserLang))
+                    .setTitle(LM.getMessage(FabricordMessageKey.Discord.Embed.ServerStatus.Title, lang = discordUserLang).string)
                     .setColor(Color.BLUE)
                     .setDescription(
                         "**TPS:** `${"%.2f".format(tps)}`\n" +
@@ -241,7 +242,7 @@ object DiscordBotManager {
     }
 
     private fun onlineStatus(): OnlineStatus {
-        return when (Config.botActivityStatus?.lowercase(Locale.getDefault())) {
+        return when (Config.botOnlineStatus.lowercase()) {
             "online" -> OnlineStatus.ONLINE
             "idle" -> OnlineStatus.IDLE
             "dnd" -> OnlineStatus.DO_NOT_DISTURB
@@ -254,12 +255,12 @@ object DiscordBotManager {
         val activityStatus = Config.botActivityStatus
         val activityMessage = Config.botActivityMessage
 
-        return when (activityStatus?.lowercase(Locale.getDefault())) {
-            "playing" -> Activity.playing(activityMessage!!)
-            "watching" -> Activity.watching(activityMessage!!)
-            "listening" -> Activity.listening(activityMessage!!)
-            "competing" -> Activity.competing(activityMessage!!)
-            else -> Activity.playing(activityMessage!!)
+        return when (activityStatus.lowercase()) {
+            "playing" -> Activity.playing(activityMessage)
+            "watching" -> Activity.watching(activityMessage)
+            "listening" -> Activity.listening(activityMessage)
+            "competing" -> Activity.competing(activityMessage)
+            else -> Activity.playing(activityMessage)
         }
     }
 
@@ -298,8 +299,8 @@ object DiscordBotManager {
         if (Config.isLogChannelIDNotSet) return
         FT {
             Config.logChannelID?.let { channelId ->
-                val blockedUserIds = Config.mentionBlockedUserID ?: emptyList()
-                val blockedRoleIds = Config.mentionBlockedRoleID ?: emptyList()
+                val blockedUserIds = Config.mentionBlockedUserID
+                val blockedRoleIds = Config.mentionBlockedRoleID
 
                 val mentionedUserIds = "<@!?([0-9]+)>".toRegex()
                     .findAll(message)

@@ -11,19 +11,18 @@ import net.ririfa.fabricord.discord.DiscordBotManager
 import net.ririfa.fabricord.discord.DiscordEmbed
 import net.ririfa.fabricord.translation.FabricordMessageKey
 import net.ririfa.fabricord.translation.FabricordMessageProvider
-import net.ririfa.fabricord.util.isOlderVersion
-import net.ririfa.langman.InitType
 import net.ririfa.langman.LangMan
+import net.ririfa.langman.LangManBuilder
+import net.ririfa.langman.TextFactory
+import net.ririfa.langman.ext.yaml.YamlFileLoader
 import org.apache.logging.log4j.LogManager
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
-import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
-import kotlin.use
 
 class Fabricord : DedicatedServerModInitializer {
     companion object {
@@ -46,18 +45,23 @@ class Fabricord : DedicatedServerModInitializer {
     }
 
     override fun onInitializeServer() {
+        loader.configDir
         if (Files.notExists(logDir)) Files.createDirectories(logDir)
-        LanguageAutoUpdater.checkForUpdatesAndExtract()
-        langMan = LangMan.createNew(
-            { Text.of(it) },
-            FabricordMessageKey::class,
-            false
-        )
-        langMan.init(
-            InitType.YAML,
-            langDir.toFile(),
-            availableLang
-        )
+        langMan = LangManBuilder.new<FabricordMessageProvider, Text>()
+            .fromResource("/assets/$MOD_ID/lang/")
+            .toPath(langDir)
+            .withMessageKey(FabricordMessageKey::class.java)
+            .withType(YamlFileLoader { inputStream -> Yaml().load(inputStream) })
+            .registerTextFactory(object : TextFactory<Text> {
+                override val clazz: Class<Text>
+                    get() = Text::class.java
+
+                override fun invoke(text: String): Text = Text.literal(text)
+            })
+            .withLanguage(availableLang)
+            .autoUpdateIfNeeded(true)
+            .debug(true)
+            .build()
         ConfigManager.init()
         registerServerEvents()
     }
@@ -157,118 +161,5 @@ class Fabricord : DedicatedServerModInitializer {
         }
 
         Logger.debug("registerServerEvents: finished")
-    }
-
-    object LanguageAutoUpdater {
-        private val yaml = Yaml()
-        private const val DEFAULT_VERSION = "1.0.0"
-
-        fun checkForUpdatesAndExtract() {
-            Logger.debug("LanguageAutoUpdater: Starting language update check")
-            try {
-                if (!Files.exists(langDir)) {
-                    Logger.debug("LanguageAutoUpdater: lang directory does not exist, creating and extracting all")
-                    Files.createDirectories(langDir)
-                    extractLangFiles(langDir)
-                    return
-                }
-
-                val latestVersions = getLatestVersionsFromJar()
-                if (latestVersions == null) {
-                    Logger.warn("LanguageAutoUpdater: latestVersions not found (langversion.info missing?), skipping update check")
-                    return
-                }
-
-                Logger.debug("LanguageAutoUpdater: latestVersions = {}", latestVersions)
-
-                val needsUpdate = Files.list(langDir).use { files ->
-                    files.toList().filter { it.toString().endsWith(".yml") }.any { file ->
-                        val langKey = file.fileName.toString().removeSuffix(".yml")
-                        val latestVersion = latestVersions[langKey] ?: DEFAULT_VERSION
-                        val currentVersion = getVersionFromYaml(file) ?: DEFAULT_VERSION
-                        Logger.debug("LanguageAutoUpdater: checking $langKey → current=$currentVersion, latest=$latestVersion")
-                        isOlderVersion(currentVersion, latestVersion)
-                    }
-                }
-
-                if (needsUpdate) {
-                    Logger.info("LanguageAutoUpdater: update needed, extracting language files")
-                    extractLangFiles(langDir)
-                } else {
-                    Logger.debug("LanguageAutoUpdater: all language files up to date, no extraction needed")
-                }
-            } catch (e: Exception) {
-                Logger.error("LanguageAutoUpdater: Failed to check for language file updates", e)
-            }
-        }
-
-        private fun extractLangFiles(targetDir: Path) {
-            Logger.debug("LanguageAutoUpdater: extracting language files to {}", targetDir)
-            try {
-                val langPath = "assets/${MOD_ID}/lang/"
-                val classLoader = Fabricord::class.java.classLoader
-
-                availableLang.forEach { lang ->
-                    val fileName = "$lang.yml"
-                    val fullPath = "$langPath$fileName"
-
-                    val inputStream: InputStream? = classLoader.getResourceAsStream(fullPath)
-                        ?: run {
-                            val fallbackPath = Path.of("build/resources/main/$fullPath")
-                            if (Files.exists(fallbackPath)) {
-                                Logger.warn("LanguageAutoUpdater: Using fallback language file: $fallbackPath")
-                                Files.newInputStream(fallbackPath)
-                            } else {
-                                Logger.warn("LanguageAutoUpdater: Language file not found: $fullPath (also missing in build/resources/main)")
-                                null
-                            }
-                        }
-
-                    if (inputStream == null) {
-                        Logger.debug("LanguageAutoUpdater: Skipping $fileName (no available source)")
-                        return@forEach
-                    }
-
-                    val targetFile = targetDir.resolve(fileName)
-                    inputStream.use { input ->
-                        Files.copy(input, targetFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
-                    }
-                    Logger.info("LanguageAutoUpdater: Extracted language file: $fileName")
-                }
-            } catch (e: Exception) {
-                Logger.error("LanguageAutoUpdater: Failed to extract language files", e)
-            }
-        }
-
-        private fun getVersionFromYaml(file: Path): String? {
-            return try {
-                Files.newBufferedReader(file).use { reader ->
-                    val data = yaml.load<Map<String, Any>>(reader)
-                    val version = data["version"] as? String
-                    Logger.debug("LanguageAutoUpdater: read version from {} = {}", file.fileName, version)
-                    version
-                }
-            } catch (e: Exception) {
-                Logger.warn("LanguageAutoUpdater: Failed to read version from ${file.fileName}", e)
-                null
-            }
-        }
-
-        private fun getLatestVersionsFromJar(): Map<String, String>? {
-            return try {
-                val classLoader = this::class.java.classLoader
-                val resourceUrl = classLoader.getResource("assets/${MOD_ID}/lang/langversion.info") ?: return null
-                resourceUrl.openStream().use { inputStream ->
-                    val data: Map<String, Any> = yaml.load(inputStream)
-                    @Suppress("UNCHECKED_CAST")
-                    val latest = data["latest"] as? Map<String, String>
-                    Logger.debug("LanguageAutoUpdater: loaded langversion.info successfully")
-                    latest
-                }
-            } catch (e: Exception) {
-                Logger.error("LanguageAutoUpdater: Failed to read langversion.info", e)
-                null
-            }
-        }
     }
 }
