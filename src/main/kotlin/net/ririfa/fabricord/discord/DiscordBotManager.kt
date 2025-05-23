@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 import net.minecraft.server.network.ServerPlayerEntity
 import net.ririfa.fabricord.*
 import net.ririfa.fabricord.translation.FabricordMessageKey
+import net.ririfa.fabricord.util.error
+import net.ririfa.fabricord.util.warn
 import java.awt.Color
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -36,7 +38,7 @@ object DiscordBotManager {
     private val uuidPattern = Regex("@\\{([0-9a-fA-F-]+)}")
 
     init {
-        FT(delay = 0, period = 3500, unit = TimeUnit.MILLISECONDS, newThread = true) {
+        FT(delay = 0, period = 5000, unit = TimeUnit.MILLISECONDS, newThread = true) {
             flushLogQueue()
         }
     }
@@ -78,9 +80,9 @@ object DiscordBotManager {
                 Logger.info(LM.getMessage(FabricordMessageKey.Discord.Bot.BotNowOnline, jda?.selfUser?.name ?: "Bot").string)
                 sendToDiscord(Config.serverStartMessage)
             } catch (e: LoginException) {
-                Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotLoginToBot).string, e)
+                Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotLoginToBot), e)
             } catch (e: Exception) {
-                Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotStartBot).string, e)
+                Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotStartBot), e)
             }
         }
     }
@@ -104,12 +106,12 @@ object DiscordBotManager {
                     shutdownFuture.get(7500, TimeUnit.MILLISECONDS)
                     Logger.info(LM.getMessage(FabricordMessageKey.Discord.Bot.BotNowOffline, instance.selfUser.name).string)
                 } catch (_: TimeoutException) {
-                    Logger.warn(LM.getMessage(FabricordMessageKey.Discord.Bot.TimedOutForStoppingBot).string)
+                    Logger.warn(LM.getMessage(FabricordMessageKey.Discord.Bot.TimedOutForStoppingBot))
                     instance.shutdownNow()
                 }
             }
         } catch (e: Exception) {
-            Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotStopBot).string, e)
+            Logger.error(LM.getMessage(FabricordMessageKey.Discord.Bot.CannotStopBot), e)
             e.printStackTrace()
         }
     }

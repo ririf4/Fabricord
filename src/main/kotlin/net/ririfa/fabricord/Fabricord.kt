@@ -45,7 +45,6 @@ class Fabricord : DedicatedServerModInitializer {
     }
 
     override fun onInitializeServer() {
-        loader.configDir
         if (Files.notExists(logDir)) Files.createDirectories(logDir)
         langMan = LangManBuilder.new<FabricordMessageProvider, Text>()
             .fromResource("/assets/$MOD_ID/lang/")

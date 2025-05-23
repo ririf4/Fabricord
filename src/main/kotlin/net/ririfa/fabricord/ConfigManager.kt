@@ -21,15 +21,25 @@ object ConfigManager {
     private val configFile: Path = ModDir.resolve("config.yml")
 
     fun init() {
+        createDirectoryIfNeeded()
+        registerDefaultHandlers()
+        loadConfig()
+    }
+
+    private fun createDirectoryIfNeeded() {
         if (!Files.exists(ModDir)) {
             Files.createDirectories(ModDir)
         }
+    }
 
-        DefaultHandlers.register(Set::class.java) { raw, type ->
+    private fun registerDefaultHandlers() {
+        DefaultHandlers.register(Set::class.java) { raw, _ ->
             if (raw == "toEmptySet") emptySet<Any>()
             else throw IllegalArgumentException("Unsupported default value '$raw' for Set")
         }
+    }
 
+    private fun loadConfig() {
         try {
             loader = Yacla.fileLoader<Config>()
                 .fromResource("/assets/fabricord/config.yml")
@@ -83,7 +93,7 @@ object ConfigManager {
         @JvmField
         var playerJoinMessage: String,
         @JvmField
-        var playerLeaveMessage: String?,
+        var playerLeaveMessage: String,
 
         @JvmField
         @Default("false")

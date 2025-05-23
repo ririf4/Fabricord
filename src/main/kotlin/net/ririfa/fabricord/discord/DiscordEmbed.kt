@@ -6,6 +6,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.ririfa.fabricord.*
 import net.ririfa.fabricord.translation.FabricordMessageKey
+import net.ririfa.fabricord.util.error
 import java.awt.Color
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
@@ -14,7 +15,7 @@ object DiscordEmbed {
     private val logQueue = ConcurrentLinkedQueue<Pair<String, MessageEmbed>>()
 
     fun init() {
-        FT(period = 500, unit = TimeUnit.MILLISECONDS, newThread = true) {
+        FT(period = 5000, unit = TimeUnit.MILLISECONDS, newThread = true) {
             val (channelId, embed) = logQueue.poll() ?: return@FT
 
             val channel = JDA?.getTextChannelById(channelId)
@@ -64,7 +65,7 @@ object DiscordEmbed {
         val name = player.name.string
         val uuid = player.uuid.toString()
         val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
-        val message = Config.playerJoinMessage!!.replace("%player%", name)
+        val message = Config.playerJoinMessage.replace("%player%", name)
         sendEmbedToDiscordImmediately(Color.GREEN, message, imageUrl)
     }
 
@@ -73,7 +74,7 @@ object DiscordEmbed {
         val name = player.name.string
         val uuid = player.uuid.toString()
         val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
-        val message = Config.playerLeaveMessage!!.replace("%player%", name)
+        val message = Config.playerLeaveMessage.replace("%player%", name)
         sendEmbedToDiscordImmediately(Color.RED, message, imageUrl)
     }
 

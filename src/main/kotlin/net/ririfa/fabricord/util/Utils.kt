@@ -5,6 +5,8 @@ import net.minecraft.registry.Registries
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvent
+import net.minecraft.text.Text
+import org.slf4j.Logger
 
 fun ServerPlayerEntity.playSoundToPlayerMaster(soundEvent: SoundEvent, f: Float, g: Float) {
     this.networkHandler.sendPacket(
@@ -36,4 +38,16 @@ fun replaceUUIDsWithMCIDs(message: String, players: List<ServerPlayerEntity>): P
         }
     }
     return Pair(updatedMessage, mentionedPlayers)
+}
+
+fun Logger.info(text: Text, vararg throwable: Throwable?) {
+    this.info(text.string, *throwable)
+}
+
+fun Logger.warn(text: Text, vararg throwable: Throwable?) {
+    this.warn(text.string, *throwable)
+}
+
+fun Logger.error(text: Text, vararg throwable: Throwable?) {
+    this.error(text.string, *throwable)
 }
