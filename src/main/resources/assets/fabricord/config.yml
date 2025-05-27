@@ -1,97 +1,89 @@
-version: "1.0.2"
+version: "1.1.0"
 
-# Thank you for installing this mod!
-# Now let's put a portal on Discord and the Minecraft server chat!
+# ────────────────
+# Thank you for installing Fabricord!
+# This mod bridges your Minecraft server chat and Discord.
+#
+# Links:
+#   GitHub          -> https://github.com/ririf4/Fabricord
+#   Modrinth        -> https://modrinth.com/mod/fabricord
+#   Community Discord -> https://discord.swiftstorm.dev
+# ────────────────
 
-# Click here for various links↓.
-# GitHub -> https://github.com/ririf4/Fabricord
-# Modrinth -> https://modrinth.com/mod/fabricord
-# Community Server -> https://discord.swiftstorm.dev
-
-# BotToken for use with Discord.
-# To get a BotToken -> https://discord.com/developers/applications
+# Your Discord bot token.
+# Create a bot and get a token here:
+# https://discord.com/developers/applications
 BotToken: ""
 
-# Channel for sending Minecraft logs.
-# If Blank, the mod will not send Minecraft Server General Chat to Discord.
-# To get a Channel ID -> https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID
+# Discord channel ID where server logs and chat will be sent.
+# Leave blank to disable logging to Discord.
+# Learn how to get channel IDs:
+# https://support.discord.com/hc/en-us/articles/206346498
 LogChannelID: ""
 
-# When true, all player chats are no longer comprehensively bridged.
-DontSendChatToDiscord: false
+# What types of messages to send from Minecraft to Discord.
+# Options: Chat, Advancement, Death, Join, Leave
+# Example:
+# WillSends:
+#   - Chat
+#   - Join
+WillSends: []
 
-# If you want to disable even the server startup logs, set `LogChannelID` to empty;
-# if you want to disable chat only, set `dontSendChatToDiscord` to true
+# ── Bot Appearance Settings ──
 
-# >----- Advanced Settings -----< #
-
-# The bot's activity can be changed.
-# "PLAYING", "STREAMING", "LISTENING" and "WATCHING" are available.
-# If blank, "PLAYING" is automatically selected.
+# Activity type shown on Discord.
+# Options: PLAYING, STREAMING, LISTENING, WATCHING
+# Default: PLAYING
 BotActivityStatus: ""
 
-# The bot's activity text can be changed.
-# If blank, "Minecraft" is automatically selected.
+# Custom activity text.
+# Default: "Minecraft"
 BotActivityMessage: ""
 
-# The bot's online status can be changed.
-# "ONLINE", "IDLE" and "DO_NOT_DISTURB" are available.
-# If blank, "ONLINE" is automatically selected.
+# Bot's online status.
+# Options: ONLINE, IDLE, DO_NOT_DISTURB
+# Default: ONLINE
 BotOnlineStatus: ""
 
-# The Log Style can be changed.
-# "classic", "modern" are available.
-# If blank, "classic" is automatically selected.
+# Message format style.
+# Options: classic, modern
+# Default: classic
 MessageStyle: ""
 
-# Whether to allow mentions such as @everyone and @role from Minecraft to Discord.
-# If false, all mentions will be disabled regardless of permission settings.
+# ── Mention Settings ──
+
+# Allow mentions like @everyone and @role from Minecraft to Discord.
 allowMentions: false
 
-# Whether to restrict mention permissions based on the Discord user's permissions.
-# If true, only users with the required Discord permission can send mentions via chat.
+# Restrict mentions based on Discord permissions.
+# If true, only users with the proper Discord permissions can trigger mentions.
 UseUserPermissionForMentions: false
 
-# A list of Discord User IDs who should not be pinged,
-# even if they are mentioned explicitly in Minecraft messages.
-# Mentions targeting these users will be sent as plain text instead of actual pings.
-BlockedUserIDs: [ ]
+# List of Discord user IDs who should never be pinged.
+BlockedUserIDs: []
 
-# A list of Discord Role IDs that should not be pinged from Minecraft.
-# Useful for preventing pings to roles like @everyone or @admins.
-BlockedRoleIDs: [ ]
+# List of Discord role IDs that should never be pinged.
+BlockedRoleIDs: []
 
-# The message that appears when the server starts.
-# If blank, the message will use the default message.
+# ── Custom Message Settings ──
+
+# Message sent when the server starts/stops.
 ServerStartMessage: ""
-
-# The message that appears when the server stops.
-# If blank, the message will use the default message.
 ServerStopMessage: ""
 
-# The message that appears when a player joins the server.
-# You can use the "%player%" placeholder.
-# It will be replaced with the player's name.
-# If blank, the message will use the default message.
+# Message sent when a player joins/leaves the server.
+# Use %player% to insert the player’s name.
 PlayerJoinMessage: ""
-
-# The message that appears when a player leaves the server.
-# You can use the "%player%" placeholder.
-# It will be replaced with the player's name.
-# If blank, the message will use the default message.
 PlayerLeaveMessage: ""
 
-# This setting allows Minecraft and Discord consoles to work together.
-# Each message interacts with each other and the console can be run from the Discord side.
+# ── Console Integration ──
+
+# If true, enables bidirectional console log interaction via Discord.
 EnableConsoleLog: false
 
-# Enter the channel ID of the target channel to be linked.
-# ***Please enter ID carefully to avoid mistakes.***
+# Discord channel ID for console log commands and outputs.
 ConsoleLogChannelID: ""
-# >-----------------------------< #
 
-# >----- Experimental Settings -----< #
+# ── Experimental Settings ──
 
-# There are no experimental settings available at this time ;)
-
-# >--------------------------------< #
+# No experimental settings available yet.
