@@ -51,3 +51,9 @@ fun Logger.warn(text: Text, vararg throwable: Throwable?) {
 fun Logger.error(text: Text, vararg throwable: Throwable?) {
     this.error(text.string, *throwable)
 }
+
+//fun Logger.logIfDebug(text: Text, vararg throwable: Throwable?) {
+//    if (Config.isDebug) {
+//        this.debug(text.string, *throwable)
+//    }
+//}

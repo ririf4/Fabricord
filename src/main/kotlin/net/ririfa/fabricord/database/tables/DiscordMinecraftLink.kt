@@ -1,5 +1,6 @@
 package net.ririfa.fabricord.database.tables
 
+import net.ririfa.fabricord.database.DataManager.cache
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -22,14 +23,20 @@ class DiscordMinecraftLink(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<DiscordMinecraftLink>(DiscordMinecraftLinks) {
         @JvmStatic
         fun from(data: DMLinkData): DiscordMinecraftLink {
-            return findById(data.minecraftUUID) ?: new(data.minecraftUUID) {
+            val existing = cache.get(data.minecraftUUID)
+            if (existing != null) return existing
+
+            val newLink = new(data.minecraftUUID) {
                 discordId = data.discordId
             }
+            cache.put(data.minecraftUUID, newLink)
+            return newLink
         }
+
 
         @JvmStatic
         fun isUserLinked(minecraftUUID: UUID): Boolean {
-            return findById(minecraftUUID) != null
+            return cache.get(minecraftUUID) != null
         }
     }
 

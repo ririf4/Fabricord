@@ -1,15 +1,17 @@
 package net.ririfa.fabricord
 
+import net.ririfa.fabricord.util.SendableEvent
 import net.ririfa.yacla.Yacla
+import net.ririfa.yacla.annotation.CustomLoader
 import net.ririfa.yacla.annotation.Default
 import net.ririfa.yacla.annotation.IfNullEvenRequired
 import net.ririfa.yacla.annotation.Required
 import net.ririfa.yacla.defaults.DefaultHandlers
 import net.ririfa.yacla.loader.ConfigLoader
 import net.ririfa.yacla.loader.ErrorHandlerWith
+import net.ririfa.yacla.loader.FieldLoader
 import net.ririfa.yacla.loader.util.ContextType
 import net.ririfa.yacla.yaml.YamlParser
-import org.jetbrains.annotations.Nullable
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -37,11 +39,16 @@ object ConfigManager {
             if (raw == "toEmptySet") emptySet<Any>()
             else throw IllegalArgumentException("Unsupported default value '$raw' for Set")
         }
+
+        DefaultHandlers.register(List::class.java) { raw, _ ->
+            if (raw == "toEmptyList") emptyList<Any>()
+            else throw IllegalArgumentException("Unsupported default value '$raw' for List")
+        }
     }
 
     private fun loadConfig() {
         try {
-            loader = Yacla.fileLoader<Config>()
+            loader = Yacla.loader<Config>()
                 .fromResource("/assets/fabricord/config.yml")
                 .toFile(configFile)
                 .parser(YamlParser())
@@ -65,14 +72,14 @@ object ConfigManager {
         @JvmField
         val botToken: String?,
         @Required(soft = true)
-        @Nullable
         @JvmField
         @IfNullEvenRequired(handler = LogChannelIDNullHandler::class)
         var logChannelID: String?,
 
         @JvmField
-        @Default("false")
-        var dontSendChatToDiscord: Boolean,
+        @Default("toEmptyList")
+        @CustomLoader(loader = SendableEventListLoader::class)
+        var willSends: List<SendableEvent>,
         @JvmField
         @Default("false")
         var botActivityMessage: String,
@@ -119,6 +126,8 @@ object ConfigManager {
          */
         @JvmField
         var isLogChannelIDNotSet = false
+
+        fun sendChat(): Boolean = willSends.contains(SendableEvent.Chat)
     }
 
     class LogChannelIDNullHandler : ErrorHandlerWith<Any?> {
@@ -130,6 +139,24 @@ object ConfigManager {
         ) {
             if (configInstance is Config) {
                 configInstance.isLogChannelIDNotSet = true
+            }
+        }
+    }
+
+    class SendableEventListLoader : FieldLoader {
+        override fun load(raw: Any?): Any {
+            val rawList = raw as? List<*>
+                ?: throw IllegalArgumentException("Expected a List for SendableEvent, got: ${raw?.javaClass?.name}")
+
+            return rawList.map {
+                val str = (it as? String)?.trim()
+                    ?: throw IllegalArgumentException("Expected string elements in SendableEvent list")
+
+                try {
+                    SendableEvent.valueOf(str)
+                } catch (e: IllegalArgumentException) {
+                    throw IllegalArgumentException("Invalid SendableEvent: '$str'", e)
+                }
             }
         }
     }

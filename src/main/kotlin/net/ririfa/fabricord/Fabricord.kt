@@ -122,7 +122,7 @@ class Fabricord : DedicatedServerModInitializer {
                     Logger.debug("JOIN: Discord bot initialized, sending join embed")
                     FT {
                         DiscordEmbed.sendPlayerJoinEmbed(player)
-                        Logger.debug("JOIN: join embed sent for ${player.name.string}")
+                        Logger.debug("JOIN: join embeds sent for {}", player.name.string)
                     }
                 } else {
                     Logger.debug("JOIN: Discord bot not initialized, skipping join embed")
@@ -143,18 +143,6 @@ class Fabricord : DedicatedServerModInitializer {
                     Logger.debug("DISCONNECT: Discord bot not initialized, skipping leave embed")
                 }
             }
-
-            // Replaced by control in Mixin.
-//            ServerMessageEvents.CHAT_MESSAGE.register { message, sender, params ->
-//                if (DiscordBotManager.isBotInitialized && Config.dontSendChatToDiscord == false) {
-//                    val uuid = sender.uuid
-//
-//                    if (uuid in localChatToggled) return@register
-//
-//                    val content = message.content.string
-//                    handleMCMessage(sender, content)
-//                }
-//            }
         } else {
             Logger.debug("registerServerEvents: logChannelID is not set, skipping JOIN and DISCONNECT event registration")
         }

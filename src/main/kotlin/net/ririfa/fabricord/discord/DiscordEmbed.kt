@@ -18,15 +18,13 @@ object DiscordEmbed {
         FT(period = 5000, unit = TimeUnit.MILLISECONDS, newThread = true) {
             val (channelId, embed) = logQueue.poll() ?: return@FT
 
-            val channel = JDA?.getTextChannelById(channelId)
-            if (channel != null) {
-                try {
-                    channel.sendMessageEmbeds(embed).queue()
-                } catch (e: Exception) {
-                    Logger.error("Failed to send embed: ${e.message}")
-                }
-            } else {
-                Logger.warn("Discord channel not found: $channelId")
+            val jda = JDA ?: return@FT
+            val channel = jda.getTextChannelById(channelId) ?: return@FT
+
+            try {
+                channel.sendMessageEmbeds(embed).queue()
+            } catch (e: Exception) {
+                Logger.error("Failed to send embed: ${e.message}")
             }
         }
     }
@@ -57,7 +55,13 @@ object DiscordEmbed {
             setAuthor(author, null, imageUrl)
         }.build()
 
-        JDA?.getTextChannelById(channelId)?.sendMessageEmbeds(embed)?.queue()
+        val jda = JDA ?: return
+        val channel = jda.getTextChannelById(channelId) ?: return
+
+        channel.sendMessageEmbeds(embed).queue(
+            null,
+            { e -> Logger.error("Failed to send embed: ${e.message}") }
+        )
     }
 
     @JvmStatic

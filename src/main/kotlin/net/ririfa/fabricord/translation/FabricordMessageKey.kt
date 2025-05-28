@@ -69,6 +69,11 @@ sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
 
         sealed class LC : Command() {
             object SwitchedLocalChatState : LC()
+
+            sealed class State : LC() {
+                object ON : State()
+                object OFF : State()
+            }
         }
     }
 

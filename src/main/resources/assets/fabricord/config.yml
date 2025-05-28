@@ -53,7 +53,7 @@ MessageStyle: ""
 # ── Mention Settings ──
 
 # Allow mentions like @everyone and @role from Minecraft to Discord.
-allowMentions: false
+AllowMentions: false
 
 # Restrict mentions based on Discord permissions.
 # If true, only users with the proper Discord permissions can trigger mentions.

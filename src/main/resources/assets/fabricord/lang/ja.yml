@@ -57,7 +57,7 @@ Command:
   Page: "ページ"
 
   LC:
-    SwitchedLocalChatState: "ローカルチャットの状態を %s にしました"
+    SwitchedLocalChatState: "ローカルチャットの状態を %state% にしました"
 
   Group:
     Create:

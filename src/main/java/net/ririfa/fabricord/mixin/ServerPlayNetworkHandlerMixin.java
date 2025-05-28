@@ -3,7 +3,7 @@ package net.ririfa.fabricord.mixin;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.ririfa.fabricord.AliasKt;
+import net.ririfa.fabricord.Aliases;
 import net.ririfa.fabricord.CommandManager;
 import net.ririfa.fabricord.database.tables.DiscordMinecraftLink;
 import net.ririfa.fabricord.discord.DiscordBotManager;
@@ -27,27 +27,23 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
     private void interceptChatMessage(@NotNull ChatMessageC2SPacket packet, CallbackInfo ci) {
-        if (!DiscordBotManager.isBotInitialized || AliasKt.getConfig().isLogChannelIDNotSet || AliasKt.getConfig().dontSendChatToDiscord)
-            return;
+        if (!DiscordBotManager.isBotInitialized ||
+                Aliases.getConfig().isLogChannelIDNotSet ||
+                !Aliases.getConfig().sendChat()) return;
 
-        ServerPlayNetworkHandler handler = (ServerPlayNetworkHandler) (Object) this;
-        ServerPlayerEntity player = handler.player;
-        FabricordMessageProvider ap = FabricordMessageProviderKt.adapt(player);
         UUID playerUUID = player.getUuid();
+        FabricordMessageProvider ap = FabricordMessageProviderKt.adapt(player);
 
-        if (!DiscordMinecraftLink.isUserLinked(playerUUID) && Boolean.TRUE.equals(AliasKt.getConfig().useUserPermissionForMention)) {
-            // Discordユーザー権限を使用する設定にも関わらずLinkされていない場合はリンクしてくださいという旨のメッセージを送信。
+        if (!DiscordMinecraftLink.isUserLinked(playerUUID) && Aliases.getConfig().useUserPermissionForMention) {
+            player.sendMessage(ap.getMessage(FabricordMessageKey.Chat.LinkDiscordAccountFirst.INSTANCE));
             ci.cancel();
-            var message = ap.getMessage(FabricordMessageKey.Chat.LinkDiscordAccountFirst.INSTANCE);
-            player.sendMessage(message);
-        } else {
-            String message = packet.chatMessage();
+            return;
+        }
 
-            if (CommandManager.localChatToggled.contains(playerUUID)) {
-                /* Do nothing(To skip handleMCMessage) **/
-            } else {
-                DiscordPlayerEventHandler.INSTANCE.handleMCMessage(player, message);
-            }
+        String message = packet.chatMessage();
+
+        if (!CommandManager.localChatToggled.contains(playerUUID)) {
+            DiscordPlayerEventHandler.INSTANCE.handleMCMessage(player, message);
         }
     }
 }

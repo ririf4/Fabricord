@@ -17,7 +17,8 @@ object CommandManager {
     val localChatToggled = mutableSetOf<UUID>()
 
     val allGroupCommands = listOf(
-        LCCommand
+        LCCommand,
+        LinkCommand
     )
 
     fun registerAll(dispatcher: CommandDispatcher<ServerCommandSource>) {
@@ -38,7 +39,12 @@ object CommandManager {
                         localChatToggled.remove(uuid)
                     }
 
-                    val stateMSG = if (newState) "ON" else "OFF"
+                    val stateMSG: Map<String, Text> = if (newState) {
+                        mapOf("state" to player.adapt().getMessage(FabricordMessageKey.Command.LC.State.ON))
+                    } else {
+                        mapOf("state" to player.adapt().getMessage(FabricordMessageKey.Command.LC.State.OFF))
+                    }
+
                     player.sendMessage(
                         player.adapt().getMessage(FabricordMessageKey.Command.LC.SwitchedLocalChatState, stateMSG),
                         false
@@ -63,6 +69,13 @@ object CommandManager {
         }
     }
 
+    object LinkCommand : C {
+        override fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
+            dispatcher.registerCommand("link") {
+
+            }
+        }
+    }
 }
 
 interface C {

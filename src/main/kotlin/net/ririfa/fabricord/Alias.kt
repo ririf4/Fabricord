@@ -1,3 +1,5 @@
+@file:JvmName("Aliases")
+
 package net.ririfa.fabricord
 
 import net.fabricmc.loader.api.FabricLoader
