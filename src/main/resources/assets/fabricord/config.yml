@@ -25,14 +25,19 @@ LogChannelID: ""
 # Options: Chat, Advancement, Death, Join, Leave
 # Example:
 # WillSends:
-#   - Chat
-#   - Join
-WillSends: []
+#   - "Chat"
+#   - "Join"
+WillSends:
+  - "Chat"
+  - "Advancement"
+  - "Death"
+  - "Join"
+  - "Leave"
 
 # ── Bot Appearance Settings ──
 
 # Activity type shown on Discord.
-# Options: PLAYING, STREAMING, LISTENING, WATCHING
+# Options: PLAYING, COMPETING, LISTENING, WATCHING
 # Default: PLAYING
 BotActivityStatus: ""
 

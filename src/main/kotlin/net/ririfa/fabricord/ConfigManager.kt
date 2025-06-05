@@ -10,7 +10,6 @@ import net.ririfa.yacla.defaults.DefaultHandlers
 import net.ririfa.yacla.loader.ConfigLoader
 import net.ririfa.yacla.loader.ErrorHandlerWith
 import net.ririfa.yacla.loader.FieldLoader
-import net.ririfa.yacla.loader.util.ContextType
 import net.ririfa.yacla.yaml.YamlParser
 import java.nio.file.Files
 import java.nio.file.Path
@@ -81,7 +80,7 @@ object ConfigManager {
         @CustomLoader(loader = SendableEventListLoader::class)
         var willSends: List<SendableEvent>,
         @JvmField
-        @Default("false")
+        @Default("Minecraft")
         var botActivityMessage: String,
         @JvmField
         @Default("playing")
@@ -130,16 +129,11 @@ object ConfigManager {
         fun sendChat(): Boolean = willSends.contains(SendableEvent.Chat)
     }
 
-    class LogChannelIDNullHandler : ErrorHandlerWith<Any?> {
+    class LogChannelIDNullHandler : ErrorHandlerWith {
         override fun handle(
-            fieldValue: Any?,
-            configInstance: Any,
-            context: Any?,
-            contextType: ContextType
+            fieldValue: Any?
         ) {
-            if (configInstance is Config) {
-                configInstance.isLogChannelIDNotSet = true
-            }
+            config.isLogChannelIDNotSet = true
         }
     }
 

@@ -5,22 +5,8 @@ import net.ririfa.langman.MessageKey
 
 sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
     sealed class System : FabricordMessageKey() {
-        sealed class Initialization : System() {
-            object FailedToCheckOrCreateRequiredDirOrFileBySec : Initialization()
-            object FailedToCheckOrCreateRequiredDirOrFileByIO : Initialization()
-            object FailedToCheckOrCreateRequiredDirOrFile : Initialization()
-
-            sealed class DirectoriesAndFiles : Initialization() {
-                object ModDirDoesNotExist : DirectoriesAndFiles()
-            }
-        }
-
         sealed class Discord : System() {
             object ErrorDuringSendingModernMessage : Discord()
-        }
-
-        sealed class GRP : System() {
-            object GroupedChatMessageBase : GRP()
         }
     }
 
@@ -57,16 +43,7 @@ sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
         }
     }
 
-    sealed class Exception : FabricordMessageKey() {
-        sealed class Config : Exception() {
-            object RequiredPropertyIsNotConfigured : Config()
-            object SoftRequiredPropertyIsNotConfigured : Config()
-        }
-    }
-
     sealed class Command : FabricordMessageKey() {
-        object ThisCommandIsPlayerOnly : Command()
-
         sealed class LC : Command() {
             object SwitchedLocalChatState : LC()
 

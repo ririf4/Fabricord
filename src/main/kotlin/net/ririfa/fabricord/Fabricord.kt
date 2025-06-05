@@ -19,7 +19,6 @@ import org.apache.logging.log4j.LogManager
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -38,14 +37,12 @@ class Fabricord : DedicatedServerModInitializer {
         val serverDir: Path = loader.gameDir
         val modDir: Path = serverDir.resolve(MOD_ID)
         val langDir: Path = modDir.resolve("lang")
-        val logDir: Path = modDir.resolve("logs")
 
         val thread: ScheduledExecutorService = Executors.newScheduledThreadPool(2)
         val availableLang = listOf<String>("en", "ja")
     }
 
     override fun onInitializeServer() {
-        if (Files.notExists(logDir)) Files.createDirectories(logDir)
         langMan = LangManBuilder.new<FabricordMessageProvider, Text>()
             .fromResource("/assets/$MOD_ID/lang/")
             .toPath(langDir)

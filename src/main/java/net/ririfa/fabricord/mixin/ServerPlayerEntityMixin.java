@@ -3,7 +3,7 @@ package net.ririfa.fabricord.mixin;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.ririfa.fabricord.AliasKt;
+import net.ririfa.fabricord.Aliases;
 import net.ririfa.fabricord.discord.DiscordBotManager;
 import net.ririfa.fabricord.discord.DiscordEmbed;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +21,7 @@ public abstract class ServerPlayerEntityMixin {
             )
     )
     public void onPlayerDeath(DamageSource source, CallbackInfo ci) {
-        if (!DiscordBotManager.isBotInitialized || AliasKt.getConfig().isLogChannelIDNotSet) return;
+        if (!DiscordBotManager.isBotInitialized || Aliases.getConfig().isLogChannelIDNotSet) return;
 
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         Text message = player.getDamageTracker().getDeathMessage();
