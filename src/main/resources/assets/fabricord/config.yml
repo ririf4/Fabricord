@@ -73,13 +73,13 @@ BlockedRoleIDs: []
 # ── Custom Message Settings ──
 
 # Message sent when the server starts/stops.
-ServerStartMessage: ""
-ServerStopMessage: ""
+ServerStartMessage: "Server has started!"
+ServerStopMessage: "Server has stopped!"
 
 # Message sent when a player joins/leaves the server.
 # Use %player% to insert the player’s name.
-PlayerJoinMessage: ""
-PlayerLeaveMessage: ""
+PlayerJoinMessage: "%player% joined the game"
+PlayerLeaveMessage: "%player% left the game"
 
 # ── Console Integration ──
 

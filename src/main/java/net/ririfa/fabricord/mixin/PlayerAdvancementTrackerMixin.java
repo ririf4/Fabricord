@@ -2,7 +2,7 @@ package net.ririfa.fabricord.mixin;
 
 import net.minecraft.advancement.*;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.ririfa.fabricord.Aliases;
+import net.ririfa.fabricord.ConfigManager;
 import net.ririfa.fabricord.discord.DiscordBotManager;
 import net.ririfa.fabricord.discord.DiscordEmbed;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +21,7 @@ public abstract class PlayerAdvancementTrackerMixin {
 
     @Inject(method = "grantCriterion", at = @At("RETURN"))
     public void onAdvancementGranted(AdvancementEntry advancementEntry, String string, @NotNull CallbackInfoReturnable<Boolean> cir) {
-        if (!DiscordBotManager.isBotInitialized || Aliases.getConfig().isLogChannelIDNotSet) return;
+        if (!DiscordBotManager.isBotInitialized || ConfigManager.isLogChannelIDNotSet()) return;
 
         if (cir.getReturnValue()) {
             Advancement advancement = advancementEntry.value();

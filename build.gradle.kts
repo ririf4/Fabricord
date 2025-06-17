@@ -30,8 +30,15 @@ repositories {
 val shade: Configuration by configurations.creating
 
 dependencies {
+    implementation("net.ririfa:langman-core:2.0.0+beta.3")
+    implementation("net.ririfa:langman-ext.yaml:2.0.0+beta.1")
+    implementation("net.ririfa:yacla-core:1.1.0+beta.4")
+    implementation("net.ririfa:yacla-yaml:1.1.0+rc.4")
+    implementation("org.snakeyaml:snakeyaml-engine:2.9")
+
     minecraft(libs.minecraft)
     mappings(libs.fabric.yarn)
+    
     modImplementation(libs.bundles.fabrics)
     modImplementation(libs.bundles.fabricord) {
         exclude(group = "net.java.dev.jna", module = "jna")

@@ -109,7 +109,7 @@ class Fabricord : DedicatedServerModInitializer {
             Logger.debug("SERVER_STOPPING: ScheduledExecutorService shut down")
         }
 
-        if (!Config.isLogChannelIDNotSet) {
+        if (!ConfigManager.isLogChannelIDNotSet) {
             Logger.debug("registerServerEvents: logChannelID is set, registering JOIN and DISCONNECT events")
             ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
                 val player = handler.player

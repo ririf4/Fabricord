@@ -2,7 +2,6 @@
 
 package net.ririfa.fabricord
 
-import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.MinecraftServer
 import net.minecraft.text.Text
 import net.ririfa.fabricord.discord.DiscordBotManager
@@ -18,10 +17,8 @@ val JDA by lazy { DiscordBotManager.jda }
 val LM: LangMan<FabricordMessageProvider, Text> by lazy { Fabricord.langMan }
 val Logger: Logger = Fabricord.logger
 val Server: MinecraftServer by lazy { Fabricord.server }
-val Loader: FabricLoader = Fabricord.loader
-val ServerDir: Path = Fabricord.serverDir
 val ModDir: Path = Fabricord.modDir
-val Config: ConfigManager.Config by lazy { ConfigManager.config }
+val Config: ConfigManager.Config by lazy { ConfigManager.getConfig() }
 val T: ScheduledExecutorService = Fabricord.thread
 
 @Suppress("FunctionName")

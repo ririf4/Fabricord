@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Webhook
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.ririfa.fabricord.Config
+import net.ririfa.fabricord.ConfigManager
 import net.ririfa.fabricord.FT
 import net.ririfa.fabricord.LM
 import net.ririfa.fabricord.Logger
@@ -126,7 +127,7 @@ object DiscordBotManager {
     }
 
     fun sendToDiscord(message: String) {
-        if (Config.isLogChannelIDNotSet) return
+        if (ConfigManager.isLogChannelIDNotSet) return
         FT {
             Config.logChannelID?.let { channelId ->
                 val blockedUserIds = Config.mentionBlockedUserID
@@ -151,7 +152,7 @@ object DiscordBotManager {
 
                 val messageAction = jda?.getTextChannelById(channelId)?.sendMessage(sanitizedMessage)
 
-                if (Config.allowMentions == false) {
+                if (!Config.allowMentions) {
                     messageAction?.setAllowedMentions(emptySet())
                 } else {
                     messageAction

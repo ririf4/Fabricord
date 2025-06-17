@@ -5,6 +5,7 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.ririfa.fabricord.Aliases;
 import net.ririfa.fabricord.CommandManager;
+import net.ririfa.fabricord.ConfigManager;
 import net.ririfa.fabricord.database.tables.DiscordMinecraftLink;
 import net.ririfa.fabricord.discord.DiscordBotManager;
 import net.ririfa.fabricord.discord.DiscordPlayerEventHandler;
@@ -28,13 +29,13 @@ public abstract class ServerPlayNetworkHandlerMixin {
     @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
     private void interceptChatMessage(@NotNull ChatMessageC2SPacket packet, CallbackInfo ci) {
         if (!DiscordBotManager.isBotInitialized ||
-                Aliases.getConfig().isLogChannelIDNotSet ||
+                ConfigManager.isLogChannelIDNotSet() ||
                 !Aliases.getConfig().sendChat()) return;
 
         UUID playerUUID = player.getUuid();
         FabricordMessageProvider ap = FabricordMessageProviderKt.adapt(player);
 
-        if (!DiscordMinecraftLink.isUserLinked(playerUUID) && Aliases.getConfig().useUserPermissionForMention) {
+        if (!DiscordMinecraftLink.isUserLinked(playerUUID) && ConfigManager.INSTANCE.getConfig().getUseUserPermissionForMention()) {
             player.sendMessage(ap.getMessage(FabricordMessageKey.Chat.LinkDiscordAccountFirst.INSTANCE));
             ci.cancel();
             return;
