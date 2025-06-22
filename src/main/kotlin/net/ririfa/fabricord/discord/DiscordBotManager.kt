@@ -32,14 +32,16 @@ object DiscordBotManager {
     fun start() {
         FT {
             try {
-                jda = JDABuilder.createDefault(Config.botToken)
-                    .addEventListeners(CompositeDiscordListener())
-                    .setStatus(onlineStatus())
-                    .setActivity(activity())
-                    .setAutoReconnect(true)
-                    .enableIntents(intents)
-                    .build()
-                    .awaitReady()
+                Config.botToken?.let { tk ->
+                    jda = JDABuilder.createDefault(tk)
+                        .addEventListeners(CompositeDiscordListener())
+                        .setStatus(onlineStatus())
+                        .setActivity(activity())
+                        .setAutoReconnect(true)
+                        .enableIntents(intents)
+                        .build()
+                        .awaitReady()
+                } ?: return@FT
 
                 val textChannel = jda?.getTextChannelById(Config.logChannelID ?: return@FT)
                 textChannel?.retrieveWebhooks()?.queue({ webhooks ->

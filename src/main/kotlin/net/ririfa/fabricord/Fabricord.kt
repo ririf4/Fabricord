@@ -15,10 +15,10 @@ import net.ririfa.langman.LangMan
 import net.ririfa.langman.LangManBuilder
 import net.ririfa.langman.TextFactory
 import net.ririfa.langman.ext.yaml.YamlFileLoader
+import net.ririfa.shaded.snakeyaml.org_yaml_snakeyaml.Yaml
 import org.apache.logging.log4j.LogManager
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -58,7 +58,7 @@ class Fabricord : DedicatedServerModInitializer {
             .autoUpdateIfNeeded(true)
             .debug(true)
             .build()
-        ConfigManager.init()
+        ConfigManager
         registerServerEvents()
     }
 

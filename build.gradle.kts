@@ -36,7 +36,14 @@ dependencies {
     modImplementation(libs.bundles.fabricord) {
         exclude(group = "net.java.dev.jna", module = "jna")
     }
-    modCompileOnly(libs.bundles.ririfa)
+    libs.apply {
+        modImplementation("${libs.yacla.core.get()}:fat")
+        modImplementation("${libs.yacla.yaml.get()}:fat")
+        modImplementation(libs.langman.core)
+        modImplementation("${libs.langman.yaml.get()}:fat")
+        modImplementation(libs.cask)
+        modImplementation(libs.jda)
+    }
     modRuntimeOnly(libs.h2)
 
     shade(libs.bundles.fabricord) {
