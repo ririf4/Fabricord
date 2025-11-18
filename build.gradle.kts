@@ -19,5 +19,5 @@ dependencies {
 	modImplementation(libs.fabric.loader)
 	modImplementation(libs.fabric.kotlin)
 
-	akkara("0.0.1+rc.1")
+	akkara("0.0.1+rc.3")
 }
