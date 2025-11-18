@@ -1,34 +1,35 @@
 {
-  "schemaVersion": 1,
-  "id": "fabricord",
-  "version": "5.0.0",
-  "name": "Fabricord",
-  "description": "A modern message style like DiscordSRV will be reproduced as a Fabric version mod.",
-  "authors": [
-    "RiriFa"
-  ],
-  "contact": {
-    "sources": "https://github.com/ririf4/Fabricord",
-    "issues": "https://github.com/ririf4/Fabricord/issues"
-  },
-  "license": "Apache-2.0",
-  "environment": "server",
-  "entrypoints": {
-    "server": [
-      {
-        "adapter": "kotlin",
-        "value": "net.ririfa.fabricord.Fabricord"
-      }
-    ]
-  },
-  "depends": {
-    "fabricloader": "0.16.13",
-    "minecraft": "1.21.5",
-    "java": "21",
-    "fabric-api": "*",
-    "fabric-language-kotlin": "1.13.2+kotlin.2.1.20"
-  },
-  "mixins": [
-    "fabricord.mixins.json"
-  ]
+	"schemaVersion": 1,
+	"id": "fabricord",
+	"version": "${version}",
+	"name": "Fabricord",
+	"description": "A modern message style like DiscordSRV will be reproduced as a Fabric version mod.",
+	"contributors": [
+		"RiriFa"
+	],
+	"contact": {
+		"sources": "https://github.com/ririf4/Fabricord",
+		"issues": "https://github.com/ririf4/Fabricord/issues"
+	},
+	"license": "Apache-2.0",
+	"icon": "assets/fabricord/icon.png",
+	"environment": "server",
+	"entrypoints": {
+		"server": [
+			{
+				"adapter": "kotlin",
+				"value": "net.ririfa.fabricord.Fabricord"
+			}
+		]
+	},
+	"mixins": [
+		"fabricord.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": "1.21.10",
+		"java": ">=21",
+		"fabric-api": "*",
+		"fabric-language-kotlin": ">=1.13.6+kotlin.2.2.20"
+	}
 }

@@ -1,49 +1,21 @@
 [versions]
-kotlin="2.1.20"
-loom="1.10-SNAPSHOT"
-shadowJar="8.1.1"
+kotlin = "2.2.20"
+loom = "1.13-SNAPSHOT"
 
-minecraft="1.21.5"
-fabric-yarn="1.21.5+build.1"
-fabric-loader="0.16.13"
-fabric-api="0.120.0+1.21.5"
-fabric-kotlin="1.13.2+kotlin.2.1.20"
-
-jda = "5.4.0"
-yacla-core = "2.0.0+rc.27"
-yacla-yaml = "2.0.0+rc.1"
-langman-core = "2.0.0+rc.5"
-langman-yaml = "2.0.0+rc.1"
-cask = "0.0.1+alpha.2"
-exposed = "0.61.0"
-gson = "2.13.0"
-h2 = "2.3.232"
+minecraft = "1.21.10"
+yarn = "1.21.10+build.2"
+fabric-api = "0.138.3+1.21.10"
+fabric-loader = "0.17.3"
+fabric-kotlin = "1.13.6+kotlin.2.2.20"
 
 [plugins]
-kotlin={ id="org.jetbrains.kotlin.jvm", version.ref="kotlin" }
-loom={ id="fabric-loom", version.ref="loom" }
-shadowJar={ id="com.github.johnrengelman.shadow", version.ref="shadowJar" }
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+loom = { id = "fabric-loom", version.ref = "loom" }
+akkara = { id = "dev.swiftstorm.akkaradb-plugin", version = "0.0.1+rc.1" }
 
 [libraries]
-minecraft={ module="com.mojang:minecraft", version.ref="minecraft" }
-fabric-yarn={ module="net.fabricmc:yarn", version.ref="fabric-yarn" }
-fabric-loader={ module="net.fabricmc:fabric-loader", version.ref="fabric-loader" }
-fabric-api={ module="net.fabricmc.fabric-api:fabric-api", version.ref="fabric-api" }
-fabric-kotlin={ module="net.fabricmc:fabric-language-kotlin", version.ref="fabric-kotlin" }
-
-jda={ module="net.dv8tion:JDA", version.ref="jda" }
-yacla-core = { module = "net.ririfa:yacla-core", version.ref = "yacla-core" }
-yacla-yaml = { module = "net.ririfa:yacla-yaml", version.ref = "yacla-yaml" }
-langman-core = { module = "net.ririfa:langman-core", version.ref = "langman-core" }
-langman-yaml = { module = "net.ririfa:langman-ext.yaml", version.ref = "langman-yaml" }
-cask = { module = "net.ririfa:cask", version.ref = "cask" }
-exposed-core={ module="org.jetbrains.exposed:exposed-core", version.ref="exposed" }
-exposed-dao={ module="org.jetbrains.exposed:exposed-dao", version.ref="exposed" }
-exposed-jdbc={ module="org.jetbrains.exposed:exposed-jdbc", version.ref="exposed" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-h2 = { module = "com.h2database:h2", version.ref = "h2" }
-
-[bundles]
-fabrics = ["fabric-loader", "fabric-api", "fabric-kotlin"]
-fabricord = ["exposed-core", "exposed-dao", "exposed-jdbc", "gson", "jda"]
-ririfa = ["yacla-core", "yacla-yaml", "langman-core", "langman-yaml", "cask"]
+minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
+fabric-yarn = { module = "net.fabricmc:yarn", version.ref = "yarn" }
+fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
+fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
+fabric-kotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabric-kotlin" }
