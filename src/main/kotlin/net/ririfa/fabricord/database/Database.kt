@@ -8,10 +8,8 @@ import net.ririfa.fabricord.Fabricord
 class Database {
     lateinit var db: PackedTable<FabricordDBTable>
 
-    val dbPath = Fabricord.modDir.resolve("fabricord")
-
     fun start() {
-        db = AkkDSL.open(dbPath, StartupMode.ULTRA_FAST, {
+        db = AkkDSL.open(Fabricord.modDir, StartupMode.ULTRA_FAST, {
             m = 2
         })
     }

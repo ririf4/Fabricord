@@ -1,4 +1,4 @@
-version: "1.1.0"
+version: "2.0.0"
 
 # ────────────────
 # Thank you for installing Fabricord!
@@ -13,6 +13,7 @@ version: "1.1.0"
 # Your Discord bot token.
 # Create a bot and get a token here:
 # https://discord.com/developers/applications
+# Or, read guide: https://github.com/ririf4/Fabricord/tree/v4-purge/BOT_INSTALL/EN.md
 BotToken: ""
 
 # Discord channel ID where server logs and chat will be sent.
@@ -73,20 +74,30 @@ BlockedRoleIDs: []
 # ── Custom Message Settings ──
 
 # Message sent when the server starts/stops.
+# You can disable these messages by leaving them blank.
+# Default: ""
+# For example:
+# ServerStartMessage: ":white_check_mark: **Server has started!**"
+# ServerStopMessage: ":octagonal_sign: **Server has stopped!**"
+# like DiscordSRV style
 ServerStartMessage: ""
 ServerStopMessage: ""
 
 # Message sent when a player joins/leaves the server.
 # Use %player% to insert the player’s name.
+# You can disable these messages by leaving them blank.
+# Default: ""
+# For example:
+# PlayerJoinMessage: "%player% joined the server"
+# PlayerLeaveMessage: "%player% left the server"
 PlayerJoinMessage: ""
 PlayerLeaveMessage: ""
 
 # ── Console Integration ──
 
-# If true, enables bidirectional console log interaction via Discord.
-EnableConsoleLog: false
-
 # Discord channel ID for console log commands and outputs.
+# If blank, console log integration will be disabled.
+# Default: ""
 ConsoleLogChannelID: ""
 
 # ── Experimental Settings ──

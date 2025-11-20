@@ -1,6 +1,7 @@
 [versions]
 kotlin = "2.2.20"
 loom = "1.13-SNAPSHOT"
+shadowJar = "9.2.2"
 
 minecraft = "1.21.10"
 yarn = "1.21.10+build.2"
@@ -8,9 +9,16 @@ fabric-api = "0.138.3+1.21.10"
 fabric-loader = "0.17.3"
 fabric-kotlin = "1.13.6+kotlin.2.2.20"
 
+akkaradb = "0.0.1+rc.4"
+langMan = "2.0.0"
+yacla-core = "2.1.0+rc.1"
+yacla = "2.0.0"
+jda = "6.1.1"
+
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 loom = { id = "fabric-loom", version.ref = "loom" }
+shadowJar = { id = "com.gradleup.shadow", version.ref = "shadowJar" }
 akkara = { id = "dev.swiftstorm.akkaradb-plugin", version = "0.0.1+rc.1" }
 
 [libraries]
@@ -19,3 +27,9 @@ fabric-yarn = { module = "net.fabricmc:yarn", version.ref = "yarn" }
 fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
 fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
 fabric-kotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabric-kotlin" }
+
+langman-core = { module = "net.ririfa:langman-core", version.ref = "langMan" }
+langman-yaml = { module = "net.ririfa:langman-ext.yaml", version.ref = "langMan" }
+yacla-core = { module = "net.ririfa:yacla-core", version.ref = "yacla-core" }
+yacla-yaml = { module = "net.ririfa:yacla-yaml", version.ref = "yacla" }
+jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
