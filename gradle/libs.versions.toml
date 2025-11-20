@@ -11,7 +11,7 @@ fabric-kotlin = "1.13.6+kotlin.2.2.20"
 
 akkaradb = "0.0.1+rc.4"
 langMan = "2.0.0"
-yacla-core = "2.1.0+rc.1"
+yacla-core = "2.1.0+rc.3"
 yacla = "2.0.0"
 jda = "6.1.1"
 
