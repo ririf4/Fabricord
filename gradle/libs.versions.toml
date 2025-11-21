@@ -14,6 +14,7 @@ langMan = "2.0.0"
 yacla-core = "2.1.0+rc.3"
 yacla = "2.0.0"
 jda = "6.1.1"
+snakeYaml = "2.5"
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -33,3 +34,4 @@ langman-yaml = { module = "net.ririfa:langman-ext.yaml", version.ref = "langMan"
 yacla-core = { module = "net.ririfa:yacla-core", version.ref = "yacla-core" }
 yacla-yaml = { module = "net.ririfa:yacla-yaml", version.ref = "yacla" }
 jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeYaml" }

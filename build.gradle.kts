@@ -30,6 +30,7 @@ dependencies {
 	modImplementation(libs.langman.yaml)
 	modImplementation(libs.yacla.core)
 	modImplementation(libs.yacla.yaml)
+	modImplementation(libs.snakeyaml)
 	modImplementation(libs.jda) {
 		exclude(group = "net.java.dev.jna", module = "jna")
 	}
