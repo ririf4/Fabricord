@@ -2,13 +2,16 @@ package net.ririfa.fabricord.discord
 
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.OnlineStatus
+import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.Webhook
+import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.requests.GatewayIntent
-import net.ririfa.fabricord.Config
-import net.ririfa.fabricord.FT
-import net.ririfa.fabricord.Logger
+import net.ririfa.fabricord.*
+import net.ririfa.fabricord.i18n.FMsgKey
 import java.time.Duration
+import javax.security.auth.login.LoginException
 
 object DiscordBotManager {
     lateinit var jda: JDA
@@ -19,14 +22,32 @@ object DiscordBotManager {
 
     fun strat() {
         FT {
-            jda = JDABuilder.createDefault(Config.botToken)
-                .setAutoReconnect(true)
-                .addEventListeners(CompositeDiscordListener())
-                .enableIntents(intents)
-                .build()
-                .awaitReady()
+            try {
+                jda = JDABuilder.createDefault(Config.botToken)
+                    .setAutoReconnect(true)
+                    .setActivity(activity())
+                    .setStatus(onlineStatus() ?: OnlineStatus.ONLINE)
+                    .addEventListeners(CompositeDiscordListener())
+                    .enableIntents(intents)
+                    .build()
+                    .awaitReady()
 
-            setupWebhook()
+                setupWebhook()
+
+                jda.updateCommands().addCommands(
+                    Commands.slash("playerlist", "Get a list of online players"),
+                    Commands.slash("status", "Get the status of the server")
+                ).queue()
+
+                Config.serverStartMessage?.let { sendToDiscord(it) }
+
+                val c = mapOf("botName" to jda.selfUser.name)
+                Logger.info(LM.getMessage(FMsgKey.Discord.Bot.BotNowOnline, c))
+            } catch (e: LoginException) {
+                Logger.error(LM.getMessage(FMsgKey.Discord.Bot.CannotLoginToBot), e)
+            } catch (e: Exception) {
+                Logger.error(LM.getMessage(FMsgKey.Discord.Bot.CannotStartBot), e)
+            }
         }
     }
 
@@ -114,5 +135,30 @@ object DiscordBotManager {
         }, { error ->
             Logger.warn("Could not retrieve webhook: ${error.message}")
         })
+    }
+
+    private fun activity(): Activity? {
+        val activityMessage = Config.botActivityMessage ?: return null
+        val activityStatus = Config.botActivityStatus?.lowercase() ?: return null
+
+        return when (activityStatus) {
+            "playing" -> Activity.playing(activityMessage)
+            "listening" -> Activity.listening(activityMessage)
+            "watching" -> Activity.watching(activityMessage)
+            "competing" -> Activity.competing(activityMessage)
+            else -> null
+        }
+    }
+
+    private fun onlineStatus(): OnlineStatus? {
+        val onlineStatus = Config.botOnlineStatus?.lowercase() ?: return null
+
+        return when (onlineStatus) {
+            "online" -> OnlineStatus.ONLINE
+            "idle" -> OnlineStatus.IDLE
+            "dnd" -> OnlineStatus.DO_NOT_DISTURB
+            "invisible" -> OnlineStatus.INVISIBLE
+            else -> null
+        }
     }
 }

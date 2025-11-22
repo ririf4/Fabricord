@@ -53,12 +53,7 @@ class Fabricord : DedicatedServerModInitializer {
             .toPath(langDir)
             .withMessageKey(FMsgKey::class.java)
             .withType(YamlFileLoader { inputStream -> Yaml().load(inputStream) })
-            .registerTextFactory(object : TextFactory<Text> {
-                override val clazz: Class<Text>
-                    get() = Text::class.java
-
-                override fun invoke(text: String): Text = Text.literal(text)
-            })
+            .registerTextFactory(textFactory)
             .withLanguage(availableLang)
             .autoUpdateIfNeeded(true)
             .debug(true)
@@ -69,5 +64,12 @@ class Fabricord : DedicatedServerModInitializer {
 
     private fun registerServerEvents() {
 
+    }
+
+    private val textFactory = object : TextFactory<Text> {
+        override val clazz: Class<Text>
+            get() = Text::class.java
+
+        override fun invoke(text: String): Text = Text.literal(text)
     }
 }
