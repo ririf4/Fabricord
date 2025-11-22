@@ -11,12 +11,21 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 import net.ririfa.fabricord.*
 import net.ririfa.fabricord.i18n.FMsgKey
 import java.time.Duration
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import javax.security.auth.login.LoginException
 
 object DiscordBotManager {
     lateinit var jda: JDA
 
     private val intents = GatewayIntent.MESSAGE_CONTENT
+    private val shutdownExecutor = Executors.newSingleThreadExecutor { r ->
+        Thread(r, "Fabricord-JDA-Shutdown").apply {
+            isDaemon = true
+        }
+    }
 
     private var webHook: Webhook? = null
 
@@ -52,7 +61,26 @@ object DiscordBotManager {
     }
 
     fun stop() {
-        jda.awaitShutdown(Duration.ofSeconds(15L))
+        Config.serverStopMessage?.let { sendToDiscord(it) }
+
+        runCatching {
+            val shutdownFuture = CompletableFuture.runAsync({
+                runCatching { jda.shutdown() }
+                    .onFailure { e -> Logger.error("Error during JDA shutdown: ", e) }
+            }, shutdownExecutor)
+
+            try {
+                shutdownFuture.get(7500, TimeUnit.MILLISECONDS)
+                val name = runCatching { jda.selfUser.name }.getOrNull() ?: "?"
+                Logger.info(LM.getMessage(FMsgKey.Discord.Bot.BotNowOffline, name).string)
+            } catch (_: TimeoutException) {
+                Logger.warn(LM.getMessage(FMsgKey.Discord.Bot.TimedOutForStoppingBot).string)
+                jda.shutdownNow()
+                Logger.warn("Forced immediate shutdown for JDA")
+            }
+        }.onFailure { e ->
+            Logger.error(LM.getMessage(FMsgKey.Discord.Bot.CannotStopBot).string, e)
+        }
     }
 
     fun sendToDiscord(message: String) {

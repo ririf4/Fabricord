@@ -11,6 +11,9 @@ sealed class FMsgKey : MessageKey<FMsgProvider, Text> {
 
             object CannotLoginToBot : Bot()
             object CannotStartBot : Bot()
+
+            object TimedOutForStoppingBot : Bot()
+            object CannotStopBot : Bot()
         }
 
         sealed class Embed : Discord() {
