@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.2.20"
+kotlin = "2.2.21"
 loom = "1.13-SNAPSHOT"
 shadowJar = "9.2.2"
 
@@ -9,7 +9,8 @@ fabric-api = "0.138.3+1.21.10"
 fabric-loader = "0.17.3"
 fabric-kotlin = "1.13.6+kotlin.2.2.20"
 
-akkaradb = "0.0.1+rc.4"
+akkaradb = "0.0.1+rc.7"
+akkara-plugin = "0.0.1+rc.21"
 langMan = "2.0.0"
 yacla-core = "2.1.0+rc.3"
 yacla = "2.0.0"
@@ -20,7 +21,7 @@ snakeYaml = "2.5"
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 loom = { id = "fabric-loom", version.ref = "loom" }
 shadowJar = { id = "com.gradleup.shadow", version.ref = "shadowJar" }
-akkara = { id = "dev.swiftstorm.akkaradb-plugin", version = "0.0.1+rc.1" }
+akkara = { id = "dev.swiftstorm.akkaradb-plugin", version.ref = "akkara-plugin" }
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }

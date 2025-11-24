@@ -14,6 +14,8 @@ sealed class FMsgKey : MessageKey<FMsgProvider, Text> {
 
             object TimedOutForStoppingBot : Bot()
             object CannotStopBot : Bot()
+
+            object ErrorDuringSendingModernMessage : Bot()
         }
 
         sealed class Embed : Discord() {
@@ -31,5 +33,20 @@ sealed class FMsgKey : MessageKey<FMsgProvider, Text> {
                 }
             }
         }
+    }
+
+    sealed class Command : FMsgKey() {
+        sealed class LC : Command() {
+            sealed class State : LC() {
+                object ON : State()
+                object OFF : State()
+            }
+
+            object SwitchedLocalChatState : LC()
+        }
+    }
+
+    sealed class Chat : FMsgKey() {
+        object LinkDiscordAccountFirst : Chat()
     }
 }

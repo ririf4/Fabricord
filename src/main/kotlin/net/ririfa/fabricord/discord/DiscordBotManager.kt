@@ -8,9 +8,8 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.Webhook
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.requests.GatewayIntent
-import net.ririfa.fabricord.*
 import net.ririfa.fabricord.i18n.FMsgKey
-import java.time.Duration
+import net.ririfa.fabricord.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -27,9 +26,13 @@ object DiscordBotManager {
         }
     }
 
-    private var webHook: Webhook? = null
+    @JvmField
+    var isBotInitialized: Boolean = false
 
-    fun strat() {
+    @JvmField
+    var webHook: Webhook? = null
+
+    fun start() {
         FT {
             try {
                 jda = JDABuilder.createDefault(Config.botToken)
@@ -52,6 +55,7 @@ object DiscordBotManager {
 
                 val c = mapOf("botName" to jda.selfUser.name)
                 Logger.info(LM.getMessage(FMsgKey.Discord.Bot.BotNowOnline, c))
+                isBotInitialized = true
             } catch (e: LoginException) {
                 Logger.error(LM.getMessage(FMsgKey.Discord.Bot.CannotLoginToBot), e)
             } catch (e: Exception) {

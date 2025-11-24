@@ -5,11 +5,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.minecraft.server.network.ServerPlayerEntity
-import net.ririfa.fabricord.Config
-import net.ririfa.fabricord.FT
-import net.ririfa.fabricord.LM
-import net.ririfa.fabricord.Server
 import net.ririfa.fabricord.i18n.FMsgKey
+import net.ririfa.fabricord.util.Config
+import net.ririfa.fabricord.util.FT
+import net.ririfa.fabricord.util.LM
+import net.ririfa.fabricord.util.Server
 import java.awt.Color
 import java.util.*
 

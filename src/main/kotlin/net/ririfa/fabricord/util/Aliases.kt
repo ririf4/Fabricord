@@ -1,12 +1,15 @@
 @file:JvmName("Aliases")
 @file:Suppress("FunctionName")
 
-package net.ririfa.fabricord
+package net.ririfa.fabricord.util
 
+import net.dv8tion.jda.api.JDA
 import net.minecraft.server.MinecraftServer
 import net.minecraft.text.Text
+import net.ririfa.fabricord.Fabricord
 import net.ririfa.fabricord.config.ConfigManager
 import net.ririfa.fabricord.config.FConfig
+import net.ririfa.fabricord.discord.DiscordBotManager
 import net.ririfa.fabricord.i18n.FMsgProvider
 import net.ririfa.langman.LangMan
 import org.slf4j.Logger
@@ -16,13 +19,15 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
-val ModDir: Path by lazy { Fabricord.modDir }
-val Logger: Logger by lazy { Fabricord.logger }
+val JDA: JDA? by lazy { DiscordBotManager.jda }
+val ModDir: Path by lazy { Fabricord.Companion.modDir }
+val Logger: Logger by lazy { Fabricord.Companion.logger }
 val Config: FConfig by lazy { ConfigManager.config }
-val Server: MinecraftServer by lazy { Fabricord.server }
-val LM: LangMan<FMsgProvider, Text> by lazy { Fabricord.langMan }
+val DBDir: Path by lazy { Fabricord.Companion.dbDir }
+val Server: MinecraftServer by lazy { Fabricord.Companion.server }
+val LM: LangMan<FMsgProvider, Text> by lazy { Fabricord.Companion.langMan }
 
-val T: ScheduledExecutorService by lazy { Fabricord.thread }
+val T: ScheduledExecutorService by lazy { Fabricord.Companion.thread }
 
 fun Logger.info(message: Text, cause: Throwable? = null) {
     if (cause != null) {
