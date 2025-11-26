@@ -22,21 +22,26 @@ val shade: Configuration by configurations.creating {
 }
 
 dependencies {
+	// === Minecraft and Fabric ===
 	minecraft(libs.minecraft)
 	mappings(libs.fabric.yarn)
 	modImplementation(libs.fabric.api)
 	modImplementation(libs.fabric.loader)
 	modImplementation(libs.fabric.kotlin)
 
+	// === RiriFa Libs ===
 	modImplementation(libs.langman.core)
 	modImplementation(libs.langman.yaml)
 	modImplementation(libs.yacla.core)
 	modImplementation(libs.yacla.yaml)
+	modImplementation(libs.cask)
+	akkara(libs.versions.akkaradb.get(), "modImplementation")
+
+	// === Other Libs ===
 	modImplementation(libs.snakeyaml)
 	modImplementation(libs.jda)
 
-	akkara(libs.versions.akkaradb.get(), "modImplementation")
-
+	// === Shadowed Libs ===
 	shade(libs.jda) {
 		exclude(group = "net.java.dev.jna", module = "jna")
 	}

@@ -9,11 +9,13 @@ fabric-api = "0.138.3+1.21.10"
 fabric-loader = "0.17.3"
 fabric-kotlin = "1.13.6+kotlin.2.2.20"
 
-akkaradb = "0.0.1+rc.7"
-akkara-plugin = "0.0.1+rc.21"
+akkaradb = "0.1.0+rc.1"
+akkara-plugin = "0.1.0+rc.1"
 langMan = "2.0.0"
 yacla-core = "2.1.0+rc.3"
 yacla = "2.0.0"
+cask = "0.0.1+alpha.3"
+
 jda = "6.1.1"
 snakeYaml = "2.5"
 
@@ -34,5 +36,7 @@ langman-core = { module = "net.ririfa:langman-core", version.ref = "langMan" }
 langman-yaml = { module = "net.ririfa:langman-ext.yaml", version.ref = "langMan" }
 yacla-core = { module = "net.ririfa:yacla-core", version.ref = "yacla-core" }
 yacla-yaml = { module = "net.ririfa:yacla-yaml", version.ref = "yacla" }
+cask = { module = "net.ririfa:cask", version.ref = "cask" }
+
 jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeYaml" }

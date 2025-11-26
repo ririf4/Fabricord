@@ -151,6 +151,10 @@ object DiscordBotManager {
         }
     }
 
+    fun sendToDiscordConsole(message: String) {
+        ConsoleLogBufferFlusher.enqueue(message)
+    }
+
     private fun setupWebhook() {
         val textChannel = jda.getTextChannelById(Config.logChannelID ?: return)
         textChannel?.retrieveWebhooks()?.queue({ webhooks ->

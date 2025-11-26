@@ -34,6 +34,7 @@ class CompositeDiscordListener : ListenerAdapter() {
         when (event.name) {
             "playerlist" -> handlePlayerList(event)
             "status" -> handleStatus(event)
+            "link" -> handleLink(event)
         }
     }
 
@@ -97,6 +98,9 @@ class CompositeDiscordListener : ListenerAdapter() {
                 }
             }, {})
         }
+    }
+
+    private fun handleLink(event: SlashCommandInteractionEvent) {
     }
 
     private fun getTPS(): Double {

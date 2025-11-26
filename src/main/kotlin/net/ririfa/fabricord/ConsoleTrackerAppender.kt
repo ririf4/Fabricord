@@ -1,5 +1,6 @@
 package net.ririfa.fabricord
 
+import net.ririfa.fabricord.discord.DiscordBotManager
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.core.LogEvent
 import org.apache.logging.log4j.core.appender.AbstractAppender
@@ -33,6 +34,6 @@ class ConsoleTrackerAppender(name: String) : AbstractAppender(name, null, Patter
             else -> return
         }
 
-        //DiscordBotManager.sendToDiscordConsole(formattedMessage)
+        DiscordBotManager.sendToDiscordConsole(formattedMessage)
     }
 }

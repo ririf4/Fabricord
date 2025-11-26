@@ -14,6 +14,7 @@ object DataBase {
         }
     }
 
+    @JvmStatic
     fun isUserLinked(mcUUID: UUID): Boolean {
         return dataBase.exists {
             mcDiscordLink.mcUUID == mcUUID
