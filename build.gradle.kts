@@ -42,9 +42,8 @@ dependencies {
 	modImplementation(libs.jda)
 
 	// === Shadowed Libs ===
-	shade(libs.jda) {
-		exclude(group = "net.java.dev.jna", module = "jna")
-	}
+	shade(libs.jda) { exclude(group = "net.java.dev.jna", module = "jna") }
+	shade(libs.snakeyaml)
 }
 
 loom {

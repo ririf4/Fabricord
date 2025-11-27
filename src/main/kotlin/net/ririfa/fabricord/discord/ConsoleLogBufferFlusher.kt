@@ -2,6 +2,7 @@ package net.ririfa.fabricord.discord
 
 import net.ririfa.fabricord.util.Config
 import net.ririfa.fabricord.util.FT
+import net.ririfa.fabricord.util.JDA
 import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
@@ -33,7 +34,7 @@ object ConsoleLogBufferFlusher {
     private fun flush() {
         if (logQueue.isEmpty()) return
 
-        val jda = DiscordBotManager.jda
+        val jda = JDA ?: return
         val channelId = Config.consoleLogChannelID ?: return
         val channel = jda.getTextChannelById(channelId) ?: return
 

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeoutException
 import javax.security.auth.login.LoginException
 
 object DiscordBotManager {
-    lateinit var jda: JDA
+    internal var jda: JDA? = null
 
     private val intents = GatewayIntent.MESSAGE_CONTENT
     private val shutdownExecutor = Executors.newSingleThreadExecutor { r ->
@@ -46,14 +46,14 @@ object DiscordBotManager {
 
                 setupWebhook()
 
-                jda.updateCommands().addCommands(
+                jda?.updateCommands()?.addCommands(
                     Commands.slash("playerlist", "Get a list of online players"),
                     Commands.slash("status", "Get the status of the server")
-                ).queue()
+                )?.queue()
 
                 Config.serverStartMessage?.let { sendToDiscord(it) }
 
-                val c = mapOf("botName" to jda.selfUser.name)
+                val c = mapOf("botName" to jda?.selfUser?.name)
                 Logger.info(LM.getMessage(FMsgKey.Discord.Bot.BotNowOnline, c))
                 isBotInitialized = true
             } catch (e: LoginException) {
@@ -69,17 +69,17 @@ object DiscordBotManager {
 
         runCatching {
             val shutdownFuture = CompletableFuture.runAsync({
-                runCatching { jda.shutdown() }
+                runCatching { jda?.shutdown() }
                     .onFailure { e -> Logger.error("Error during JDA shutdown: ", e) }
             }, shutdownExecutor)
 
             try {
                 shutdownFuture.get(7500, TimeUnit.MILLISECONDS)
-                val name = runCatching { jda.selfUser.name }.getOrNull() ?: "?"
+                val name = runCatching { jda?.selfUser?.name }.getOrNull() ?: "?"
                 Logger.info(LM.getMessage(FMsgKey.Discord.Bot.BotNowOffline, name).string)
             } catch (_: TimeoutException) {
                 Logger.warn(LM.getMessage(FMsgKey.Discord.Bot.TimedOutForStoppingBot).string)
-                jda.shutdownNow()
+                jda?.shutdownNow()
                 Logger.warn("Forced immediate shutdown for JDA")
             }
         }.onFailure { e ->
@@ -129,7 +129,7 @@ object DiscordBotManager {
             }
 
             // --- Build Discord message ----------------------------------
-            val channel = jda.getTextChannelById(channelId) ?: return@FT
+            val channel = jda?.getTextChannelById(channelId) ?: return@FT
             val action = channel.sendMessage(sanitizedMessage)
 
             if (blockAll) {
@@ -156,7 +156,7 @@ object DiscordBotManager {
     }
 
     private fun setupWebhook() {
-        val textChannel = jda.getTextChannelById(Config.logChannelID ?: return)
+        val textChannel = jda?.getTextChannelById(Config.logChannelID ?: return)
         textChannel?.retrieveWebhooks()?.queue({ webhooks ->
             webHook = webhooks.firstOrNull { it.name == "Fabricord" }
 

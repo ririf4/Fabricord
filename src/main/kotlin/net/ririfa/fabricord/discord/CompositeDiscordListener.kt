@@ -18,6 +18,7 @@ class CompositeDiscordListener : ListenerAdapter() {
     private val uuidPattern = Regex("@\\{([0-9a-fA-F-]+)}")
 
     private val logChannelID = Config.logChannelID
+    private val consoleChannel = Config.consoleLogChannelID
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         when (event.channel.id) {
@@ -25,6 +26,20 @@ class CompositeDiscordListener : ListenerAdapter() {
                 FT {
                     val (mentionedPlayers, foundUUID) = findMentionedPlayers(event.message.contentRaw)
 
+                    if (mentionedPlayers.isEmpty()) {
+                        DiscordMessageHandler.handleDiscordMessage(event)
+                    } else {
+                        DiscordMessageHandler.handleMentionedDiscordMessage(event, mentionedPlayers, foundUUID)
+                    }
+                }
+            }
+
+            consoleChannel -> {
+                if (!event.author.isBot) {
+                    val command = event.message.contentRaw
+                    Server.execute {
+                        Server.commandManager.parseAndExecute(Server.commandSource, command)
+                    }
                 }
             }
         }
