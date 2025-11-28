@@ -51,7 +51,17 @@ enum class Commands(
         dispatcher.registerCommand("link") {
             executes {
                 val player = it.source.player ?: return@executes 0
-                player.sendMessage(Text.of("WIP"), false)
+                val code = LinkCommandAuthCodeManager.issueLinkCode(player.uuid)
+                val ac = mapOf(
+                    "code" to code
+                )
+                player.sendMessage(
+                    player.adapt().getMessage(
+                        FMsgKey.Command.LINK.IssuedCode,
+                        ac
+                    ),
+                    false
+                )
                 1
             }
         }

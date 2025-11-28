@@ -8,16 +8,22 @@ import net.ririfa.fabricord.util.DBDir
 import java.util.*
 
 object DataBase {
-    val dataBase: PackedTable<FTable> by lazy {
-        AkkDSL.open<FTable>(DBDir, StartupMode.ULTRA_FAST) {
+    val mcDiscordLink: PackedTable<MCDiscordLink, UUID> by lazy {
+        AkkDSL.open(DBDir, StartupMode.ULTRA_FAST) {
             m = 2; parityCoder = RSParityCoder(2)
         }
     }
 
+    fun linkUser(mc: UUID, discord: Long) {
+        mcDiscordLink.put(MCDiscordLink(mcUUID = mc, discordId = discord))
+    }
+
+    fun getDiscordId(mc: UUID): Long? {
+        return mcDiscordLink.get(mc)?.discordId
+    }
+
     @JvmStatic
-    fun isUserLinked(mcUUID: UUID): Boolean {
-        return dataBase.exists {
-            mcDiscordLink.mcUUID == mcUUID
-        }
+    fun isUserLinked(mc: UUID): Boolean {
+        return mcDiscordLink.get(mc) != null
     }
 }

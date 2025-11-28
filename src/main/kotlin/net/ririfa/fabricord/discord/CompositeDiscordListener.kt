@@ -1,10 +1,17 @@
 package net.ririfa.fabricord.discord
 
 import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.components.label.Label
+import net.dv8tion.jda.api.components.textinput.TextInput
+import net.dv8tion.jda.api.components.textinput.TextInputStyle
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.modals.Modal
 import net.minecraft.server.network.ServerPlayerEntity
+import net.ririfa.fabricord.command.LinkCommandAuthCodeManager
+import net.ririfa.fabricord.database.DataBase
 import net.ririfa.fabricord.i18n.FMsgKey
 import net.ririfa.fabricord.util.Config
 import net.ririfa.fabricord.util.FT
@@ -16,6 +23,8 @@ import java.util.*
 class CompositeDiscordListener : ListenerAdapter() {
     private val mcidPattern = Regex("@([a-zA-Z0-9_]+)")
     private val uuidPattern = Regex("@\\{([0-9a-fA-F-]+)}")
+
+    private val modalID = "FABRICORD_LINK_ACCOUNT_MODAL"
 
     private val logChannelID = Config.logChannelID
     private val consoleChannel = Config.consoleLogChannelID
@@ -51,6 +60,10 @@ class CompositeDiscordListener : ListenerAdapter() {
             "status" -> handleStatus(event)
             "link" -> handleLink(event)
         }
+    }
+
+    override fun onModalInteraction(event: ModalInteractionEvent) {
+        onModal(event)
     }
 
     private fun handlePlayerList(event: SlashCommandInteractionEvent) {
@@ -116,6 +129,44 @@ class CompositeDiscordListener : ListenerAdapter() {
     }
 
     private fun handleLink(event: SlashCommandInteractionEvent) {
+        val codeInput = TextInput.create("code", TextInputStyle.SHORT)
+            .setMinLength(6)
+            .setMaxLength(6)
+            .setRequired(true)
+            .build()
+
+        val modal = Modal.create(modalID, LM.getMessage(FMsgKey.Discord.Modal.LINK.Title).string)
+            .addComponents(
+                Label.of("Link Code", codeInput)
+            )
+            .build()
+
+        event.replyModal(modal).queue()
+    }
+
+    private fun onModal(event: ModalInteractionEvent) {
+        if (event.modalId != modalID) return
+
+        val code = event.getValue("code")?.asString
+        if (code == null) {
+            event.reply(LM.getMessage(FMsgKey.Discord.Modal.LINK.Invalid).string)
+                .setEphemeral(true)
+                .queue()
+            return
+        }
+
+        val normalized = code.trim().uppercase()
+
+        val uuid = LinkCommandAuthCodeManager.consume(normalized)
+        if (uuid == null) {
+            event.reply("This code is invalid or has expired.").setEphemeral(true).queue()
+            return
+        }
+
+        DataBase.linkUser(uuid, event.user.idLong)
+        event.reply(LM.getMessage(FMsgKey.Discord.Modal.LINK.LinkedSuccessfully).string)
+            .setEphemeral(true)
+            .queue()
     }
 
     private fun getTPS(): Double {

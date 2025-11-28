@@ -18,6 +18,15 @@ sealed class FMsgKey : MessageKey<FMsgProvider, Text> {
             object ErrorDuringSendingModernMessage : Bot()
         }
 
+        sealed class Modal : Discord() {
+            sealed class LINK : Modal() {
+                object Title : LINK()
+                object LinkedSuccessfully : LINK()
+
+                object Invalid : LINK()
+            }
+        }
+
         sealed class Embed : Discord() {
             sealed class PlayerList : Embed() {
                 object Title : PlayerList()
@@ -43,6 +52,10 @@ sealed class FMsgKey : MessageKey<FMsgProvider, Text> {
             }
 
             object SwitchedLocalChatState : LC()
+        }
+
+        sealed class LINK : Command() {
+            object IssuedCode : LINK()
         }
     }
 
