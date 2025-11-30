@@ -22,6 +22,13 @@ object DataBase {
         return mcDiscordLink.get(mc)?.discordId
     }
 
+    fun getMinecraftUUID(discord: Long): UUID? {
+        val entry = mcDiscordLink.firstOrNull {
+            discordId == discord
+        }
+        return entry?.mcUUID
+    }
+
     @JvmStatic
     fun isUserLinked(mc: UUID): Boolean {
         return mcDiscordLink.get(mc) != null

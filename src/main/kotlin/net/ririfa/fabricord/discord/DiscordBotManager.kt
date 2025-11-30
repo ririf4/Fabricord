@@ -6,7 +6,9 @@ import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.Webhook
+import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.ririfa.fabricord.i18n.FMsgKey
 import net.ririfa.fabricord.util.*
@@ -48,7 +50,22 @@ object DiscordBotManager {
 
                 jda?.updateCommands()?.addCommands(
                     Commands.slash("playerlist", "Get a list of online players"),
-                    Commands.slash("status", "Get the status of the server")
+                    Commands.slash("status", "Get the status of the server"),
+                    Commands.slash("kick", "Kick a player from the Minecraft server")
+                        .addOptions(
+                            OptionData(OptionType.STRING, "player", "The player to kick", true),
+                            OptionData(OptionType.STRING, "reason", "The reason for kicking the player", false)
+                        ),
+                    Commands.slash("ban", "Ban a player from the Minecraft server")
+                        .addOptions(
+                            OptionData(OptionType.STRING, "player", "The player to ban", true),
+                            OptionData(OptionType.STRING, "reason", "The reason for banning the player", false),
+                            OptionData(OptionType.INTEGER, "expire_date", "When the ban will lifted (format: 20250101 for Jan 1, 2025)", false)
+                        ),
+                    Commands.slash("pardon", "Unban a player from the Minecraft server")
+                        .addOptions(
+                            OptionData(OptionType.STRING, "player", "The player to unban", true)
+                        )
                 )?.queue()
 
                 Config.serverStartMessage?.let { sendToDiscord(it) }

@@ -9,7 +9,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.modals.Modal
+import net.minecraft.network.DisconnectionInfo
+import net.minecraft.server.BannedPlayerEntry
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.text.Text
 import net.ririfa.fabricord.command.LinkCommandAuthCodeManager
 import net.ririfa.fabricord.database.DataBase
 import net.ririfa.fabricord.i18n.FMsgKey
@@ -19,6 +22,7 @@ import net.ririfa.fabricord.util.LM
 import net.ririfa.fabricord.util.Server
 import java.awt.Color
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class CompositeDiscordListener : ListenerAdapter() {
     private val mcidPattern = Regex("@([a-zA-Z0-9_]+)")
@@ -59,11 +63,35 @@ class CompositeDiscordListener : ListenerAdapter() {
             "playerlist" -> handlePlayerList(event)
             "status" -> handleStatus(event)
             "link" -> handleLink(event)
+            "kick" -> handleKick(event)
+            "ban" -> handleBan(event)
+            "pardon" -> handlePardon(event)
         }
     }
 
     override fun onModalInteraction(event: ModalInteractionEvent) {
-        onModal(event)
+        if (event.modalId != modalID) return
+
+        val code = event.getValue("code")?.asString
+        if (code == null) {
+            event.reply(LM.getMessage(FMsgKey.Discord.Modal.LINK.Invalid).string)
+                .setEphemeral(true)
+                .queue()
+            return
+        }
+
+        val normalized = code.trim().uppercase()
+
+        val uuid = LinkCommandAuthCodeManager.consume(normalized)
+        if (uuid == null) {
+            event.reply("This code is invalid or has expired.").setEphemeral(true).queue()
+            return
+        }
+
+        DataBase.linkUser(uuid, event.user.idLong)
+        event.reply(LM.getMessage(FMsgKey.Discord.Modal.LINK.LinkedSuccessfully).string)
+            .setEphemeral(true)
+            .queue()
     }
 
     private fun handlePlayerList(event: SlashCommandInteractionEvent) {
@@ -135,7 +163,7 @@ class CompositeDiscordListener : ListenerAdapter() {
             .setRequired(true)
             .build()
 
-        val modal = Modal.create(modalID, LM.getMessage(FMsgKey.Discord.Modal.LINK.Title).string)
+        val modal = Modal.create(modalID, LM.getMessage(FMsgKey.Discord.Modal.LINK.Title, lang = event.userLocale.locale).string)
             .addComponents(
                 Label.of("Link Code", codeInput)
             )
@@ -144,29 +172,123 @@ class CompositeDiscordListener : ListenerAdapter() {
         event.replyModal(modal).queue()
     }
 
-    private fun onModal(event: ModalInteractionEvent) {
-        if (event.modalId != modalID) return
+    private fun handleKick(event: SlashCommandInteractionEvent) {
+        val executorDiscordUser = event.user
+        val playerOptionString = event.getOption("player")?.asString!!
+        val reasonOptionString = event.getOption("reason")?.asString
 
-        val code = event.getValue("code")?.asString
-        if (code == null) {
-            event.reply(LM.getMessage(FMsgKey.Discord.Modal.LINK.Invalid).string)
+        val mcExecutor = DataBase.getMinecraftUUID(executorDiscordUser.idLong)?.let { uuid -> Server.playerManager.getPlayer(uuid) }
+        val isOp = Server.playerManager.isOperator(mcExecutor?.playerConfigEntry)
+        val targetPlayer = Server.playerManager.getPlayer(playerOptionString) ?: return
+
+        if (!isOp) {
+            event.reply(LM.getMessage(FMsgKey.Discord.Command.Kick.NoPermission, lang = event.userLocale.locale).string)
                 .setEphemeral(true)
-                .queue()
+                .queue { hook ->
+                    hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS)
+                }
             return
         }
 
-        val normalized = code.trim().uppercase()
+        targetPlayer.networkHandler.disconnect(DisconnectionInfo(Text.of(reasonOptionString)))
 
-        val uuid = LinkCommandAuthCodeManager.consume(normalized)
-        if (uuid == null) {
-            event.reply("This code is invalid or has expired.").setEphemeral(true).queue()
-            return
-        }
+        val ac = mapOf(
+            "player" to targetPlayer.name.string,
+        )
 
-        DataBase.linkUser(uuid, event.user.idLong)
-        event.reply(LM.getMessage(FMsgKey.Discord.Modal.LINK.LinkedSuccessfully).string)
+        event.reply(LM.getMessage(FMsgKey.Discord.Command.Kick.SentKickPacket, ac, lang = event.userLocale.locale).string)
             .setEphemeral(true)
+            .queue { hook ->
+                hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS)
+            }
+    }
+
+    private fun handleBan(event: SlashCommandInteractionEvent) {
+        val executorDiscordUser = event.user
+        val playerName = event.getOption("player")!!.asString
+        val reason = event.getOption("reason")?.asString ?: "Banned"
+        val expireDays = event.getOption("expire_date")?.asInt
+
+        val mcExecutor = DataBase.getMinecraftUUID(executorDiscordUser.idLong)
+            ?.let { uuid -> Server.playerManager.getPlayer(uuid) }
+
+        val isOp = Server.playerManager.isOperator(mcExecutor?.playerConfigEntry)
+        val targetPlayer = Server.playerManager.getPlayer(playerName) ?: run {
+            event.reply("Player not found").setEphemeral(true).queue()
+            return
+        }
+
+        if (!isOp) {
+            event.reply(LM.getMessage(FMsgKey.Discord.Command.Ban.NoPermission, lang = event.userLocale.locale).string)
+                .setEphemeral(true)
+                .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+            return
+        }
+
+        val created = Date()
+        val source = executorDiscordUser.name
+        val expiry =
+            if (expireDays != null)
+                Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(expireDays.toLong()))
+            else
+                null
+
+        val entry = BannedPlayerEntry(
+            targetPlayer.playerConfigEntry,
+            created,
+            source,
+            expiry,
+            reason
+        )
+
+        Server.playerManager.userBanList.add(entry)
+        targetPlayer.networkHandler.disconnect(Text.literal(reason))
+
+        val ac = mapOf(
+            "player" to targetPlayer.name.string,
+        )
+        event.reply(LM.getMessage(FMsgKey.Discord.Command.Ban.BannedPlayer, ac, lang = event.userLocale.locale).string)
+            .setEphemeral(false)
             .queue()
+    }
+
+    private fun handlePardon(event: SlashCommandInteractionEvent) {
+        val executorDiscordUser = event.user
+        val playerName = event.getOption("player")!!.asString
+
+        val mcExecutor = DataBase.getMinecraftUUID(executorDiscordUser.idLong)
+            ?.let { uuid -> Server.playerManager.getPlayer(uuid) }
+
+        val isOp = Server.playerManager.isOperator(mcExecutor?.playerConfigEntry)
+        if (!isOp) {
+            event.reply(LM.getMessage(FMsgKey.Discord.Command.Pardon.NoPermission, lang = event.userLocale.locale).string)
+                .setEphemeral(true)
+                .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+            return
+        }
+
+        val banList = Server.playerManager.userBanList
+
+        val bannedEntry = banList.values().firstOrNull { entry ->
+            entry.key?.comp_4423.equals(playerName, ignoreCase = true)
+        }
+
+        if (bannedEntry == null) {
+            event.reply("$playerName is not banned.")
+                .setEphemeral(true)
+                .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+            return
+        }
+
+        banList.remove(bannedEntry.key)
+
+        event.reply(
+            LM.getMessage(
+                FMsgKey.Discord.Command.Pardon.UnbannedPlayer,
+                mapOf("player" to playerName),
+                lang = event.userLocale.locale
+            ).string
+        ).setEphemeral(false).queue()
     }
 
     private fun getTPS(): Double {

@@ -30,7 +30,7 @@ object ConfigManager {
                 Files.createDirectories(ModDir)
             }
 
-            return@lazy loader.load().also { it.validate() }.config
+            return@lazy loader.load().config
         } catch (e: Exception) {
             Logger.error("Failed to initialize config: ${e.message}", e)
             isErrorOccurred = true

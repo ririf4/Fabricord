@@ -42,6 +42,26 @@ sealed class FMsgKey : MessageKey<FMsgProvider, Text> {
                 }
             }
         }
+
+        sealed class Command : Bot() {
+            sealed class Kick : Command() {
+                object SentKickPacket : Kick()
+
+                object NoPermission : Kick()
+            }
+
+            sealed class Ban : Command() {
+                object BannedPlayer : Ban()
+
+                object NoPermission : Ban()
+            }
+
+            sealed class Pardon : Command() {
+                object UnbannedPlayer : Pardon()
+
+                object NoPermission : Pardon()
+            }
+        }
     }
 
     sealed class Command : FMsgKey() {
