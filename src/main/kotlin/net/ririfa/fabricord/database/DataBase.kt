@@ -23,10 +23,9 @@ object DataBase {
     }
 
     fun getMinecraftUUID(discord: Long): UUID? {
-        val entry = mcDiscordLink.firstOrNull {
+        return mcDiscordLink.firstOrNull {
             discordId == discord
-        }
-        return entry?.mcUUID
+        }?.mcUUID
     }
 
     @JvmStatic

@@ -18,8 +18,10 @@ repositories {
 }
 
 val shade: Configuration by configurations.creating {
-	extendsFrom(configurations.runtimeOnly.get())
+    isCanBeConsumed = false
+    isCanBeResolved = true
 }
+configurations.runtimeOnly.get().extendsFrom(shade)
 
 dependencies {
 	// === Minecraft and Fabric ===
@@ -32,8 +34,8 @@ dependencies {
 	// === RiriFa Libs ===
 	modImplementation(libs.langman.core)
 	modImplementation(libs.langman.yaml)
-	modImplementation(libs.yacla.core)
-	modImplementation(libs.yacla.yaml)
+    modImplementation(libs.yacla.core)
+    modImplementation(libs.yacla.yaml)
 	modImplementation(libs.cask)
 	akkara(libs.versions.akkaradb.get(), "modImplementation")
 
@@ -43,19 +45,13 @@ dependencies {
 
 	// === Shadowed Libs ===
 	shade(libs.jda) { exclude(group = "net.java.dev.jna", module = "jna") }
-	shade(libs.snakeyaml)
 }
 
 loom {
 	accessWidenerPath = file("src/main/resources/fabricord.accesswidener")
 }
 
-java {
-	withSourcesJar()
-
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
+java { withSourcesJar() }
 
 kotlin {
 	jvmToolchain {

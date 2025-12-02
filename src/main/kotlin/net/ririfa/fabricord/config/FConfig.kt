@@ -52,58 +52,45 @@ data class FConfig(
 
 object FConfigSchema : YaclaSchema<FConfig> {
     override fun configure(def: FieldDefBuilder<FConfig>) {
-        def.field(FConfig::botToken) {
-            loader(BlankToNullLoader)
-            validate {
+        def.field(FConfig::botToken)
+            .loader(BlankToNullLoader)
+            .validate {
                 if (it == null) Logger.warn("Bot token is not set in config, Fabricord will not function properly.")
             }
-        }
-        def.field(FConfig::logChannelID) {
-            loader(BlankToNullLoader)
-            validate {
+        def.field(FConfig::logChannelID)
+            .loader(BlankToNullLoader)
+            .validate {
                 if (it == null) Logger.warn("Log channel ID is not set in config, some features may not work properly.")
             }
-        }
-        def.field(FConfig::willSends) {
-            loader(SendableEventListLoader)
-        }
-        def.field(FConfig::botActivityMessage) {
-            loader(BlankToNullLoader)
-        }
-        def.field(FConfig::botActivityStatus) {
-            loader(BlankToNullLoader)
-        }
-        def.field(FConfig::botOnlineStatus) {
-            loader(BlankToNullLoader)
-        }
-        def.field(FConfig::serverStartMessage) {
-            loader(BlankToNullLoader)
-        }
-        def.field(FConfig::serverStopMessage) {
-            loader(BlankToNullLoader)
-        }
-        def.field(FConfig::playerJoinMessage) {
-            loader(BlankToNullLoader)
-        }
-        def.field(FConfig::playerLeaveMessage) {
-            loader(BlankToNullLoader)
-        }
-        def.field(FConfig::messageStyle) {
-            loader(StringToMessageStyleLoader)
-            default(MessageStyle.CLASSIC)
-        }
-        def.field(FConfig::useUserPermissionsForMention) {
-            default(false)
-        }
-        def.field(FConfig::blockAllMentions) {
-            default(false)
-        }
-        def.field(FConfig::mentionBlockedUserID) {
-            loader(ListToSetLoader)
-        }
-        def.field(FConfig::mentionBlockedRoleID) {
-            loader(ListToSetLoader)
-        }
+        def.field(FConfig::consoleLogChannelID)
+            .loader(BlankToNullLoader)
+        def.field(FConfig::willSends)
+            .loader(SendableEventListLoader)
+        def.field(FConfig::botActivityMessage)
+            .loader(BlankToNullLoader)
+        def.field(FConfig::botActivityStatus)
+            .loader(BlankToNullLoader)
+        def.field(FConfig::botOnlineStatus)
+            .loader(BlankToNullLoader)
+        def.field(FConfig::serverStartMessage)
+            .loader(BlankToNullLoader)
+        def.field(FConfig::serverStopMessage)
+            .loader(BlankToNullLoader)
+        def.field(FConfig::playerJoinMessage)
+            .loader(BlankToNullLoader)
+        def.field(FConfig::playerLeaveMessage)
+            .loader(BlankToNullLoader)
+        def.field(FConfig::messageStyle)
+            .loader(StringToMessageStyleLoader)
+            .default(MessageStyle.CLASSIC)
+        def.field(FConfig::useUserPermissionsForMention)
+            .default(false)
+        def.field(FConfig::blockAllMentions)
+            .default(false)
+        def.field(FConfig::mentionBlockedUserID)
+            .loader(ListToSetLoader)
+        def.field(FConfig::mentionBlockedRoleID)
+            .loader(ListToSetLoader)
     }
 }
 
