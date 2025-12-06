@@ -32,15 +32,14 @@ dependencies {
 	modImplementation(libs.fabric.kotlin)
 
 	// === RiriFa Libs ===
-	modImplementation(libs.langman.core)
-	modImplementation(libs.langman.yaml)
-    modImplementation(libs.yacla.core)
-    modImplementation(libs.yacla.yaml)
-	modImplementation(libs.cask)
+    modCompileOnly(libs.langman.core)
+    modCompileOnly(libs.langman.yaml)
+    modCompileOnly(libs.yacla.core)
+    modCompileOnly(libs.yacla.yaml)
+    modCompileOnly(libs.cask)
 	akkara(libs.versions.akkaradb.get(), "modImplementation")
 
 	// === Other Libs ===
-	modImplementation(libs.snakeyaml)
 	modImplementation(libs.jda)
 
 	// === Shadowed Libs ===

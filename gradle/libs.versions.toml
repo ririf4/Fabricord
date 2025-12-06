@@ -11,13 +11,13 @@ fabric-kotlin = "1.13.6+kotlin.2.2.20"
 
 akkaradb = "0.2.0"
 akkara-plugin = "0.1.0"
-langMan = "2.0.0"
+langMan-core = "2.0.3"
+langMan-yaml = "2.0.1"
 yacla-core = "3.0.0"
 yacla-yaml = "3.0.0"
-cask = "0.0.1+alpha.3"
+cask = "1.0.0"
 
 jda = "6.1.1"
-snakeYaml = "2.5"
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -32,11 +32,10 @@ fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fab
 fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
 fabric-kotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabric-kotlin" }
 
-langman-core = { module = "net.ririfa:langman-core", version.ref = "langMan" }
-langman-yaml = { module = "net.ririfa:langman-ext.yaml", version.ref = "langMan" }
+langman-core = { module = "net.ririfa:langman-core", version.ref = "langMan-core" }
+langman-yaml = { module = "net.ririfa:langman-ext.yaml", version.ref = "langMan-yaml" }
 yacla-core = { module = "net.ririfa:yacla-core", version.ref = "yacla-core" }
 yacla-yaml = { module = "net.ririfa:yacla-yaml", version.ref = "yacla-yaml" }
 cask = { module = "net.ririfa:cask", version.ref = "cask" }
 
 jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
-snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeYaml" }
