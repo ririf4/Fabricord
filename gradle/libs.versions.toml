@@ -18,6 +18,7 @@ yacla-yaml = "3.0.0"
 cask = "1.0.0"
 
 jda = "6.1.1"
+yaml = "2.5"
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -39,3 +40,4 @@ yacla-yaml = { module = "net.ririfa:yacla-yaml", version.ref = "yacla-yaml" }
 cask = { module = "net.ririfa:cask", version.ref = "cask" }
 
 jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "yaml" }

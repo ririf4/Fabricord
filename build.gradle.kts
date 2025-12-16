@@ -41,9 +41,11 @@ dependencies {
 
 	// === Other Libs ===
 	modImplementation(libs.jda)
+	modImplementation(libs.snakeyaml)
 
 	// === Shadowed Libs ===
 	shade(libs.jda) { exclude(group = "net.java.dev.jna", module = "jna") }
+	shade(libs.snakeyaml)
 }
 
 loom {
@@ -83,6 +85,7 @@ tasks.register<ShadowJar>("finalJar") {
 	}
 
 	relocate("net.dv8tion.jda", "net.ririfa.shadowed.jda")
+	relocate("org.yaml.snakeyaml", "net.ririfa.shadowed.snakeyaml")
 
 	exclude("net/dv8tion/jda/api/audio/**")
 	exclude("net/dv8tion/jda/internal/audio/**")

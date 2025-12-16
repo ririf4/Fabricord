@@ -1,22 +1,24 @@
-version: "1.0.1"
-
-System:
-  Discord:
-    ErrorDuringSendingModernMessage: "'modern'メッセージの送信中にエラーが発生しました。"
+version: "1.1.0"
 
 Discord:
-  Config:
-    LogChannelIDIsBlank: "メインログを出力するチャンネルIDが空です。"
-
   Bot:
     BotNowOnline: "Botがオンラインになりました: %s"
     BotNowOffline: "Botがオフラインになりました: %s"
 
+    CannotLoginToBot: "Botへのログインに失敗しました"
     CannotStartBot: "不明なエラーにより、Botへの接続に失敗しました。"
-    CannotStopBot: "不明なエラーにより、Botの停止に失敗しました。"
-    TimedOutForStoppingBot: "Botの停止がタイムアウトしたため、強制的に停止します。"
 
-    CannotLoginToBot: "ログインエラーにより、Botに接続できません。"
+    TimedOutForStoppingBot: "Botの停止がタイムアウトしたため、強制的に停止します。"
+    CannotStopBot: "不明なエラーにより、Botの停止に失敗しました。"
+
+    ErrorDuringSendingModernMessage: "'modern'メッセージの送信中にエラーが発生しました。"
+
+  Modal:
+    LINK:
+      Title: "Discordアカウントのリンク"
+      LinkedSuccessfully: "DiscordアカウントとMinecraftアカウントのリンクに成功しました！"
+
+      Invalid: "無効なリンクコードです。もう一度やり直してください。"
 
   Embed:
     PlayerList:
@@ -31,9 +33,29 @@ Discord:
       Description:
         MemoryUsage: "メモリ使用量"
 
+  Command:
+    Kick:
+      SentKickPacket: "%player%をキックしました。"
+      NoPermission: "他のプレイヤーをキックする権限がありません。"
+
+    Ban:
+      SentBanPacket: "%player%をBANしました。"
+      NoPermission: "他のプレイヤーをBANする権限がありません。"
+
+    Pardon:
+      SentPardonPacket: "%player%のBANを解除しました。"
+      NoPermission: "他のプレイヤーのBANを解除する権限がありません。"
+
 Command:
   LC:
+    State:
+      ON: "オン"
+      OFF: "オフ"
+
     SwitchedLocalChatState: "ローカルチャットの状態を %state% にしました"
+
+  LINK:
+    IssuedCode: "Discordアカウントをリンクするためのコードを発行しました。コードは %code% です。有効期限は5分です。"
 
 Chat:
   LinkDiscordAccountFirst: "チャットをする前に、MinecraftアカウントとDiscordアカウントを、'/link'コマンドからリンクしてください"
