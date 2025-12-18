@@ -1,2 +1,61 @@
-version: "1.0.1"
+version: "1.1.0"
 
+Discord:
+  Bot:
+    BotNowOnline: "Bot is now online: %s"
+    BotNowOffline: "Bot is now offline: %s"
+
+    CannotLoginToBot: "Failed to login to the bot"
+    CannotStartBot: "Failed to connect to the bot due to an unknown error"
+
+    TimedOutForStoppingBot: "Bot stop timed out, forcing shutdown"
+    CannotStopBot: "Failed to stop the bot due to an unknown error"
+
+    ErrorDuringSendingModernMessage: "An error occurred while sending a 'modern' message"
+
+  Modal:
+    LINK:
+      Title: "Link Discord Account"
+      LinkedSuccessfully: "Successfully linked your Discord account with your Minecraft account!"
+
+      Invalid: "Invalid link code. Please try again."
+
+  Embed:
+    PlayerList:
+      Title: "Online Players"
+      Description: "Currently, %playerCount% players are online.\n\n"
+
+      ThereAreNoPlayersOnline: "There are no players online at the moment."
+
+    ServerStatus:
+      Title: "Server Status"
+
+      Description:
+        MemoryUsage: "Memory Usage"
+
+  Command:
+    Kick:
+      SentKickPacket: "Kicked %player%"
+      NoPermission: "You do not have permission to kick other players"
+
+    Ban:
+      SentBanPacket: "Banned %player%"
+      NoPermission: "You do not have permission to ban other players"
+
+    Pardon:
+      SentPardonPacket: "Unbanned %player%"
+      NoPermission: "You do not have permission to unban other players"
+
+Command:
+  LC:
+    State:
+      ON: "On"
+      OFF: "Off"
+
+    SwitchedLocalChatState: "Local chat state changed to %state%"
+
+  LINK:
+    IssuedCode: "A code to link your Discord account has been issued. The code is %code% and is valid for 5 minutes."
+
+Chat:
+  LinkDiscordAccountFirst: "Please link your Minecraft account with your Discord account using the '/link' command before chatting"
