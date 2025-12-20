@@ -58,18 +58,18 @@ MessageStyle: ""
 
 # ── Mention Settings ──
 
-# Allow mentions like @everyone and @role from Minecraft to Discord.
-AllowMentions: false
+# Block all mentions from Minecraft to Discord.
+BlockAllMentions: false
 
 # Restrict mentions based on Discord permissions.
 # If true, only users with the proper Discord permissions can trigger mentions.
 UseUserPermissionForMentions: false
 
 # List of Discord user IDs who should never be pinged.
-BlockedUserIDs: []
+MentionBlockedUserIDs: [ ]
 
 # List of Discord role IDs that should never be pinged.
-BlockedRoleIDs: []
+MentionBlockedRoleIDs: [ ]
 
 # ── Custom Message Settings ──
 

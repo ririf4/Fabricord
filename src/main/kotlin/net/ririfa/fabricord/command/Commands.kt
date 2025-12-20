@@ -52,9 +52,7 @@ enum class Commands(
             executes {
                 val player = it.source.player ?: return@executes 0
                 val code = LinkCommandAuthCodeManager.issueLinkCode(player.uuid)
-                val ac = mapOf(
-                    "code" to code
-                )
+                val ac = mapOf("code" to code)
                 player.sendMessage(
                     player.adapt().getMessage(
                         FMsgKey.Command.LINK.IssuedCode,

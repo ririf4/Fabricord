@@ -36,13 +36,13 @@ data class FConfig(
     var messageStyle: MessageStyle?,
 
     @JvmField
-    val useUserPermissionsForMention: Boolean,
+    val useUserPermissionForMentions: Boolean,
     @JvmField
     val blockAllMentions: Boolean,
     @JvmField
-    val mentionBlockedUserID: Set<String>?,
+    val mentionBlockedUserIDs: Set<String>?,
     @JvmField
-    val mentionBlockedRoleID: Set<String>?,
+    val mentionBlockedRoleIDs: Set<String>?,
 
     @JvmField
     val consoleLogChannelID: String?,
@@ -83,13 +83,13 @@ object FConfigSchema : YaclaSchema<FConfig> {
         def.field(FConfig::messageStyle)
             .loader(StringToMessageStyleLoader)
             .default(MessageStyle.CLASSIC)
-        def.field(FConfig::useUserPermissionsForMention)
+        def.field(FConfig::useUserPermissionForMentions)
             .default(false)
         def.field(FConfig::blockAllMentions)
             .default(false)
-        def.field(FConfig::mentionBlockedUserID)
+        def.field(FConfig::mentionBlockedUserIDs)
             .loader(ListToSetLoader)
-        def.field(FConfig::mentionBlockedRoleID)
+        def.field(FConfig::mentionBlockedRoleIDs)
             .loader(ListToSetLoader)
     }
 }

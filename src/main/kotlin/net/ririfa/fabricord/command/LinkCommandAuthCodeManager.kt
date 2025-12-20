@@ -1,18 +1,18 @@
 package net.ririfa.fabricord.command
 
 import net.ririfa.cask.cask
-import net.ririfa.cask.ttl
+import net.ririfa.cask.ttlMinutes
 import net.ririfa.fabricord.util.CodeGenerator
 import java.util.*
 
 object LinkCommandAuthCodeManager {
     val UtS = cask<UUID, String> {
-        ttl = 5 * 60L  // 5 minutes
+        ttlMinutes = 5L  // 5 minutes
         shareGcExecutor(true)
     }
 
     val StU = cask<String, UUID> {
-        ttl = 5 * 60L  // 5 minutes
+        ttlMinutes = 5 * 60L  // 5 minutes
         shareGcExecutor(true)
         onEvict { _, uuid ->
             uuid?.let { UtS.invalidate(it) }

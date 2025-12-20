@@ -34,7 +34,7 @@ object DiscordPlayerEventHandler {
             val discordId = DataBase.getDiscordId(player.uuid) ?: return // ID should not-null value but just in case
             val guild = Config.logChannelID?.let { DiscordBotManager.jda?.getTextChannelById(it) }?.guild ?: return
             guild.retrieveMemberById(discordId).queue({ member ->
-                val allowed = if (Config.useUserPermissionsForMention) {
+                val allowed = if (Config.useUserPermissionForMentions) {
                     resolveAllowedMentions(member)
                 } else if (Config.blockAllMentions) {
                     emptySet()

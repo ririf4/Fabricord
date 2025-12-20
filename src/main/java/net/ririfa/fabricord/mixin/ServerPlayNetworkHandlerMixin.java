@@ -33,7 +33,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         FMsgProvider ap = FMsgProviderKt.adapt(player);
 
         // If `useUserPermissionsForMention` is enabled, check if the user has linked their Discord account first
-        if (!DataBase.isUserLinked(playerUUID) && Aliases.getConfig().useUserPermissionsForMention) {
+        if (!DataBase.isUserLinked(playerUUID) && Aliases.getConfig().useUserPermissionForMentions) {
             player.sendMessage(ap.getMessage(FMsgKey.Chat.LinkDiscordAccountFirst.INSTANCE));
             ci.cancel();
             return;

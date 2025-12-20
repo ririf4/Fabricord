@@ -37,7 +37,7 @@ dependencies {
     modCompileOnly(libs.yacla.core)
     modCompileOnly(libs.yacla.yaml)
     modCompileOnly(libs.cask)
-	akkara(libs.versions.akkaradb.get(), "modImplementation")
+	akkara(libs.versions.akkaradb.get(), "modCompileOnly")
 
 	// === Other Libs ===
 	modImplementation(libs.jda)
@@ -72,6 +72,13 @@ tasks.withType<JavaCompile> {
 
 tasks.named<RemapJarTask>("remapJar") {
 	finalizedBy("finalJar")
+}
+
+tasks.named<ProcessResources>("processResources") {
+	inputs.property("version", project.version)
+	filesMatching("fabric.mod.json") {
+		expand("version" to project.version)
+	}
 }
 
 tasks.register<ShadowJar>("finalJar") {

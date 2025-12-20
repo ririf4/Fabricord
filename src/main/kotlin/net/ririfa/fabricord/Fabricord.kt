@@ -62,6 +62,7 @@ class Fabricord : DedicatedServerModInitializer {
 
     override fun onInitializeServer() {
         langMan = LangManBuilder.new<FMsgProvider, Text>()
+            .fromClass(Fabricord::class.java)
             .fromResource("/assets/$MOD_ID/lang/")
             .toPath(langDir)
             .withMessageKey(FMsgKey::class.java)

@@ -1,15 +1,15 @@
 [versions]
-kotlin = "2.2.21"
-loom = "1.13-SNAPSHOT"
+kotlin = "2.3.0"
+loom = "1.14-SNAPSHOT"
 shadowJar = "9.2.2"
 
-minecraft = "1.21.10"
-yarn = "1.21.10+build.2"
-fabric-api = "0.138.3+1.21.10"
-fabric-loader = "0.17.3"
-fabric-kotlin = "1.13.6+kotlin.2.2.20"
+minecraft = "1.21.11"
+yarn = "1.21.11+build.3"
+fabric-api = "0.140.0+1.21.11"
+fabric-loader = "0.18.3"
+fabric-kotlin = "1.13.8+kotlin.2.3.0"
 
-akkaradb = "0.2.0"
+akkaradb = "0.4.0"
 akkara-plugin = "0.1.0"
 langMan-core = "2.0.3"
 langMan-yaml = "2.0.1"
@@ -19,12 +19,6 @@ cask = "1.0.0"
 
 jda = "6.1.1"
 yaml = "2.5"
-
-[plugins]
-kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-loom = { id = "fabric-loom", version.ref = "loom" }
-shadowJar = { id = "com.gradleup.shadow", version.ref = "shadowJar" }
-akkara = { id = "dev.swiftstorm.akkaradb-plugin", version.ref = "akkara-plugin" }
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
@@ -41,3 +35,10 @@ cask = { module = "net.ririfa:cask", version.ref = "cask" }
 
 jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "yaml" }
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+loom = { id = "fabric-loom", version.ref = "loom" }
+shadowJar = { id = "com.gradleup.shadow", version.ref = "shadowJar" }
+akkara = { id = "dev.swiftstorm.akkaradb-plugin", version.ref = "akkara-plugin" }
+

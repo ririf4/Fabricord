@@ -110,8 +110,8 @@ object DiscordBotManager {
         FT {
             val blockAll = Config.blockAllMentions
 
-            val blockedUserIds = Config.mentionBlockedUserID.orEmpty()
-            val blockedRoleIds = Config.mentionBlockedRoleID.orEmpty()
+            val blockedUserIds = Config.mentionBlockedUserIDs.orEmpty()
+            val blockedRoleIds = Config.mentionBlockedRoleIDs.orEmpty()
 
             // --- Extract mentions ---------------------------------------
             val userMentionRegex = "<@!?([0-9]+)>".toRegex()

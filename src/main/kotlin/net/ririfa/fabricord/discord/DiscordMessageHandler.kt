@@ -112,7 +112,7 @@ object DiscordMessageHandler {
             .append(discord)
 
         role?.let {
-            text.append(Text.literal(" | ").styled { it.withColor(0xFFFFFF) })
+            text.append(Text.literal(" | ").styled { style -> style.withColor(0xFFFFFF) })
                 .append(it)
         }
 
