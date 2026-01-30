@@ -30,12 +30,12 @@ class CompositeDiscordListener : ListenerAdapter() {
 
     private val modalID = "FABRICORD_LINK_ACCOUNT_MODAL"
 
-    private val logChannelID = Config.logChannelID
+    private val logChannelIDs = Config.logChannelIDs
     private val consoleChannel = Config.consoleLogChannelID
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
-        when (event.channel.id) {
-            logChannelID -> {
+        when {
+            logChannelIDs != null && event.channel.id in logChannelIDs -> {
                 FT {
                     val (mentionedPlayers, foundUUID) = findMentionedPlayers(event.message.contentRaw)
 
@@ -47,7 +47,7 @@ class CompositeDiscordListener : ListenerAdapter() {
                 }
             }
 
-            consoleChannel -> {
+            consoleChannel != null && event.channel.id == consoleChannel -> {
                 if (!event.author.isBot) {
                     val command = event.message.contentRaw
                     Server.execute {
@@ -91,7 +91,9 @@ class CompositeDiscordListener : ListenerAdapter() {
         DataBase.linkUser(uuid, event.user.idLong)
         event.reply(LM.getMessage(FMsgKey.Discord.Modal.LINK.LinkedSuccessfully).string)
             .setEphemeral(true)
-            .queue()
+            .queue { hook ->
+                hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS)
+            }
     }
 
     private fun handlePlayerList(event: SlashCommandInteractionEvent) {
@@ -145,7 +147,7 @@ class CompositeDiscordListener : ListenerAdapter() {
                     "**TPS:** `${"%.2f".format(tps)}`\n" +
                             "**MSPT:** `${"%.2f".format(mspt)}` ms\n" +
                             "**Players:** `${playerInfo}`\n" +
-                            "**$memUsage:** `${memoryUsage}`"
+                            "**${memUsage.string}:** `${memoryUsage}`"
                 )
 
             event.replyEmbeds(embedBuilder.build()).queue({ message ->
@@ -178,8 +180,23 @@ class CompositeDiscordListener : ListenerAdapter() {
         val reasonOptionString = event.getOption("reason")?.asString
 
         val mcExecutor = DataBase.getMinecraftUUID(executorDiscordUser.idLong)?.let { uuid -> Server.playerManager.getPlayer(uuid) }
-        val isOp = Server.playerManager.isOperator(mcExecutor?.playerConfigEntry)
-        val targetPlayer = Server.playerManager.getPlayer(playerOptionString) ?: return
+        val isOp = mcExecutor?.playerConfigEntry?.let { Server.playerManager.isOperator(it) }
+            ?: DataBase.isOp(mcExecutor?.uuid ?: return)
+            ?: run {
+                event.reply(LM.getMessage(FMsgKey.Discord.Command.CannotGetPlayerPerm, lang = event.userLocale.locale).string)
+                    .setEphemeral(true)
+                    .queue { hook ->
+                        hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS)
+                    }
+                return
+            }
+
+        val targetPlayer = Server.playerManager.getPlayer(playerOptionString) ?: run {
+            event.reply("Player not found")
+                .setEphemeral(true)
+                .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+            return
+        }
 
         if (!isOp) {
             event.reply(LM.getMessage(FMsgKey.Discord.Command.Kick.NoPermission, lang = event.userLocale.locale).string)
@@ -192,9 +209,7 @@ class CompositeDiscordListener : ListenerAdapter() {
 
         targetPlayer.networkHandler.disconnect(DisconnectionInfo(Text.of(reasonOptionString)))
 
-        val ac = mapOf(
-            "player" to targetPlayer.name.string,
-        )
+        val ac = mapOf("player" to targetPlayer.name.string)
 
         event.reply(LM.getMessage(FMsgKey.Discord.Command.Kick.SentKickPacket, ac, lang = event.userLocale.locale).string)
             .setEphemeral(true)
@@ -206,15 +221,30 @@ class CompositeDiscordListener : ListenerAdapter() {
     private fun handleBan(event: SlashCommandInteractionEvent) {
         val executorDiscordUser = event.user
         val playerName = event.getOption("player")!!.asString
-        val reason = event.getOption("reason")?.asString ?: "Banned"
+        val reason = event.getOption("reason")?.asString ?: "Banned by an operator."
         val expireDays = event.getOption("expire_date")?.asInt
 
-        val mcExecutor = DataBase.getMinecraftUUID(executorDiscordUser.idLong)
-            ?.let { uuid -> Server.playerManager.getPlayer(uuid) }
+        val uuid = DataBase.getMinecraftUUID(executorDiscordUser.idLong) ?: run {
+            event.reply(LM.getMessage(FMsgKey.Discord.Command.NoLinkedAccount, lang = event.userLocale.locale).string)
+                .setEphemeral(true)
+                .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+            return
+        }
+        val player = Server.playerManager.getPlayer(uuid)
 
-        val isOp = Server.playerManager.isOperator(mcExecutor?.playerConfigEntry)
+        val isOp = player?.playerConfigEntry?.let { Server.playerManager.isOperator(it) }
+            ?: DataBase.isOp(uuid)
+            ?: run {
+                event.reply(LM.getMessage(FMsgKey.Discord.Command.CannotGetPlayerPerm, lang = event.userLocale.locale).string)
+                    .setEphemeral(true)
+                    .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+                return
+            }
+
         val targetPlayer = Server.playerManager.getPlayer(playerName) ?: run {
-            event.reply("Player not found").setEphemeral(true).queue()
+            event.reply(LM.getMessage(FMsgKey.Discord.Command.PlayerNotFound, lang = event.userLocale.locale).string)
+                .setEphemeral(true)
+                .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
             return
         }
 
@@ -244,22 +274,33 @@ class CompositeDiscordListener : ListenerAdapter() {
         Server.playerManager.userBanList.add(entry)
         targetPlayer.networkHandler.disconnect(Text.literal(reason))
 
-        val ac = mapOf(
-            "player" to targetPlayer.name.string,
-        )
-        event.reply(LM.getMessage(FMsgKey.Discord.Command.Ban.BannedPlayer, ac, lang = event.userLocale.locale).string)
-            .setEphemeral(false)
-            .queue()
+        val ac = mapOf("player" to targetPlayer.name.string)
+        event.reply(LM.getMessage(FMsgKey.Discord.Command.Ban.SendBanPacket, ac, lang = event.userLocale.locale).string)
+            .setEphemeral(true)
+            .queue { hook -> hook.deleteOriginal().queueAfter(7, TimeUnit.SECONDS) }
     }
 
     private fun handlePardon(event: SlashCommandInteractionEvent) {
         val executorDiscordUser = event.user
         val playerName = event.getOption("player")!!.asString
 
-        val mcExecutor = DataBase.getMinecraftUUID(executorDiscordUser.idLong)
-            ?.let { uuid -> Server.playerManager.getPlayer(uuid) }
+        val uuid = DataBase.getMinecraftUUID(executorDiscordUser.idLong) ?: run {
+            event.reply(LM.getMessage(FMsgKey.Discord.Command.NoLinkedAccount, lang = event.userLocale.locale).string)
+                .setEphemeral(true)
+                .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+            return
+        }
+        val mcExecutor = Server.playerManager.getPlayer(uuid)
 
-        val isOp = Server.playerManager.isOperator(mcExecutor?.playerConfigEntry)
+        val isOp = mcExecutor?.playerConfigEntry?.let { Server.playerManager.isOperator(it) }
+            ?: DataBase.isOp(uuid)
+            ?: run {
+                event.reply(LM.getMessage(FMsgKey.Discord.Command.CannotGetPlayerPerm, lang = event.userLocale.locale).string)
+                    .setEphemeral(true)
+                    .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+                return
+            }
+
         if (!isOp) {
             event.reply(LM.getMessage(FMsgKey.Discord.Command.Pardon.NoPermission, lang = event.userLocale.locale).string)
                 .setEphemeral(true)
@@ -284,7 +325,7 @@ class CompositeDiscordListener : ListenerAdapter() {
 
         event.reply(
             LM.getMessage(
-                FMsgKey.Discord.Command.Pardon.UnbannedPlayer,
+                FMsgKey.Discord.Command.Pardon.SentPardonPacket,
                 mapOf("player" to playerName),
                 lang = event.userLocale.locale
             ).string

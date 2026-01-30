@@ -2,30 +2,30 @@ version: "1.1.0"
 
 Discord:
   Bot:
-    BotNowOnline: "Bot is now online: %s"
-    BotNowOffline: "Bot is now offline: %s"
+    BotNowOnline: "The bot is now online: %botName%"
+    BotNowOffline: "The bot is now offline: %botName%"
 
-    CannotLoginToBot: "Failed to login to the bot"
-    CannotStartBot: "Failed to connect to the bot due to an unknown error"
+    CannotLoginToBot: "Failed to log in to the bot"
+    CannotStartBot: "An unknown error occurred while trying to start the bot"
 
-    TimedOutForStoppingBot: "Bot stop timed out, forcing shutdown"
-    CannotStopBot: "Failed to stop the bot due to an unknown error"
+    TimedOutForStoppingBot: "Stopping the bot timed out, forcing shutdown"
+    CannotStopBot: "An unknown error occurred while trying to stop the bot"
 
     ErrorDuringSendingModernMessage: "An error occurred while sending a 'modern' message"
 
   Modal:
     LINK:
       Title: "Link Discord Account"
-      LinkedSuccessfully: "Successfully linked your Discord account with your Minecraft account!"
+      LinkedSuccessfully: "Successfully linked your Discord account with your Minecraft account"
 
-      Invalid: "Invalid link code. Please try again."
+      Invalid: "Invalid link code. Please try again"
 
   Embed:
     PlayerList:
       Title: "Online Players"
-      Description: "Currently, %playerCount% players are online.\n\n"
+      Description: "Currently, there are %playerCount% players online.\n\n"
 
-      ThereAreNoPlayersOnline: "There are no players online at the moment."
+      ThereAreNoPlayersOnline: "There are currently no players online"
 
     ServerStatus:
       Title: "Server Status"
@@ -46,16 +46,18 @@ Discord:
       SentPardonPacket: "Unbanned %player%"
       NoPermission: "You do not have permission to unban other players"
 
+    NoLinkedAccount: "No linked Discord account found"
+
 Command:
   LC:
     State:
       ON: "On"
       OFF: "Off"
 
-    SwitchedLocalChatState: "Local chat state changed to %state%"
+    SwitchedLocalChatState: "Local chat state set to %state%"
 
   LINK:
-    IssuedCode: "A code to link your Discord account has been issued. The code is %code% and is valid for 5 minutes."
+    IssuedCode: "A code to link your Discord account has been issued. The code is %code% and is valid for 5 minutes"
 
 Chat:
   LinkDiscordAccountFirst: "Please link your Minecraft account with your Discord account using the '/link' command before chatting"

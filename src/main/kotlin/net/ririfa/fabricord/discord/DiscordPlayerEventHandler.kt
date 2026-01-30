@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
+import net.dv8tion.jda.api.utils.messages.MessageCreateData
 import net.minecraft.server.network.ServerPlayerEntity
 import net.ririfa.fabricord.database.DataBase
 import net.ririfa.fabricord.i18n.FMsgKey
@@ -28,30 +29,55 @@ object DiscordPlayerEventHandler {
 
     private fun modernStyle(player: ServerPlayerEntity, message: String) {
         try {
+            val channelIds = Config.logChannelIDs ?: return
+
             val data = MessageCreateBuilder()
                 .setContent(message)
 
-            val discordId = DataBase.getDiscordId(player.uuid) ?: return // ID should not-null value but just in case
-            val guild = Config.logChannelID?.let { DiscordBotManager.jda?.getTextChannelById(it) }?.guild ?: return
-            guild.retrieveMemberById(discordId).queue({ member ->
-                val allowed = if (Config.useUserPermissionForMentions) {
-                    resolveAllowedMentions(member)
-                } else if (Config.blockAllMentions) {
-                    emptySet()
-                } else null
+            when {
+                Config.useUserPermissionForMentions -> {
+                    // Check user permissions (async)
+                    val discordId = DataBase.getDiscordId(player.uuid) ?: return
 
-                if (allowed != null) data.setAllowedMentions(allowed)
+                    channelIds.forEach { channelId ->
+                        val guild = DiscordBotManager.jda?.getTextChannelById(channelId)?.guild ?: return@forEach
 
-                DiscordBotManager.webHook?.sendMessage(data.build())
-                    ?.setUsername(player.name.string)
-                    ?.setAvatarUrl("https://visage.surgeplay.com/face/256/${player.uuid}")
-                    ?.queue()
-            }, { error ->
-                Logger.error("Failed to retrieve Discord member", error)
-            })
+                        guild.retrieveMemberById(discordId).queue({ member ->
+                            val allowed = resolveAllowedMentions(member)
+                            data.setAllowedMentions(allowed)
+                            sendWebhookMessage(player, data.build(), channelId)
+                        }, { error ->
+                            Logger.error("Failed to retrieve Discord member for channel $channelId", error)
+                        })
+                    }
+                }
+
+                Config.blockAllMentions -> {
+                    // Block all mentions
+                    data.setAllowedMentions(emptySet())
+                    channelIds.forEach { channelId ->
+                        sendWebhookMessage(player, data.build(), channelId)
+                    }
+                }
+
+                else -> {
+                    // Use default Discord behavior (no mention restrictions)
+                    channelIds.forEach { channelId ->
+                        sendWebhookMessage(player, data.build(), channelId)
+                    }
+                }
+            }
+
         } catch (e: Exception) {
             Logger.error(LM.getMessage(FMsgKey.Discord.Bot.ErrorDuringSendingModernMessage).string, e)
         }
+    }
+
+    private fun sendWebhookMessage(player: ServerPlayerEntity, message: MessageCreateData, channelId: String) {
+        DiscordBotManager.webHooks[channelId]?.sendMessage(message)
+            ?.setUsername(player.name.string)
+            ?.setAvatarUrl("https://visage.surgeplay.com/face/256/${player.uuid}")
+            ?.queue()
     }
 
     private fun resolveAllowedMentions(member: Member): Set<Message.MentionType> {

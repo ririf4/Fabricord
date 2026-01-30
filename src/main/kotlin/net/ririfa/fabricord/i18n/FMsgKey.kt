@@ -51,16 +51,20 @@ sealed class FMsgKey : MessageKey<FMsgProvider, Text> {
             }
 
             sealed class Ban : Command() {
-                object BannedPlayer : Ban()
+                object SendBanPacket : Ban()
 
                 object NoPermission : Ban()
             }
 
             sealed class Pardon : Command() {
-                object UnbannedPlayer : Pardon()
+                object SentPardonPacket : Pardon()
 
                 object NoPermission : Pardon()
             }
+
+            object PlayerNotFound : Command()
+            object NoLinkedAccount : Command()
+            object CannotGetPlayerPerm : Command()
         }
     }
 

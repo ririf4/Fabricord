@@ -2,6 +2,7 @@ package net.ririfa.fabricord.mixin;
 
 import net.minecraft.advancement.*;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.ririfa.fabricord.config.SendableEvent;
 import net.ririfa.fabricord.discord.DiscordBotManager;
 import net.ririfa.fabricord.discord.DiscordEmbed;
 import net.ririfa.fabricord.util.Aliases;
@@ -12,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Mixin(PlayerAdvancementTracker.class)
@@ -21,18 +23,31 @@ public abstract class PlayerAdvancementTrackerMixin {
 
     @Inject(method = "grantCriterion", at = @At("RETURN"))
     public void onAdvancementGranted(AdvancementEntry advancementEntry, String string, @NotNull CallbackInfoReturnable<Boolean> cir) {
-        if (!DiscordBotManager.isBotInitialized || Aliases.getConfig().logChannelID == null) return;
+        var config = Aliases.getConfig();
+        if (!DiscordBotManager.isBotInitialized || config.logChannelIDs == null || Objects.requireNonNull(config.willSends).contains(SendableEvent.Advancement))
+            return;
 
-        if (cir.getReturnValue()) {
-            Advancement advancement = advancementEntry.value();
-            Optional<AdvancementDisplay> display = advancement.comp_1913();
+        // === IgnoredAdvancements check ===
+        if (config.ignoredAdvancements != null) {
+            String advancementId = advancementEntry.id().toString();
+            Aliases.getLogger().info("Advancement ID: " + advancementId);
+            if (config.ignoredAdvancements.contains(advancementId)) {
+                return;
+            }
+        }
 
-            if (display.isPresent() && display.get().shouldAnnounceToChat()) {
-                AdvancementProgress progress = ((PlayerAdvancementTracker) (Object) this).getProgress(advancementEntry);
-                if (progress.isDone()) {
-                    String title = display.get().getTitle().getString();
-                    DiscordEmbed.sendPlayerGrantCriterionEmbed(owner, title);
-                }
+        if (!cir.getReturnValue()) return;
+
+        Advancement advancement = advancementEntry.value();
+        Optional<AdvancementDisplay> display = advancement.comp_1913();
+
+        if (display.isPresent() && display.get().shouldAnnounceToChat()) {
+            AdvancementProgress progress =
+                    ((PlayerAdvancementTracker) (Object) this).getProgress(advancementEntry);
+
+            if (progress.isDone()) {
+                String title = display.get().getTitle().getString();
+                DiscordEmbed.sendPlayerGrantCriterionEmbed(owner, title);
             }
         }
     }

@@ -2,8 +2,8 @@ version: "1.1.0"
 
 Discord:
   Bot:
-    BotNowOnline: "Botがオンラインになりました: %s"
-    BotNowOffline: "Botがオフラインになりました: %s"
+    BotNowOnline: "Botがオンラインになりました: %botName%"
+    BotNowOffline: "Botがオフラインになりました: %botName%"
 
     CannotLoginToBot: "Botへのログインに失敗しました"
     CannotStartBot: "不明なエラーにより、Botへの接続に失敗しました。"
@@ -45,6 +45,8 @@ Discord:
     Pardon:
       SentPardonPacket: "%player%のBANを解除しました。"
       NoPermission: "他のプレイヤーのBANを解除する権限がありません。"
+
+    NoLinkedAccount: "リンクされたDiscordアカウントがありません。"
 
 Command:
   LC:

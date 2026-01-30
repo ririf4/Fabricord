@@ -20,7 +20,7 @@ object LinkCommandAuthCodeManager {
     }
 
     fun issueLinkCode(uuid: UUID): String {
-        UtS.get(uuid)?.let { existing ->
+        UtS.get(uuid)?.let { _ ->
             UtS.invalidate(uuid)
         }
 

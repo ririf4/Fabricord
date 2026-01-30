@@ -11,6 +11,9 @@ plugins {
 	alias(libs.plugins.shadowJar)
 }
 
+group = "net.ririfa"
+version = "5.0.0-mc.1.21.11+beta.1"
+
 repositories {
 	mavenCentral()
 	maven("https://maven.fabricmc.net/") { name = "FabricMC" }
@@ -31,7 +34,7 @@ dependencies {
 	modImplementation(libs.fabric.loader)
 	modImplementation(libs.fabric.kotlin)
 
-	// === RiriFa Libs ===
+	// === RiriFa Libs(Katalis will provide these on rutime) ===
     modCompileOnly(libs.langman.core)
     modCompileOnly(libs.langman.yaml)
     modCompileOnly(libs.yacla.core)

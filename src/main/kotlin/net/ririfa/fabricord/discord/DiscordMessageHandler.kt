@@ -56,8 +56,8 @@ object DiscordMessageHandler {
         isMention: Boolean,
         contentOverride: String? = null
     ): MutableText? {
-        val channelId = Config.logChannelID ?: return null
-        if (event.channel.id != channelId || event.author.isBot) return null
+        val channelIds = Config.logChannelIDs ?: return null
+        if (event.channel.id !in channelIds || event.author.isBot) return null
 
         val guild = event.guild
         val member = event.member
@@ -65,7 +65,7 @@ object DiscordMessageHandler {
             member?.effectiveName ?: member?.user?.globalName ?: member?.user?.name ?: "Unknown"
 
         val role = member?.roles?.maxByOrNull { it.position }
-        val roleColor = role?.color?.let(::toTextColor) ?: TextColor.fromRgb(0xFFFFFF)
+        val roleColor = role?.colors?.primary?.let(::toTextColor) ?: TextColor.fromRgb(0xFFFFFF)
 
         val base = prefix(
             guildName = guild.name,

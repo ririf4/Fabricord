@@ -29,19 +29,21 @@ object DiscordEmbed {
         }
     }
 
-    private fun sendEmbedToDiscord(color: Color, author: String? = null, imageUrl: String, channelId: String? = Config.logChannelID) {
-        if (channelId == null) return
+    private fun sendEmbedToDiscord(color: Color, author: String? = null, imageUrl: String, channelIds: Set<String>? = Config.logChannelIDs) {
+        if (channelIds == null) return
 
         val embed = EmbedBuilder().apply {
             setColor(color)
             setAuthor(author, null, imageUrl)
         }.build()
 
-        logQueue.add(channelId to embed)
+        channelIds.forEach { channelId ->
+            logQueue.add(channelId to embed)
+        }
     }
 
-    private fun sendEmbedToDiscordImmediately(color: Color, author: String? = null, imageUrl: String, channelId: String? = Config.logChannelID) {
-        if (channelId == null) return
+    private fun sendEmbedToDiscordImmediately(color: Color, author: String? = null, imageUrl: String, channelIds: Set<String>? = Config.logChannelIDs) {
+        if (channelIds == null) return
 
         val embed = EmbedBuilder().apply {
             setColor(color)
@@ -49,30 +51,40 @@ object DiscordEmbed {
         }.build()
 
         val jda = JDA ?: return
-        val channel = jda.getTextChannelById(channelId) ?: return
 
-        channel.sendMessageEmbeds(embed).queue(
-            null,
-            { e -> Logger.error("Failed to send embed: ${e.message}") }
-        )
+        channelIds.forEach { channelId ->
+            val channel = jda.getTextChannelById(channelId) ?: return@forEach
+
+            channel.sendMessageEmbeds(embed).queue(
+                null,
+                { e -> Logger.error("Failed to send embed to channel $channelId: ${e.message}") }
+            )
+        }
     }
 
     @JvmStatic
     fun sendPlayerJoinEmbed(player: ServerPlayerEntity) {
-        val name = player.name.string
-        val uuid = player.uuid.toString()
-        val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
-        val message = Config.playerJoinMessage?.replace("%player%", name)
-        sendEmbedToDiscordImmediately(Color.GREEN, message, imageUrl)
+        Config.playerJoinMessage?.let { rawMessage ->
+            val name = player.name.string
+            val uuid = player.uuid.toString()
+            val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
+            val message = rawMessage.replace("%player%", name)
+
+            sendEmbedToDiscordImmediately(Color.GREEN, message, imageUrl)
+        }
     }
+
 
     @JvmStatic
     fun sendPlayerLeftEmbed(player: ServerPlayerEntity) {
-        val name = player.name.string
-        val uuid = player.uuid.toString()
-        val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
-        val message = Config.playerLeaveMessage?.replace("%player%", name)
-        sendEmbedToDiscordImmediately(Color.RED, message, imageUrl)
+        Config.playerLeaveMessage?.let { rawMessage ->
+            val name = player.name.string
+            val uuid = player.uuid.toString()
+            val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
+            val message = rawMessage.replace("%player%", name)
+
+            sendEmbedToDiscordImmediately(Color.RED, message, imageUrl)
+        }
     }
 
     @JvmStatic

@@ -12,10 +12,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.ririfa.fabricord.i18n.FMsgKey
 import net.ririfa.fabricord.util.*
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 import javax.security.auth.login.LoginException
 
 object DiscordBotManager {
@@ -32,12 +30,13 @@ object DiscordBotManager {
     var isBotInitialized: Boolean = false
 
     @JvmField
-    var webHook: Webhook? = null
+    var webHooks: MutableMap<String, Webhook> = mutableMapOf()
 
     fun start() {
+        val token = Config.botToken ?: return
         FT {
             try {
-                jda = JDABuilder.createDefault(Config.botToken)
+                jda = JDABuilder.createDefault(token)
                     .setAutoReconnect(true)
                     .setActivity(activity())
                     .setStatus(onlineStatus() ?: OnlineStatus.ONLINE)
@@ -51,6 +50,7 @@ object DiscordBotManager {
                 jda?.updateCommands()?.addCommands(
                     Commands.slash("playerlist", "Get a list of online players"),
                     Commands.slash("status", "Get the status of the server"),
+                    Commands.slash("link", "Link your Discord account to a Minecraft account"),
                     Commands.slash("kick", "Kick a player from the Minecraft server")
                         .addOptions(
                             OptionData(OptionType.STRING, "player", "The player to kick", true),
@@ -84,28 +84,37 @@ object DiscordBotManager {
     fun stop() {
         Config.serverStopMessage?.let { sendToDiscord(it) }
 
-        runCatching {
-            val shutdownFuture = CompletableFuture.runAsync({
-                runCatching { jda?.shutdown() }
-                    .onFailure { e -> Logger.error("Error during JDA shutdown: ", e) }
-            }, shutdownExecutor)
+        try {
+            val bot = jda
+            if (bot != null) {
+                val name = runCatching { bot.selfUser.name }.getOrNull() ?: "?"
 
-            try {
-                shutdownFuture.get(7500, TimeUnit.MILLISECONDS)
-                val name = runCatching { jda?.selfUser?.name }.getOrNull() ?: "?"
-                Logger.info(LM.getMessage(FMsgKey.Discord.Bot.BotNowOffline, name).string)
-            } catch (_: TimeoutException) {
-                Logger.warn(LM.getMessage(FMsgKey.Discord.Bot.TimedOutForStoppingBot).string)
-                jda?.shutdownNow()
-                Logger.warn("Forced immediate shutdown for JDA")
+                bot.shutdown()
+
+                if (!bot.awaitShutdown(5000, TimeUnit.MILLISECONDS)) {
+                    Logger.warn(LM.getMessage(FMsgKey.Discord.Bot.TimedOutForStoppingBot).string)
+                    bot.shutdownNow()
+                    bot.awaitShutdown(3, TimeUnit.SECONDS)
+                }
+
+                Logger.info(
+                    LM.getMessage(FMsgKey.Discord.Bot.BotNowOffline, name).string
+                )
             }
-        }.onFailure { e ->
-            Logger.error(LM.getMessage(FMsgKey.Discord.Bot.CannotStopBot).string, e)
+        } catch (e: Exception) {
+            Logger.error(
+                LM.getMessage(FMsgKey.Discord.Bot.CannotStopBot).string,
+                e
+            )
+        } finally {
+            shutdownExecutor.shutdown()
+            shutdownExecutor.awaitTermination(3, TimeUnit.SECONDS)
         }
     }
 
+
     fun sendToDiscord(message: String) {
-        val channelId = Config.logChannelID ?: return
+        val channelIds = Config.logChannelIDs ?: return
 
         FT {
             val blockAll = Config.blockAllMentions
@@ -146,25 +155,27 @@ object DiscordBotManager {
             }
 
             // --- Build Discord message ----------------------------------
-            val channel = jda?.getTextChannelById(channelId) ?: return@FT
-            val action = channel.sendMessage(sanitizedMessage)
+            channelIds.forEach { channelId ->
+                val channel = jda?.getTextChannelById(channelId) ?: return@forEach
+                val action = channel.sendMessage(sanitizedMessage)
 
-            if (blockAll) {
-                // Completely block mentions
-                action.setAllowedMentions(emptySet())
-            } else {
-                // Allow mentions except blocked ones
-                action.setAllowedMentions(
-                    listOf(
-                        Message.MentionType.USER,
-                        Message.MentionType.ROLE
+                if (blockAll) {
+                    // Completely block mentions
+                    action.setAllowedMentions(emptySet())
+                } else {
+                    // Allow mentions except blocked ones
+                    action.setAllowedMentions(
+                        listOf(
+                            Message.MentionType.USER,
+                            Message.MentionType.ROLE
+                        )
                     )
-                )
-                action.mentionUsers(*allowedUserIds.toTypedArray())
-                action.mentionRoles(*allowedRoleIds.toTypedArray())
-            }
+                    action.mentionUsers(*allowedUserIds.toTypedArray())
+                    action.mentionRoles(*allowedRoleIds.toTypedArray())
+                }
 
-            action.queue()
+                action.queue()
+            }
         }
     }
 
@@ -173,21 +184,24 @@ object DiscordBotManager {
     }
 
     private fun setupWebhook() {
-        val textChannel = jda?.getTextChannelById(Config.logChannelID ?: return)
-        textChannel?.retrieveWebhooks()?.queue({ webhooks ->
-            webHook = webhooks.firstOrNull { it.name == "Fabricord" }
+        Config.logChannelIDs?.forEach { channelId ->
+            val textChannel = jda?.getTextChannelById(channelId) ?: return@forEach
+            textChannel.retrieveWebhooks().queue({ webhooks ->
+                val webHook = webhooks.firstOrNull { it.name == "Fabricord" }
 
-            if (webHook == null) {
-                textChannel.createWebhook("Fabricord").queue { created ->
-                    webHook = created
-                    Logger.info("Created webhook: ${created.name}")
+                if (webHook == null) {
+                    textChannel.createWebhook("Fabricord").queue { created ->
+                        webHooks[channelId] = created
+                        Logger.info("Created webhook: ${created.name} in channel $channelId")
+                    }
+                } else {
+                    webHooks[channelId] = webHook
+                    Logger.info("Using existing webhook: ${webHook.name} in channel $channelId")
                 }
-            } else {
-                Logger.info("Using existing webhook: ${webHook?.name}")
-            }
-        }, { error ->
-            Logger.warn("Could not retrieve webhook: ${error.message}")
-        })
+            }, { error ->
+                Logger.warn("Could not retrieve webhook for channel $channelId: ${error.message}")
+            })
+        }
     }
 
     private fun activity(): Activity? {

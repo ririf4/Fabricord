@@ -27,14 +27,14 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
     private void interceptChatMessage(@NotNull ChatMessageC2SPacket packet, CallbackInfo ci) {
-        if (!DiscordBotManager.isBotInitialized || Aliases.getConfig().logChannelID == null || !Aliases.getConfig().sendChat()) return;
+        if (!DiscordBotManager.isBotInitialized || Aliases.getConfig().logChannelIDs == null || !Aliases.getConfig().sendChat()) return;
 
         UUID playerUUID = player.getUuid();
         FMsgProvider ap = FMsgProviderKt.adapt(player);
 
         // If `useUserPermissionsForMention` is enabled, check if the user has linked their Discord account first
         if (!DataBase.isUserLinked(playerUUID) && Aliases.getConfig().useUserPermissionForMentions) {
-            player.sendMessage(ap.getMessage(FMsgKey.Chat.LinkDiscordAccountFirst.INSTANCE));
+            player.sendMessage(FMsgKey.Chat.LinkDiscordAccountFirst.INSTANCE.t(ap));
             ci.cancel();
             return;
         }

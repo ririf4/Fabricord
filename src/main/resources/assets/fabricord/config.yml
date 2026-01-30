@@ -20,7 +20,13 @@ BotToken: ""
 # Leave blank to disable logging to Discord.
 # Learn how to get channel IDs:
 # https://support.discord.com/hc/en-us/articles/206346498
-LogChannelID: ""
+LogChannels:
+  default: [ ]
+  Chat: [ ]
+  Advancement: [ ]
+  Death: [ ]
+  Join: [ ]
+  Leave: [ ]
 
 # What types of messages to send from Minecraft to Discord.
 # Options: Chat, Advancement, Death, Join, Leave
@@ -92,6 +98,18 @@ ServerStopMessage: ""
 # PlayerLeaveMessage: "%player% left the server"
 PlayerJoinMessage: ""
 PlayerLeaveMessage: ""
+
+# ── Extra Settings ──
+
+# Disable death messages from being sent to Discord.
+DisableDeathMessages: false
+
+# Disable advancement messages from being sent to Discord.
+DisableAdvancementMessages: false
+
+# Names of achievements to be ignored (must be in the format namespace:advancement)
+IgnoredAdvancements:
+  - ""
 
 # ── Console Integration ──
 

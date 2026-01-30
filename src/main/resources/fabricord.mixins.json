@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "server": [
     "PlayerAdvancementTrackerMixin",
+    "PlayerManagerMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin"
   ],

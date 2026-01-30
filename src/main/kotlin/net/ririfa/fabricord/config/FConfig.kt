@@ -10,7 +10,8 @@ data class FConfig(
     @JvmField
     val botToken: String?,
     @JvmField
-    val logChannelID: String?,
+    //TODO: Map<LogChannelType, Set<String>>
+    val logChannelIDs: Set<String>?,
 
     @JvmField
     var willSends: List<SendableEvent>?,
@@ -23,9 +24,9 @@ data class FConfig(
     var botOnlineStatus: String?,
 
     @JvmField
-    val serverStartMessage: String?,
+    var serverStartMessage: String?,
     @JvmField
-    val serverStopMessage: String?,
+    var serverStopMessage: String?,
 
     @JvmField
     val playerJoinMessage: String?,
@@ -44,6 +45,15 @@ data class FConfig(
     @JvmField
     val mentionBlockedRoleIDs: Set<String>?,
 
+    //TODO: 機能追加
+    @JvmField
+    val disableDeathMessages: Boolean,
+    @JvmField
+    val disableAdvancementMessages: Boolean,
+
+    @JvmField
+    val ignoredAdvancements: Set<String>?,
+
     @JvmField
     val consoleLogChannelID: String?,
 ) {
@@ -54,13 +64,13 @@ object FConfigSchema : YaclaSchema<FConfig> {
     override fun configure(def: FieldDefBuilder<FConfig>) {
         def.field(FConfig::botToken)
             .loader(BlankToNullLoader)
-            .validate {
-                if (it == null) Logger.warn("Bot token is not set in config, Fabricord will not function properly.")
+            .ifNull { _, _ ->
+                Logger.warn("Bot token is not set in config, Fabricord will not function properly.")
             }
-        def.field(FConfig::logChannelID)
-            .loader(BlankToNullLoader)
-            .validate {
-                if (it == null) Logger.warn("Log channel ID is not set in config, some features may not work properly.")
+        def.field(FConfig::logChannelIDs)
+            .loader(ListToSetLoader())
+            .ifNull { _, _ ->
+                Logger.warn("Log channel IDs are not set in config, some features may not work properly.")
             }
         def.field(FConfig::consoleLogChannelID)
             .loader(BlankToNullLoader)
@@ -72,30 +82,33 @@ object FConfigSchema : YaclaSchema<FConfig> {
             .loader(BlankToNullLoader)
         def.field(FConfig::botOnlineStatus)
             .loader(BlankToNullLoader)
+
         def.field(FConfig::serverStartMessage)
-            .loader(BlankToNullLoader)
+            .loader(BlankToNullLoaderWithDefault(":white_check_mark: **Server has started!**"))
         def.field(FConfig::serverStopMessage)
-            .loader(BlankToNullLoader)
+            .loader(BlankToNullLoaderWithDefault(":octagonal_sign: **Server has stopped!**"))
         def.field(FConfig::playerJoinMessage)
-            .loader(BlankToNullLoader)
+            .loader(BlankToNullLoaderWithDefault("%player% joined the server"))
         def.field(FConfig::playerLeaveMessage)
-            .loader(BlankToNullLoader)
+            .loader(BlankToNullLoaderWithDefault("%player% left the server"))
+
         def.field(FConfig::messageStyle)
             .loader(StringToMessageStyleLoader)
-            .default(MessageStyle.CLASSIC)
         def.field(FConfig::useUserPermissionForMentions)
             .default(false)
         def.field(FConfig::blockAllMentions)
             .default(false)
         def.field(FConfig::mentionBlockedUserIDs)
-            .loader(ListToSetLoader)
+            .loader(ListToSetLoader())
+        def.field(FConfig::ignoredAdvancements)
+            .loader(ListToSetLoader())
         def.field(FConfig::mentionBlockedRoleIDs)
-            .loader(ListToSetLoader)
+            .loader(ListToSetLoader())
     }
 }
 
 object StringToMessageStyleLoader : FieldLoader {
-    override fun load(raw: Any?): Any? {
+    override fun load(raw: Any?): Any {
         val str = (raw as? String)?.trim()
             ?: throw IllegalArgumentException("Expected a String for MessageStyle, got: ${raw?.javaClass?.name}")
 
@@ -134,13 +147,40 @@ object BlankToNullLoader : FieldLoader {
     }
 }
 
-object ListToSetLoader : FieldLoader {
+class BlankToNullLoaderWithDefault(val defaultValue: String) : FieldLoader {
+    override fun load(raw: Any?): Any? {
+        return when (raw) {
+            is String -> {
+                if (raw.isBlank()) {
+                    null
+                } else if (raw.uppercase() == "DEFAULT") {
+                    defaultValue
+                } else {
+                    raw
+                }
+            }
+
+            else -> raw
+        }
+    }
+}
+
+class ListToSetLoader(val emptyToNull: Boolean = true) : FieldLoader {
     override fun load(raw: Any?): Any? {
         if (raw !is List<*>) return null
-        return raw.mapNotNull { it?.toString() }.toSet()
+        val set = raw.mapNotNull {
+            it?.toString()?.takeIf { str ->
+                if (emptyToNull) str.isNotBlank() else str.isNotEmpty()
+            }
+        }.toSet()
+        return set.ifEmpty { null }
     }
 }
 
 enum class SendableEvent {
     Chat, Advancement, Death, Join, Leave
+}
+
+enum class LogChannelType {
+    Default, Chat, Advancement, Death, Join, Leave
 }

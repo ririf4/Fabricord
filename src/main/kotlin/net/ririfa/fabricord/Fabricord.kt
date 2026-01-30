@@ -9,6 +9,8 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.text.Text
 import net.ririfa.fabricord.command.CommandManager
 import net.ririfa.fabricord.config.ConfigManager
+import net.ririfa.fabricord.config.SendableEvent
+import net.ririfa.fabricord.database.DataBase
 import net.ririfa.fabricord.discord.DiscordBotManager
 import net.ririfa.fabricord.discord.DiscordEmbed
 import net.ririfa.fabricord.i18n.FMsgKey
@@ -27,6 +29,7 @@ import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
 class Fabricord : DedicatedServerModInitializer {
     companion object {
@@ -74,6 +77,7 @@ class Fabricord : DedicatedServerModInitializer {
             .build()
 
         registerServerEvents()
+        DataBase.initialize()
     }
 
     private fun registerServerEvents() {
@@ -97,24 +101,33 @@ class Fabricord : DedicatedServerModInitializer {
             }
         }
 
-        ServerLifecycleEvents.SERVER_STOPPING.register { server ->
+        ServerLifecycleEvents.SERVER_STOPPING.register {
             if (DiscordBotManager.isBotInitialized) DiscordBotManager.stop()
-            thread.shutdown()
         }
 
-        if (Config.logChannelID != null) {
-            ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
-                val player = handler.player
+        ServerLifecycleEvents.SERVER_STOPPED.register {
+            thread.shutdown()
+            thread.awaitTermination(3, TimeUnit.SECONDS)
+            DataBase.terminate()
+        }
 
-                if (DiscordBotManager.isBotInitialized) FT {
+        ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
+            val player = handler.player
+            val isOp = server.playerManager.isOperator(player.playerConfigEntry)
+
+            FT {
+                DataBase.insertPlayer(player.uuid, isOp)
+                if (Config.willSends?.contains(SendableEvent.Join) == true && Config.logChannelIDs != null && DiscordBotManager.isBotInitialized) {
                     DiscordEmbed.sendPlayerJoinEmbed(player)
                 }
             }
+        }
 
-            ServerPlayConnectionEvents.DISCONNECT.register { handler, _ ->
-                val player = handler.player
+        ServerPlayConnectionEvents.DISCONNECT.register { handler, _ ->
+            val player = handler.player
 
-                if (DiscordBotManager.isBotInitialized) FT {
+            FT {
+                if (Config.willSends?.contains(SendableEvent.Leave) == true && Config.logChannelIDs != null && DiscordBotManager.isBotInitialized) {
                     DiscordEmbed.sendPlayerLeftEmbed(player)
                 }
             }
