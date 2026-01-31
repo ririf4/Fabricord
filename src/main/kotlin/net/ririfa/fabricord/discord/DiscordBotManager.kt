@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.requests.GatewayIntent
+import net.ririfa.fabricord.config.LogChannelType
 import net.ririfa.fabricord.i18n.FMsgKey
 import net.ririfa.fabricord.util.*
 import java.util.concurrent.Executors
@@ -68,7 +69,7 @@ object DiscordBotManager {
                         )
                 )?.queue()
 
-                Config.serverStartMessage?.let { sendToDiscord(it) }
+                Config.serverStartMessage?.let { sendToDiscord(it, Config.logChannels?.get(LogChannelType.ServerStart)) }
 
                 val c = mapOf("botName" to jda?.selfUser?.name)
                 Logger.info(LM.getMessage(FMsgKey.Discord.Bot.BotNowOnline, c))
@@ -82,7 +83,7 @@ object DiscordBotManager {
     }
 
     fun stop() {
-        Config.serverStopMessage?.let { sendToDiscord(it) }
+        Config.serverStopMessage?.let { sendToDiscord(it, Config.logChannels?.get(LogChannelType.ServerStop)) }
 
         try {
             val bot = jda
@@ -112,9 +113,8 @@ object DiscordBotManager {
         }
     }
 
-
-    fun sendToDiscord(message: String) {
-        val channelIds = Config.logChannelIDs ?: return
+    fun sendToDiscord(message: String, channelIds: Set<String>?) {
+        channelIds ?: return
 
         FT {
             val blockAll = Config.blockAllMentions
@@ -184,23 +184,25 @@ object DiscordBotManager {
     }
 
     private fun setupWebhook() {
-        Config.logChannelIDs?.forEach { channelId ->
-            val textChannel = jda?.getTextChannelById(channelId) ?: return@forEach
-            textChannel.retrieveWebhooks().queue({ webhooks ->
-                val webHook = webhooks.firstOrNull { it.name == "Fabricord" }
+        Config.logChannels?.forEach { (_, ids) ->
+            ids.forEach { id ->
+                val textChannel = jda?.getTextChannelById(id) ?: return@forEach
+                textChannel.retrieveWebhooks().queue({ webhooks ->
+                    val webHook = webhooks.firstOrNull { it.name == "Fabricord" }
 
-                if (webHook == null) {
-                    textChannel.createWebhook("Fabricord").queue { created ->
-                        webHooks[channelId] = created
-                        Logger.info("Created webhook: ${created.name} in channel $channelId")
+                    if (webHook == null) {
+                        textChannel.createWebhook("Fabricord").queue { created ->
+                            webHooks[id] = created
+                            Logger.info("Created webhook: ${created.name} in channel $id")
+                        }
+                    } else {
+                        webHooks[id] = webHook
+                        Logger.info("Using existing webhook: ${webHook.name} in channel $id")
                     }
-                } else {
-                    webHooks[channelId] = webHook
-                    Logger.info("Using existing webhook: ${webHook.name} in channel $channelId")
-                }
-            }, { error ->
-                Logger.warn("Could not retrieve webhook for channel $channelId: ${error.message}")
-            })
+                }, { error ->
+                    Logger.warn("Could not retrieve webhook for channel $id: ${error.message}")
+                })
+            }
         }
     }
 

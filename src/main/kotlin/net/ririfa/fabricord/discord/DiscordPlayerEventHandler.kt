@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
 import net.dv8tion.jda.api.utils.messages.MessageCreateData
 import net.minecraft.server.network.ServerPlayerEntity
+import net.ririfa.fabricord.config.LogChannelType
 import net.ririfa.fabricord.database.DataBase
 import net.ririfa.fabricord.i18n.FMsgKey
 import net.ririfa.fabricord.util.*
@@ -24,12 +25,12 @@ object DiscordPlayerEventHandler {
     private fun classicStyle(player: ServerPlayerEntity, message: String) {
         val mcId = player.name.string
         val formattedMessage = "$mcId » $message"
-        DiscordBotManager.sendToDiscord(formattedMessage)
+        DiscordBotManager.sendToDiscord(formattedMessage, Config.logChannels?.get(LogChannelType.Chat))
     }
 
     private fun modernStyle(player: ServerPlayerEntity, message: String) {
         try {
-            val channelIds = Config.logChannelIDs ?: return
+            val channelIds = Config.logChannels?.get(LogChannelType.Chat) ?: return
 
             val data = MessageCreateBuilder()
                 .setContent(message)

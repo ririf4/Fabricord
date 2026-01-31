@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
+import net.ririfa.fabricord.config.LogChannelType
 import net.ririfa.fabricord.util.Config
 import net.ririfa.fabricord.util.FT
 import net.ririfa.fabricord.util.JDA
@@ -29,7 +30,7 @@ object DiscordEmbed {
         }
     }
 
-    private fun sendEmbedToDiscord(color: Color, author: String? = null, imageUrl: String, channelIds: Set<String>? = Config.logChannelIDs) {
+    private fun sendEmbedToDiscord(color: Color, author: String? = null, imageUrl: String, channelIds: Set<String>?) {
         if (channelIds == null) return
 
         val embed = EmbedBuilder().apply {
@@ -42,7 +43,7 @@ object DiscordEmbed {
         }
     }
 
-    private fun sendEmbedToDiscordImmediately(color: Color, author: String? = null, imageUrl: String, channelIds: Set<String>? = Config.logChannelIDs) {
+    private fun sendEmbedToDiscordImmediately(color: Color, author: String? = null, imageUrl: String, channelIds: Set<String>?) {
         if (channelIds == null) return
 
         val embed = EmbedBuilder().apply {
@@ -70,7 +71,7 @@ object DiscordEmbed {
             val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
             val message = rawMessage.replace("%player%", name)
 
-            sendEmbedToDiscordImmediately(Color.GREEN, message, imageUrl)
+            sendEmbedToDiscordImmediately(Color.GREEN, message, imageUrl, Config.logChannels?.get(LogChannelType.Join))
         }
     }
 
@@ -83,7 +84,7 @@ object DiscordEmbed {
             val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
             val message = rawMessage.replace("%player%", name)
 
-            sendEmbedToDiscordImmediately(Color.RED, message, imageUrl)
+            sendEmbedToDiscordImmediately(Color.RED, message, imageUrl, Config.logChannels?.get(LogChannelType.Leave))
         }
     }
 
@@ -91,7 +92,7 @@ object DiscordEmbed {
     fun sendPlayerDeathEmbed(player: ServerPlayerEntity, deathMessage: Text) {
         val uuid = player.uuid.toString()
         val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
-        sendEmbedToDiscord(Color.BLACK, deathMessage.string, imageUrl)
+        sendEmbedToDiscord(Color.BLACK, deathMessage.string, imageUrl, Config.logChannels?.get(LogChannelType.Death))
     }
 
     @JvmStatic
@@ -99,6 +100,6 @@ object DiscordEmbed {
         val name = player.name.string
         val uuid = player.uuid.toString()
         val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
-        sendEmbedToDiscord(Color.YELLOW, "$name has made the advancement $criterion", imageUrl)
+        sendEmbedToDiscord(Color.YELLOW, "$name has made the advancement $criterion", imageUrl, Config.logChannels?.get(LogChannelType.Advancement))
     }
 }

@@ -117,7 +117,7 @@ class Fabricord : DedicatedServerModInitializer {
 
             FT {
                 DataBase.insertPlayer(player.uuid, isOp)
-                if (Config.willSends?.contains(SendableEvent.Join) == true && Config.logChannelIDs != null && DiscordBotManager.isBotInitialized) {
+                if (Config.willSends?.contains(SendableEvent.Join) == true && Config.logChannels != null && DiscordBotManager.isBotInitialized) {
                     DiscordEmbed.sendPlayerJoinEmbed(player)
                 }
             }
@@ -127,7 +127,7 @@ class Fabricord : DedicatedServerModInitializer {
             val player = handler.player
 
             FT {
-                if (Config.willSends?.contains(SendableEvent.Leave) == true && Config.logChannelIDs != null && DiscordBotManager.isBotInitialized) {
+                if (Config.willSends?.contains(SendableEvent.Leave) == true && Config.logChannels != null && DiscordBotManager.isBotInitialized) {
                     DiscordEmbed.sendPlayerLeftEmbed(player)
                 }
             }

@@ -27,7 +27,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
     private void interceptChatMessage(@NotNull ChatMessageC2SPacket packet, CallbackInfo ci) {
-        if (!DiscordBotManager.isBotInitialized || Aliases.getConfig().logChannelIDs == null || !Aliases.getConfig().sendChat()) return;
+        if (!DiscordBotManager.isBotInitialized || Aliases.getConfig().logChannels == null || !Aliases.getConfig().sendChat()) return;
 
         UUID playerUUID = player.getUuid();
         FMsgProvider ap = FMsgProviderKt.adapt(player);

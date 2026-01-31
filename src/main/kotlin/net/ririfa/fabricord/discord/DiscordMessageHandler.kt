@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.*
+import net.ririfa.fabricord.config.LogChannelType
 import net.ririfa.fabricord.util.*
 import java.awt.Color
 import java.net.URI
@@ -56,7 +57,7 @@ object DiscordMessageHandler {
         isMention: Boolean,
         contentOverride: String? = null
     ): MutableText? {
-        val channelIds = Config.logChannelIDs ?: return null
+        val channelIds = Config.logChannels?.get(LogChannelType.Chat) ?: return null
         if (event.channel.id !in channelIds || event.author.isBot) return null
 
         val guild = event.guild

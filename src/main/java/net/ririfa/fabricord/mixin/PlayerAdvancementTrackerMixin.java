@@ -24,7 +24,7 @@ public abstract class PlayerAdvancementTrackerMixin {
     @Inject(method = "grantCriterion", at = @At("RETURN"))
     public void onAdvancementGranted(AdvancementEntry advancementEntry, String string, @NotNull CallbackInfoReturnable<Boolean> cir) {
         var config = Aliases.getConfig();
-        if (!DiscordBotManager.isBotInitialized || config.logChannelIDs == null || Objects.requireNonNull(config.willSends).contains(SendableEvent.Advancement))
+        if (!DiscordBotManager.isBotInitialized || config.logChannels == null || Objects.requireNonNull(config.willSends).contains(SendableEvent.Advancement))
             return;
 
         // === IgnoredAdvancements check ===

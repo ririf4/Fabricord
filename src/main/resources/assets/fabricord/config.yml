@@ -21,12 +21,26 @@ BotToken: ""
 # Learn how to get channel IDs:
 # https://support.discord.com/hc/en-us/articles/206346498
 LogChannels:
-  default: [ ]
-  Chat: [ ]
-  Advancement: [ ]
-  Death: [ ]
-  Join: [ ]
-  Leave: [ ]
+  - event: "default"
+    channelID: ""
+
+  - event: "GeneralLog"
+    channelID: ""
+
+  - event: "Chat"
+    channelID: ""
+
+  - event: "Advancement"
+    channelID: ""
+
+  - event: "Death"
+    channelID: ""
+
+  - event: "Join"
+    channelID: ""
+
+  - event: "Leave"
+    channelID: ""
 
 # What types of messages to send from Minecraft to Discord.
 # Options: Chat, Advancement, Death, Join, Leave

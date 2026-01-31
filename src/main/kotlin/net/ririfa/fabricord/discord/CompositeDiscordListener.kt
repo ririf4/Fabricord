@@ -14,6 +14,7 @@ import net.minecraft.server.BannedPlayerEntry
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.ririfa.fabricord.command.LinkCommandAuthCodeManager
+import net.ririfa.fabricord.config.LogChannelType
 import net.ririfa.fabricord.database.DataBase
 import net.ririfa.fabricord.i18n.FMsgKey
 import net.ririfa.fabricord.util.Config
@@ -30,7 +31,7 @@ class CompositeDiscordListener : ListenerAdapter() {
 
     private val modalID = "FABRICORD_LINK_ACCOUNT_MODAL"
 
-    private val logChannelIDs = Config.logChannelIDs
+    private val logChannelIDs = Config.logChannels?.get(LogChannelType.Chat)
     private val consoleChannel = Config.consoleLogChannelID
 
     override fun onMessageReceived(event: MessageReceivedEvent) {

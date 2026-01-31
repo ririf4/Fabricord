@@ -10,8 +10,7 @@ data class FConfig(
     @JvmField
     val botToken: String?,
     @JvmField
-    //TODO: Map<LogChannelType, Set<String>>
-    val logChannelIDs: Set<String>?,
+    val logChannels: Map<LogChannelType, Set<String>>?,
 
     @JvmField
     var willSends: List<SendableEvent>?,
@@ -67,11 +66,8 @@ object FConfigSchema : YaclaSchema<FConfig> {
             .ifNull { _, _ ->
                 Logger.warn("Bot token is not set in config, Fabricord will not function properly.")
             }
-        def.field(FConfig::logChannelIDs)
-            .loader(ListToSetLoader())
-            .ifNull { _, _ ->
-                Logger.warn("Log channel IDs are not set in config, some features may not work properly.")
-            }
+        def.field(FConfig::logChannels)
+            .loader(LogChannelsLoader)
         def.field(FConfig::consoleLogChannelID)
             .loader(BlankToNullLoader)
         def.field(FConfig::willSends)
@@ -104,6 +100,56 @@ object FConfigSchema : YaclaSchema<FConfig> {
             .loader(ListToSetLoader())
         def.field(FConfig::mentionBlockedRoleIDs)
             .loader(ListToSetLoader())
+    }
+}
+
+object LogChannelsLoader : FieldLoader {
+    override fun load(raw: Any?): Any? {
+        if (raw !is List<*>) {
+            return null
+        }
+
+        val map = mutableMapOf<LogChannelType, MutableSet<String>>()
+
+        raw.forEach { entry ->
+            if (entry !is Map<*, *>) {
+                Logger.warn("Invalid LogChannels entry: expected Map, got ${entry?.javaClass?.name}")
+                return@forEach
+            }
+
+            val eventStr = entry["event"] as? String ?: run {
+                Logger.warn("Missing 'event' key in LogChannels entry")
+                return@forEach
+            }
+
+            val channelID = entry["channelID"] as? String ?: run {
+                Logger.warn("Missing 'channelID' key in LogChannels entry for event: $eventStr")
+                return@forEach
+            }
+
+            if (channelID.isBlank()) {
+                return@forEach
+            }
+
+            val type = when (eventStr.uppercase()) {
+                "DEFAULT" -> LogChannelType.Default
+                "CHAT" -> LogChannelType.Chat
+                "ADVANCEMENT" -> LogChannelType.Advancement
+                "DEATH" -> LogChannelType.Death
+                "JOIN" -> LogChannelType.Join
+                "LEAVE" -> LogChannelType.Leave
+                "SERVER_START" -> LogChannelType.ServerStart
+                "SERVER_STOP" -> LogChannelType.ServerStop
+                else -> {
+                    Logger.warn("Unknown LogChannel event type: '$eventStr'")
+                    return@forEach
+                }
+            }
+
+            map.getOrPut(type) { mutableSetOf() }.add(channelID)
+        }
+
+        return map.takeIf { it.isNotEmpty() }
     }
 }
 
@@ -182,5 +228,5 @@ enum class SendableEvent {
 }
 
 enum class LogChannelType {
-    Default, Chat, Advancement, Death, Join, Leave
+    Default, GeneralLog, Chat, Advancement, Death, Join, Leave, ServerStart, ServerStop
 }
