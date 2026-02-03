@@ -57,7 +57,9 @@ object DiscordMessageHandler {
         isMention: Boolean,
         contentOverride: String? = null
     ): MutableText? {
-        val channelIds = Config.logChannels?.get(LogChannelType.Chat) ?: return null
+        val channelIds = Config.logChannels?.get(LogChannelType.Chat)
+            ?: Config.logChannels?.get(LogChannelType.Default)
+            ?: return null
         if (event.channel.id !in channelIds || event.author.isBot) return null
 
         val guild = event.guild

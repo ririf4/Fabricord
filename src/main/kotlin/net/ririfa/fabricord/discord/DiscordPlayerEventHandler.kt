@@ -25,12 +25,17 @@ object DiscordPlayerEventHandler {
     private fun classicStyle(player: ServerPlayerEntity, message: String) {
         val mcId = player.name.string
         val formattedMessage = "$mcId » $message"
-        DiscordBotManager.sendToDiscord(formattedMessage, Config.logChannels?.get(LogChannelType.Chat))
+        val channelIds = Config.logChannels?.get(LogChannelType.Chat)
+            ?: Config.logChannels?.get(LogChannelType.Default)
+            ?: return
+        DiscordBotManager.sendToDiscord(formattedMessage, channelIds)
     }
 
     private fun modernStyle(player: ServerPlayerEntity, message: String) {
         try {
-            val channelIds = Config.logChannels?.get(LogChannelType.Chat) ?: return
+            val channelIds = Config.logChannels?.get(LogChannelType.Chat)
+                ?: Config.logChannels?.get(LogChannelType.Default)
+                ?: return
 
             val data = MessageCreateBuilder()
                 .setContent(message)

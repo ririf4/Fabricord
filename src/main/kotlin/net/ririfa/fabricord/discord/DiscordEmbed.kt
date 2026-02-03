@@ -70,8 +70,10 @@ object DiscordEmbed {
             val uuid = player.uuid.toString()
             val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
             val message = rawMessage.replace("%player%", name)
+            val channelIds = Config.logChannels?.get(LogChannelType.Join)
+                ?: Config.logChannels?.get(LogChannelType.Default)
 
-            sendEmbedToDiscordImmediately(Color.GREEN, message, imageUrl, Config.logChannels?.get(LogChannelType.Join))
+            sendEmbedToDiscordImmediately(Color.GREEN, message, imageUrl, channelIds)
         }
     }
 
@@ -83,8 +85,10 @@ object DiscordEmbed {
             val uuid = player.uuid.toString()
             val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
             val message = rawMessage.replace("%player%", name)
+            val channelIds = Config.logChannels?.get(LogChannelType.Leave)
+                ?: Config.logChannels?.get(LogChannelType.Default)
 
-            sendEmbedToDiscordImmediately(Color.RED, message, imageUrl, Config.logChannels?.get(LogChannelType.Leave))
+            sendEmbedToDiscordImmediately(Color.RED, message, imageUrl, channelIds)
         }
     }
 
@@ -92,7 +96,9 @@ object DiscordEmbed {
     fun sendPlayerDeathEmbed(player: ServerPlayerEntity, deathMessage: Text) {
         val uuid = player.uuid.toString()
         val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
-        sendEmbedToDiscord(Color.BLACK, deathMessage.string, imageUrl, Config.logChannels?.get(LogChannelType.Death))
+        val channelIds = Config.logChannels?.get(LogChannelType.Death)
+            ?: Config.logChannels?.get(LogChannelType.Default)
+        sendEmbedToDiscord(Color.BLACK, deathMessage.string, imageUrl, channelIds)
     }
 
     @JvmStatic
@@ -100,6 +106,8 @@ object DiscordEmbed {
         val name = player.name.string
         val uuid = player.uuid.toString()
         val imageUrl = "https://visage.surgeplay.com/face/256/$uuid"
-        sendEmbedToDiscord(Color.YELLOW, "$name has made the advancement $criterion", imageUrl, Config.logChannels?.get(LogChannelType.Advancement))
+        val channelIds = Config.logChannels?.get(LogChannelType.Advancement)
+            ?: Config.logChannels?.get(LogChannelType.Default)
+        sendEmbedToDiscord(Color.YELLOW, "$name has made the advancement $criterion", imageUrl, channelIds)
     }
 }

@@ -69,7 +69,11 @@ object DiscordBotManager {
                         )
                 )?.queue()
 
-                Config.serverStartMessage?.let { sendToDiscord(it, Config.logChannels?.get(LogChannelType.ServerStart)) }
+                Config.serverStartMessage?.let { message ->
+                    val channelIds = Config.logChannels?.get(LogChannelType.ServerStart)
+                        ?: Config.logChannels?.get(LogChannelType.Default)
+                    sendToDiscord(message, channelIds)
+                }
 
                 val c = mapOf("botName" to jda?.selfUser?.name)
                 Logger.info(LM.getMessage(FMsgKey.Discord.Bot.BotNowOnline, c))
@@ -83,7 +87,11 @@ object DiscordBotManager {
     }
 
     fun stop() {
-        Config.serverStopMessage?.let { sendToDiscord(it, Config.logChannels?.get(LogChannelType.ServerStop)) }
+        Config.serverStopMessage?.let { message ->
+            val channelIds = Config.logChannels?.get(LogChannelType.ServerStop)
+                ?: Config.logChannels?.get(LogChannelType.Default)
+            sendToDiscord(message, channelIds)
+        }
 
         try {
             val bot = jda

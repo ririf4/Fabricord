@@ -16,31 +16,23 @@ version: "2.0.0"
 # Or, read guide: https://github.com/ririf4/Fabricord/tree/v4-purge/BOT_INSTALL/EN.md
 BotToken: ""
 
+A:
+  A: ""
+  S: ""
+
 # Discord channel ID where server logs and chat will be sent.
 # Leave blank to disable logging to Discord.
 # Learn how to get channel IDs:
 # https://support.discord.com/hc/en-us/articles/206346498
 LogChannels:
-  - event: "default"
-    channelID: ""
-
-  - event: "GeneralLog"
-    channelID: ""
-
-  - event: "Chat"
-    channelID: ""
-
-  - event: "Advancement"
-    channelID: ""
-
-  - event: "Death"
-    channelID: ""
-
-  - event: "Join"
-    channelID: ""
-
-  - event: "Leave"
-    channelID: ""
+  DEFAULT: [ "" ]
+  CHAT: [ "" ]
+  ADVANCEMENT: [ "" ]
+  DEATH: [ "" ]
+  JOIN: [ "" ]
+  LEAVE: [ "" ]
+  SERVER_START: [ "" ]
+  SERVER_STOP: [ "" ]
 
 # What types of messages to send from Minecraft to Discord.
 # Options: Chat, Advancement, Death, Join, Leave

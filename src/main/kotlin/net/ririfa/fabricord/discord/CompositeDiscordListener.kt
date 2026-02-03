@@ -32,6 +32,7 @@ class CompositeDiscordListener : ListenerAdapter() {
     private val modalID = "FABRICORD_LINK_ACCOUNT_MODAL"
 
     private val logChannelIDs = Config.logChannels?.get(LogChannelType.Chat)
+        ?: Config.logChannels?.get(LogChannelType.Default)
     private val consoleChannel = Config.consoleLogChannelID
 
     override fun onMessageReceived(event: MessageReceivedEvent) {

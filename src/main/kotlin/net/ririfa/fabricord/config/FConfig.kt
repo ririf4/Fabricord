@@ -104,52 +104,20 @@ object FConfigSchema : YaclaSchema<FConfig> {
 }
 
 object LogChannelsLoader : FieldLoader {
-    override fun load(raw: Any?): Any? {
-        if (raw !is List<*>) {
-            return null
-        }
+    override fun load(raw: Any?): Map<LogChannelType, Set<String>>? {
+        val map = raw as? Map<*, *> ?: return null
 
-        val map = mutableMapOf<LogChannelType, MutableSet<String>>()
+        return map.mapNotNull { (key, value) ->
+            val type = LogChannelType.valueOf(key.toString())
+            val channels = (value as? List<*>)
+                ?.mapNotNull { it?.toString() }
+                ?.filter { it.isNotBlank() }
+                ?.toSet()
+                ?.takeIf { it.isNotEmpty() } // 空のSetは除外
+                ?: return@mapNotNull null
 
-        raw.forEach { entry ->
-            if (entry !is Map<*, *>) {
-                Logger.warn("Invalid LogChannels entry: expected Map, got ${entry?.javaClass?.name}")
-                return@forEach
-            }
-
-            val eventStr = entry["event"] as? String ?: run {
-                Logger.warn("Missing 'event' key in LogChannels entry")
-                return@forEach
-            }
-
-            val channelID = entry["channelID"] as? String ?: run {
-                Logger.warn("Missing 'channelID' key in LogChannels entry for event: $eventStr")
-                return@forEach
-            }
-
-            if (channelID.isBlank()) {
-                return@forEach
-            }
-
-            val type = when (eventStr.uppercase()) {
-                "DEFAULT" -> LogChannelType.Default
-                "CHAT" -> LogChannelType.Chat
-                "ADVANCEMENT" -> LogChannelType.Advancement
-                "DEATH" -> LogChannelType.Death
-                "JOIN" -> LogChannelType.Join
-                "LEAVE" -> LogChannelType.Leave
-                "SERVER_START" -> LogChannelType.ServerStart
-                "SERVER_STOP" -> LogChannelType.ServerStop
-                else -> {
-                    Logger.warn("Unknown LogChannel event type: '$eventStr'")
-                    return@forEach
-                }
-            }
-
-            map.getOrPut(type) { mutableSetOf() }.add(channelID)
-        }
-
-        return map.takeIf { it.isNotEmpty() }
+            type to channels
+        }.toMap().takeIf { it.isNotEmpty() }
     }
 }
 
@@ -228,5 +196,5 @@ enum class SendableEvent {
 }
 
 enum class LogChannelType {
-    Default, GeneralLog, Chat, Advancement, Death, Join, Leave, ServerStart, ServerStop
+    Default, Chat, Advancement, Death, Join, Leave, ServerStart, ServerStop
 }
