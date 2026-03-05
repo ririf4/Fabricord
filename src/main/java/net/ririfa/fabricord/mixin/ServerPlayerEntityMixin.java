@@ -24,8 +24,10 @@ public abstract class ServerPlayerEntityMixin {
             )
     )
     public void onPlayerDeath(DamageSource source, CallbackInfo ci) {
-        if (Objects.requireNonNull(Aliases.getConfig().willSends).contains(SendableEvent.Death)) return;
-        if (!DiscordBotManager.isBotInitialized || Aliases.getConfig().logChannels == null) return;
+        var config = Aliases.getConfig();
+        if (!DiscordBotManager.isBotInitialized || config.logChannels == null) return;
+        if (!Objects.requireNonNull(config.willSends).contains(SendableEvent.Death)) return;
+        if (config.disableDeathMessages) return;
 
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         Text message = player.getDamageTracker().getDeathMessage();

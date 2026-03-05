@@ -243,19 +243,22 @@ class CompositeDiscordListener : ListenerAdapter() {
                 return
             }
 
-        val targetPlayer = Server.playerManager.getPlayer(playerName) ?: run {
-            event.reply(LM.getMessage(FMsgKey.Discord.Command.PlayerNotFound, lang = event.userLocale.locale).string)
-                .setEphemeral(true)
-                .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
-            return
-        }
-
         if (!isOp) {
             event.reply(LM.getMessage(FMsgKey.Discord.Command.Ban.NoPermission, lang = event.userLocale.locale).string)
                 .setEphemeral(true)
                 .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
             return
         }
+
+        val targetOnlinePlayer = Server.playerManager.getPlayer(playerName)
+        val targetEntry = targetOnlinePlayer?.playerConfigEntry
+            ?: Server.apiServices.comp_4407.findByName(playerName).orElse(null)
+            ?: run {
+                event.reply(LM.getMessage(FMsgKey.Discord.Command.PlayerNotFound, lang = event.userLocale.locale).string)
+                    .setEphemeral(true)
+                    .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+                return
+            }
 
         val created = Date()
         val source = executorDiscordUser.name
@@ -265,18 +268,12 @@ class CompositeDiscordListener : ListenerAdapter() {
             else
                 null
 
-        val entry = BannedPlayerEntry(
-            targetPlayer.playerConfigEntry,
-            created,
-            source,
-            expiry,
-            reason
-        )
-
+        val entry = BannedPlayerEntry(targetEntry, created, source, expiry, reason)
         Server.playerManager.userBanList.add(entry)
-        targetPlayer.networkHandler.disconnect(Text.literal(reason))
 
-        val ac = mapOf("player" to targetPlayer.name.string)
+        targetOnlinePlayer?.networkHandler?.disconnect(Text.literal(reason))
+
+        val ac = mapOf("player" to (targetEntry.comp_4423 ?: playerName))
         event.reply(LM.getMessage(FMsgKey.Discord.Command.Ban.SendBanPacket, ac, lang = event.userLocale.locale).string)
             .setEphemeral(true)
             .queue { hook -> hook.deleteOriginal().queueAfter(7, TimeUnit.SECONDS) }

@@ -102,6 +102,11 @@ class Fabricord : DedicatedServerModInitializer {
         }
 
         ServerLifecycleEvents.SERVER_STOPPING.register {
+            if (Config.consoleLogChannelID != null && consoleAppender.isInitialized) {
+                val rootLogger = LogManager.getRootLogger() as? org.apache.logging.log4j.core.Logger
+                rootLogger?.removeAppender(consoleAppender)
+                consoleAppender.stop()
+            }
             if (DiscordBotManager.isBotInitialized) DiscordBotManager.stop()
         }
 

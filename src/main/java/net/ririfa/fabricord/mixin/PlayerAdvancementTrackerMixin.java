@@ -24,13 +24,13 @@ public abstract class PlayerAdvancementTrackerMixin {
     @Inject(method = "grantCriterion", at = @At("RETURN"))
     public void onAdvancementGranted(AdvancementEntry advancementEntry, String string, @NotNull CallbackInfoReturnable<Boolean> cir) {
         var config = Aliases.getConfig();
-        if (!DiscordBotManager.isBotInitialized || config.logChannels == null || Objects.requireNonNull(config.willSends).contains(SendableEvent.Advancement))
-            return;
+        if (!DiscordBotManager.isBotInitialized || config.logChannels == null) return;
+        if (!Objects.requireNonNull(config.willSends).contains(SendableEvent.Advancement)) return;
+        if (config.disableAdvancementMessages) return;
 
         // === IgnoredAdvancements check ===
         if (config.ignoredAdvancements != null) {
             String advancementId = advancementEntry.id().toString();
-            Aliases.getLogger().info("Advancement ID: " + advancementId);
             if (config.ignoredAdvancements.contains(advancementId)) {
                 return;
             }

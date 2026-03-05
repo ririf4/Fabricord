@@ -44,7 +44,6 @@ data class FConfig(
     @JvmField
     val mentionBlockedRoleIDs: Set<String>?,
 
-    //TODO: 機能追加
     @JvmField
     val disableDeathMessages: Boolean,
     @JvmField
@@ -100,6 +99,10 @@ object FConfigSchema : YaclaSchema<FConfig> {
             .loader(ListToSetLoader())
         def.field(FConfig::mentionBlockedRoleIDs)
             .loader(ListToSetLoader())
+        def.field(FConfig::disableDeathMessages)
+            .default(false)
+        def.field(FConfig::disableAdvancementMessages)
+            .default(false)
     }
 }
 
@@ -113,7 +116,7 @@ object LogChannelsLoader : FieldLoader {
                 ?.mapNotNull { it?.toString() }
                 ?.filter { it.isNotBlank() }
                 ?.toSet()
-                ?.takeIf { it.isNotEmpty() } // 空のSetは除外
+                ?.takeIf { it.isNotEmpty() }
                 ?: return@mapNotNull null
 
             type to channels
