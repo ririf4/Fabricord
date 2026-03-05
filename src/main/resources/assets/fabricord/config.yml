@@ -16,10 +16,6 @@ version: "2.0.0"
 # Or, read guide: https://github.com/ririf4/Fabricord/tree/v4-purge/BOT_INSTALL/EN.md
 BotToken: ""
 
-A:
-  A: ""
-  S: ""
-
 # Discord channel ID where server logs and chat will be sent.
 # Leave blank to disable logging to Discord.
 # Learn how to get channel IDs:

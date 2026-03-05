@@ -19,7 +19,6 @@ object ConfigManager {
             .fromResource("/assets/fabricord/config.yml")
             .toFile(configFile)
             .parser(YamlParser())
-            .schema(FConfigSchema)
             .autoUpdateIfOutdated(true)
             .withLogger(SLF4JYaclaLogger)
     }
@@ -34,7 +33,7 @@ object ConfigManager {
         } catch (e: Exception) {
             Logger.error("Failed to initialize config: ${e.message}", e)
             isErrorOccurred = true
-            return@lazy Yacla.fillByDefault<FConfig>(FConfigSchema)
+            return@lazy Yacla.fillByDefault<FConfig>()
         }
     }
 }
