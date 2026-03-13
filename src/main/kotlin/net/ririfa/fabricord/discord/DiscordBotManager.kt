@@ -14,13 +14,19 @@ import net.ririfa.fabricord.config.LogChannelType
 import net.ririfa.fabricord.i18n.FMsgKey
 import net.ririfa.fabricord.util.*
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import javax.security.auth.login.LoginException
 
 object DiscordBotManager {
     internal var jda: JDA? = null
 
-    private val intents = GatewayIntent.MESSAGE_CONTENT
+    private fun buildIntents(): List<GatewayIntent> = buildList {
+        add(GatewayIntent.MESSAGE_CONTENT)
+        if (Config.opSyncRoleIDs?.isNotEmpty() == true) {
+            add(GatewayIntent.GUILD_MEMBERS)
+        }
+    }
     private val shutdownExecutor = Executors.newSingleThreadExecutor { r ->
         Thread(r, "Fabricord-JDA-Shutdown").apply {
             isDaemon = true
@@ -33,6 +39,9 @@ object DiscordBotManager {
     @JvmField
     var webHooks: MutableMap<String, Webhook> = mutableMapOf()
 
+    @Volatile
+    private var playerCountFuture: ScheduledFuture<*>? = null
+
     fun start() {
         val token = Config.botToken ?: return
         FT {
@@ -42,7 +51,7 @@ object DiscordBotManager {
                     .setActivity(activity())
                     .setStatus(onlineStatus() ?: OnlineStatus.ONLINE)
                     .addEventListeners(CompositeDiscordListener())
-                    .enableIntents(intents)
+                    .enableIntents(buildIntents())
                     .build()
                     .awaitReady()
 
@@ -66,6 +75,10 @@ object DiscordBotManager {
                     Commands.slash("pardon", "Unban a player from the Minecraft server")
                         .addOptions(
                             OptionData(OptionType.STRING, "player", "The player to unban", true)
+                        ),
+                    Commands.slash("run", "Run a Minecraft command on the server")
+                        .addOptions(
+                            OptionData(OptionType.STRING, "command", "The command to run (without leading /)", true)
                         )
                 )?.queue()
 
@@ -73,6 +86,13 @@ object DiscordBotManager {
                     val channelIds = Config.logChannels?.get(LogChannelType.ServerStart)
                         ?: Config.logChannels?.get(LogChannelType.Default)
                     sendToDiscord(message, channelIds)
+                }
+
+                Config.playerCountActivityFormat?.let { format ->
+                    playerCountFuture = T.scheduleAtFixedRate(
+                        { updatePlayerCountActivity(format) },
+                        0L, 30L, TimeUnit.SECONDS
+                    )
                 }
 
                 val c = mapOf("botName" to jda?.selfUser?.name)
@@ -86,7 +106,25 @@ object DiscordBotManager {
         }
     }
 
+    fun restart() {
+        playerCountFuture?.cancel(false)
+        playerCountFuture = null
+        try {
+            jda?.shutdown()
+            jda?.awaitShutdown(5000, TimeUnit.MILLISECONDS)
+        } catch (e: Exception) {
+            Logger.warn("Bot restart: shutdown error - ${e.message}")
+        } finally {
+            jda = null
+            isBotInitialized = false
+            webHooks.clear()
+        }
+        start()
+    }
+
     fun stop() {
+        playerCountFuture?.cancel(false)
+        playerCountFuture = null
         Config.serverStopMessage?.let { message ->
             val channelIds = Config.logChannels?.get(LogChannelType.ServerStop)
                 ?: Config.logChannels?.get(LogChannelType.Default)
@@ -212,6 +250,22 @@ object DiscordBotManager {
                 })
             }
         }
+    }
+
+    private fun updatePlayerCountActivity(format: String) {
+        val server = runCatching { Server }.getOrNull() ?: return
+        val count = server.playerManager.playerList.size
+        val max = server.maxPlayerCount
+        val message = format.replace("{count}", count.toString()).replace("{max}", max.toString())
+        val activityType = Config.botActivityStatus?.lowercase() ?: "playing"
+        val act = when (activityType) {
+            "playing" -> Activity.playing(message)
+            "listening" -> Activity.listening(message)
+            "watching" -> Activity.watching(message)
+            "competing" -> Activity.competing(message)
+            else -> Activity.playing(message)
+        }
+        jda?.presence?.activity = act
     }
 
     private fun activity(): Activity? {

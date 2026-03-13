@@ -13,6 +13,7 @@ import net.ririfa.fabricord.config.SendableEvent
 import net.ririfa.fabricord.database.DataBase
 import net.ririfa.fabricord.discord.DiscordBotManager
 import net.ririfa.fabricord.discord.DiscordEmbed
+import net.ririfa.fabricord.discord.OpSync
 import net.ririfa.fabricord.i18n.FMsgKey
 import net.ririfa.fabricord.i18n.FMsgProvider
 import net.ririfa.fabricord.util.Config
@@ -59,8 +60,13 @@ class Fabricord : DedicatedServerModInitializer {
         }
         val availableLang: List<String> = listOf(
             "en",
-            "ja"
+            "ja",
+            "de",
+            "fr"
         )
+
+        @Volatile
+        var serverStartTime: Long = 0L
     }
 
     override fun onInitializeServer() {
@@ -93,6 +99,7 @@ class Fabricord : DedicatedServerModInitializer {
 
         ServerLifecycleEvents.SERVER_STARTED.register { server ->
             Fabricord.server = server
+            serverStartTime = System.currentTimeMillis()
             if (!ConfigManager.isErrorOccurred) {
                 DiscordBotManager.start()
                 DiscordEmbed.init()
@@ -124,6 +131,9 @@ class Fabricord : DedicatedServerModInitializer {
                 DataBase.insertPlayer(player.uuid, isOp)
                 if (Config.willSends?.contains(SendableEvent.Join) == true && Config.logChannels != null && DiscordBotManager.isBotInitialized) {
                     DiscordEmbed.sendPlayerJoinEmbed(player)
+                }
+                if (Config.opSyncRoleIDs?.isNotEmpty() == true && DiscordBotManager.isBotInitialized) {
+                    OpSync.syncOnJoin(player)
                 }
             }
         }

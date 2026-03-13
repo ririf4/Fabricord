@@ -2,11 +2,16 @@ package net.ririfa.fabricord.command
 
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.StringArgumentType.greedyString
+import net.minecraft.command.permission.Permission
+import net.minecraft.command.permission.PermissionLevel
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
+import net.ririfa.fabricord.config.ConfigManager
+import net.ririfa.fabricord.discord.DiscordBotManager
 import net.ririfa.fabricord.i18n.FMsgKey
 import net.ririfa.fabricord.i18n.adapt
 import net.ririfa.fabricord.util.argument
+import net.ririfa.fabricord.util.literal
 import net.ririfa.fabricord.util.registerCommand
 import net.ririfa.fabricord.util.toggle
 
@@ -62,6 +67,25 @@ enum class Commands(
                 )
                 1
             }
+        }
+    }),
+
+    FABRICORD({ dispatcher ->
+        dispatcher.registerCommand("fabricord") {
+            requires { it.permissions.hasPermission(Permission.Level(PermissionLevel.fromLevel(2))) }
+            then(
+                literal("reload").executes { ctx ->
+                    val source = ctx.source
+                    val success = ConfigManager.reload()
+                    if (success) {
+                        DiscordBotManager.restart()
+                        source.sendFeedback({ Text.literal("[Fabricord] Config reloaded.") }, false)
+                    } else {
+                        source.sendError(Text.literal("[Fabricord] Failed to reload config. Check logs for details."))
+                    }
+                    if (success) 1 else 0
+                }
+            )
         }
     });
 

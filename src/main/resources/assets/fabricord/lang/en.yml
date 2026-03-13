@@ -32,6 +32,10 @@ Discord:
 
       Description:
         MemoryUsage: "Memory Usage"
+        Uptime: "Uptime"
+        Version: "Version"
+        WorldTime: "World Time"
+        LoadedChunks: "Loaded Chunks"
 
   Command:
     Kick:
@@ -45,6 +49,10 @@ Discord:
     Pardon:
       SentPardonPacket: "Unbanned %player%"
       NoPermission: "You do not have permission to unban other players"
+
+    Run:
+      Executed: "Executed: `%command%`"
+      NoPermission: "You do not have permission to run Minecraft commands"
 
     NoLinkedAccount: "No linked Discord account found"
 

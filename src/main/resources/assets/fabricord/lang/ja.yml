@@ -32,6 +32,10 @@ Discord:
 
       Description:
         MemoryUsage: "メモリ使用量"
+        Uptime: "稼働時間"
+        Version: "バージョン"
+        WorldTime: "ワールド時刻"
+        LoadedChunks: "ロード済みチャンク"
 
   Command:
     Kick:
@@ -45,6 +49,10 @@ Discord:
     Pardon:
       SentPardonPacket: "%player%のBANを解除しました。"
       NoPermission: "他のプレイヤーのBANを解除する権限がありません。"
+
+    Run:
+      Executed: "実行しました: `%command%`"
+      NoPermission: "Minecraftコマンドを実行する権限がありません。"
 
     NoLinkedAccount: "リンクされたDiscordアカウントがありません。"
 

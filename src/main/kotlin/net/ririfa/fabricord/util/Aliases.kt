@@ -20,14 +20,14 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 val JDA: JDA? by lazy { DiscordBotManager.jda }
-val ModDir: Path by lazy { Fabricord.Companion.modDir }
-val Logger: Logger by lazy { Fabricord.Companion.logger }
-val Config: FConfig by lazy { ConfigManager.config }
-val DBDir: Path by lazy { Fabricord.Companion.dbDir }
-val Server: MinecraftServer by lazy { Fabricord.Companion.server }
-val LM: LangMan<FMsgProvider, Text> by lazy { Fabricord.Companion.langMan }
+val ModDir: Path by lazy { Fabricord.modDir }
+val Logger: Logger by lazy { Fabricord.logger }
+val Config: FConfig get() = ConfigManager.config
+val DBDir: Path by lazy { Fabricord.dbDir }
+val Server: MinecraftServer by lazy { Fabricord.server }
+val LM: LangMan<FMsgProvider, Text> by lazy { Fabricord.langMan }
 
-val T: ScheduledExecutorService by lazy { Fabricord.Companion.thread }
+val T: ScheduledExecutorService by lazy { Fabricord.thread }
 
 fun Logger.info(message: Text, cause: Throwable? = null) {
     if (cause != null) {

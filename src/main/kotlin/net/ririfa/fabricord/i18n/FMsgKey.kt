@@ -39,6 +39,10 @@ sealed class FMsgKey : MessageKey<FMsgProvider, Text> {
                 object Title : ServerStatus()
                 sealed class Description : ServerStatus() {
                     object MemoryUsage : Description()
+                    object Uptime : Description()
+                    object Version : Description()
+                    object WorldTime : Description()
+                    object LoadedChunks : Description()
                 }
             }
         }
@@ -60,6 +64,11 @@ sealed class FMsgKey : MessageKey<FMsgProvider, Text> {
                 object SentPardonPacket : Pardon()
 
                 object NoPermission : Pardon()
+            }
+
+            sealed class Run : Command() {
+                object Executed : Run()
+                object NoPermission : Run()
             }
 
             object PlayerNotFound : Command()

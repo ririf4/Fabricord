@@ -40,6 +40,10 @@ data class FConfig(
     @SetOf @JvmField val ignoredAdvancements: Set<String>? = null,
 
     @BlankToNull @JvmField val consoleLogChannelID: String? = null,
+
+    @BlankToNull @JvmField val playerCountActivityFormat: String? = null,
+
+    @SetOf @JvmField val opSyncRoleIDs: Set<String>? = null,
 ) {
     fun sendChat(): Boolean = willSends?.contains(SendableEvent.Chat) == true
 }

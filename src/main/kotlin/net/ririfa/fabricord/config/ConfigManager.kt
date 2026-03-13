@@ -12,28 +12,39 @@ import java.nio.file.Path
 object ConfigManager {
     private val configFile: Path = ModDir.resolve("config.yml")
 
+    @Volatile
     var isErrorOccurred: Boolean = false
 
-    val loader: ConfigLoaderBuilder<FConfig> by lazy {
-        Yacla.loader<FConfig>()
+    private val loader: ConfigLoaderBuilder<FConfig>
+        get() = Yacla.loader<FConfig>()
             .fromResource("/assets/fabricord/config.yml")
             .toFile(configFile)
             .parser(YamlParser())
             .autoUpdateIfOutdated(true)
             .withLogger(SLF4JYaclaLogger)
-    }
 
-    val config: FConfig by lazy {
-        try {
+    @Volatile
+    private var _config: FConfig? = null
+
+    val config: FConfig
+        get() = _config ?: loadConfig().also { _config = it }
+
+    private fun loadConfig(): FConfig {
+        return try {
             if (!Files.exists(ModDir)) {
                 Files.createDirectories(ModDir)
             }
-
-            return@lazy loader.load().config
+            loader.load().config
         } catch (e: Exception) {
             Logger.error("Failed to initialize config: ${e.message}", e)
             isErrorOccurred = true
-            return@lazy Yacla.fillByDefault<FConfig>()
+            Yacla.fillByDefault<FConfig>()
         }
+    }
+
+    fun reload(): Boolean {
+        isErrorOccurred = false
+        _config = loadConfig()
+        return !isErrorOccurred
     }
 }

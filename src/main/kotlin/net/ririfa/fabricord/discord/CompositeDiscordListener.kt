@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.components.label.Label
 import net.dv8tion.jda.api.components.textinput.TextInput
 import net.dv8tion.jda.api.components.textinput.TextInputStyle
+import net.dv8tion.jda.api.events.guild.member.GuildMemberUpdateEvent
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -13,6 +14,7 @@ import net.minecraft.network.DisconnectionInfo
 import net.minecraft.server.BannedPlayerEntry
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
+import net.ririfa.fabricord.Fabricord
 import net.ririfa.fabricord.command.LinkCommandAuthCodeManager
 import net.ririfa.fabricord.config.LogChannelType
 import net.ririfa.fabricord.database.DataBase
@@ -22,6 +24,7 @@ import net.ririfa.fabricord.util.FT
 import net.ririfa.fabricord.util.LM
 import net.ririfa.fabricord.util.Server
 import java.awt.Color
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -60,6 +63,14 @@ class CompositeDiscordListener : ListenerAdapter() {
         }
     }
 
+    override fun onGuildMemberUpdate(event: GuildMemberUpdateEvent) {
+        if (Config.opSyncRoleIDs?.isNotEmpty() != true) return
+
+        FT {
+            OpSync.syncFromRoleChange(event.member.idLong, event.member.roles)
+        }
+    }
+
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         when (event.name) {
             "playerlist" -> handlePlayerList(event)
@@ -68,6 +79,7 @@ class CompositeDiscordListener : ListenerAdapter() {
             "kick" -> handleKick(event)
             "ban" -> handleBan(event)
             "pardon" -> handlePardon(event)
+            "run" -> handleRun(event)
         }
     }
 
@@ -91,6 +103,7 @@ class CompositeDiscordListener : ListenerAdapter() {
         }
 
         DataBase.linkUser(uuid, event.user.idLong)
+        OpSync.syncOnLink(uuid)
         event.reply(LM.getMessage(FMsgKey.Discord.Modal.LINK.LinkedSuccessfully).string)
             .setEphemeral(true)
             .queue { hook ->
@@ -133,27 +146,31 @@ class CompositeDiscordListener : ListenerAdapter() {
 
     private fun handleStatus(event: SlashCommandInteractionEvent) {
         FT {
-            val discordUserLang = event.userLocale.locale
+            val lang = event.userLocale.locale
 
             val tps = getTPS()
             val mspt = getMSPT()
-            val memoryUsage = getMemoryUsage()
-            val playerInfo = getPlayerInfo()
 
-            val memUsage = LM.getMessage(FMsgKey.Discord.Embed.ServerStatus.Description.MemoryUsage, lang = discordUserLang)
+            fun label(key: FMsgKey) = LM.getMessage(key, lang = lang).string
 
             val embedBuilder = EmbedBuilder()
-                .setTitle(LM.getMessage(FMsgKey.Discord.Embed.ServerStatus.Title, lang = discordUserLang).string)
-                .setColor(Color.BLUE)
-                .setDescription(
-                    "**TPS:** `${"%.2f".format(tps)}`\n" +
-                            "**MSPT:** `${"%.2f".format(mspt)}` ms\n" +
-                            "**Players:** `${playerInfo}`\n" +
-                            "**${memUsage.string}:** `${memoryUsage}`"
-                )
+                .setTitle(label(FMsgKey.Discord.Embed.ServerStatus.Title))
+                .setColor(tpsColor(tps))
+                .setTimestamp(Instant.now())
+                // Row 1
+                .addField("TPS", "`${"%.2f".format(tps)}`", true)
+                .addField("MSPT", "`${"%.2f".format(mspt)} ms`", true)
+                .addField("Players", "`${getPlayerInfo()}`", true)
+                // Row 2
+                .addField(label(FMsgKey.Discord.Embed.ServerStatus.Description.MemoryUsage), "`${getMemoryUsage()}`", true)
+                .addField(label(FMsgKey.Discord.Embed.ServerStatus.Description.Uptime), "`${getUptime()}`", true)
+                .addField(label(FMsgKey.Discord.Embed.ServerStatus.Description.Version), "`${Server.version}`", true)
+                // Row 3
+                .addField(label(FMsgKey.Discord.Embed.ServerStatus.Description.WorldTime), "`${getWorldTime()}`", true)
+                .addField(label(FMsgKey.Discord.Embed.ServerStatus.Description.LoadedChunks), "`${getLoadedChunks()}`", true)
 
             event.replyEmbeds(embedBuilder.build()).queue({ message ->
-                FT(delay = 10000, arg = message) { msg ->
+                FT(delay = 30000, arg = message) { msg ->
                     msg?.deleteOriginal()?.queue({}, {})
                 }
             }, {})
@@ -331,6 +348,44 @@ class CompositeDiscordListener : ListenerAdapter() {
         ).setEphemeral(false).queue()
     }
 
+    private fun handleRun(event: SlashCommandInteractionEvent) {
+        val executorDiscordUser = event.user
+        val command = event.getOption("command")!!.asString
+
+        val uuid = DataBase.getMinecraftUUID(executorDiscordUser.idLong) ?: run {
+            event.reply(LM.getMessage(FMsgKey.Discord.Command.NoLinkedAccount, lang = event.userLocale.locale).string)
+                .setEphemeral(true)
+                .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+            return
+        }
+
+        val mcExecutor = Server.playerManager.getPlayer(uuid)
+        val isOp = mcExecutor?.playerConfigEntry?.let { Server.playerManager.isOperator(it) }
+            ?: DataBase.isOp(uuid)
+            ?: run {
+                event.reply(LM.getMessage(FMsgKey.Discord.Command.CannotGetPlayerPerm, lang = event.userLocale.locale).string)
+                    .setEphemeral(true)
+                    .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+                return
+            }
+
+        if (!isOp) {
+            event.reply(LM.getMessage(FMsgKey.Discord.Command.Run.NoPermission, lang = event.userLocale.locale).string)
+                .setEphemeral(true)
+                .queue { hook -> hook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS) }
+            return
+        }
+
+        Server.execute {
+            Server.commandManager.parseAndExecute(Server.commandSource, command)
+        }
+
+        val ac = mapOf("command" to command)
+        event.reply(LM.getMessage(FMsgKey.Discord.Command.Run.Executed, ac, lang = event.userLocale.locale).string)
+            .setEphemeral(true)
+            .queue { hook -> hook.deleteOriginal().queueAfter(10, TimeUnit.SECONDS) }
+    }
+
     private fun getTPS(): Double {
         val tickTimes = Server.tickTimes
         val avgTickTime = Arrays.stream(tickTimes).average().orElse(0.0) / 1_000_000.0
@@ -347,14 +402,48 @@ class CompositeDiscordListener : ListenerAdapter() {
         val freeMemory = runtime.freeMemory() / (1024 * 1024)
         val maxMemory = runtime.maxMemory() / (1024 * 1024)
         val usedMemory = totalMemory - freeMemory
-
-        return "$usedMemory MB / $totalMemory MB (Max: $maxMemory MB)"
+        return "$usedMemory / $totalMemory MB (Max: $maxMemory MB)"
     }
 
     private fun getPlayerInfo(): String {
         val playerCount = Server.playerManager.playerList.size
         val maxPlayers = Server.playerManager.maxPlayerCount
         return "$playerCount / $maxPlayers"
+    }
+
+    private fun getUptime(): String {
+        val uptimeMs = System.currentTimeMillis() - Fabricord.serverStartTime
+        val totalSeconds = uptimeMs / 1000
+        val days = totalSeconds / 86400
+        val hours = (totalSeconds % 86400) / 3600
+        val minutes = (totalSeconds % 3600) / 60
+        val seconds = totalSeconds % 60
+        return when {
+            days > 0 -> "${days}d ${hours}h ${minutes}m"
+            hours > 0 -> "${hours}h ${minutes}m"
+            else -> "${minutes}m ${seconds}s"
+        }
+    }
+
+    private fun getWorldTime(): String {
+        val time = runCatching { Server.overworld.time % 24000 }.getOrDefault(0L)
+        val label = when {
+            time < 13000 -> "☀ Day"
+            else -> "☽ Night"
+        }
+        return "$label ($time)"
+    }
+
+    private fun getLoadedChunks(): Int {
+        return runCatching {
+            Server.worlds.sumOf { world -> world.chunkManager.loadedChunkCount }
+        }.getOrDefault(0)
+    }
+
+    private fun tpsColor(tps: Double): Color = when {
+        tps >= 18.0 -> Color(0x57F287)
+        tps >= 15.0 -> Color(0xFEE75C)
+        else -> Color(0xED4245)
     }
 
     private fun findMentionedPlayers(messageContent: String): Pair<List<ServerPlayerEntity>, Boolean> {

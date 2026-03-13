@@ -120,6 +120,26 @@ IgnoredAdvancements:
 # Default: ""
 ConsoleLogChannelID: ""
 
+# ── Dynamic Activity ──
+
+# Dynamically update the bot's activity with the current player count (updated every 30 seconds).
+# Use {count} for the number of online players and {max} for the server max.
+# Example: "Minecraft | {count}/{max} players"
+# Leave blank to disable (uses BotActivityMessage instead).
+PlayerCountActivityFormat: ""
+
+# ── OP Sync Settings ──
+
+# Discord role IDs whose holders will automatically receive Minecraft OP.
+# Requires the "Server Members Intent" to be enabled in the Discord Developer Portal.
+# Syncing occurs on: MC login, Discord role change (if the player is online), and account linking.
+# WARNING: If a player loses all listed roles, their MC OP will be revoked.
+# Leave empty to disable.
+# Example:
+# OpSyncRoleIDs:
+#   - "123456789012345678"
+OpSyncRoleIDs: [ ]
+
 # ── Experimental Settings ──
 
 # No experimental settings available yet.
