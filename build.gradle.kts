@@ -1,111 +1,13 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import dev.swiftstorm.akkaradb.plugin.akkara
-import net.fabricmc.loom.task.RemapJarTask
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-	alias(libs.plugins.kotlin)
-	alias(libs.plugins.loom)
-	alias(libs.plugins.akkara)
-	alias(libs.plugins.shadowJar)
+    alias(libs.plugins.kotlin.jvm)
 }
 
-group = "net.ririfa"
-version = "5.0.0-mc.1.21.11+beta.1"
+allprojects {
+    plugins.apply("kotlin")
 
-repositories {
-	mavenCentral()
-	maven("https://maven.fabricmc.net/") { name = "FabricMC" }
-	maven("https://repo.swiftstorm.dev/maven2/") { name = "SwiftStorm Repository" }
-}
-
-val shade: Configuration by configurations.creating {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-}
-configurations.runtimeOnly.get().extendsFrom(shade)
-
-dependencies {
-	// === Minecraft and Fabric ===
-	minecraft(libs.minecraft)
-	mappings(libs.fabric.yarn)
-	modImplementation(libs.fabric.api)
-	modImplementation(libs.fabric.loader)
-	modImplementation(libs.fabric.kotlin)
-
-	// === RiriFa Libs(Katalis will provide these on rutime) ===
-    modCompileOnly(libs.langman.core)
-    modCompileOnly(libs.langman.yaml)
-    modCompileOnly(libs.yacla.core)
-    modCompileOnly(libs.yacla.yaml)
-    modCompileOnly(libs.cask)
-	akkara(libs.versions.akkaradb.get(), "modCompileOnly")
-
-	// === Other Libs ===
-	modImplementation(libs.jda)
-	modImplementation(libs.snakeyaml)
-
-	// === Shadowed Libs ===
-	shade(libs.jda) { exclude(group = "net.java.dev.jna", module = "jna") }
-	shade(libs.snakeyaml)
-}
-
-loom {
-	accessWidenerPath = file("src/main/resources/fabricord.accesswidener")
-}
-
-java { withSourcesJar() }
-
-kotlin {
-	jvmToolchain {
-		languageVersion.set(JavaLanguageVersion.of(21))
-	}
-}
-
-tasks.withType<KotlinCompile> {
-	compilerOptions {
-		jvmTarget.set(JvmTarget.JVM_21)
-	}
-}
-
-tasks.withType<JavaCompile> {
-	options.release.set(21)
-}
-
-tasks.named<RemapJarTask>("remapJar") {
-	finalizedBy("finalJar")
-}
-
-tasks.named<ProcessResources>("processResources") {
-	inputs.property("version", project.version)
-	filesMatching("fabric.mod.json") {
-		expand("version" to project.version)
-	}
-}
-
-tasks.register<ShadowJar>("finalJar") {
-	archiveClassifier.set("final")
-	configurations = listOf(shade)
-	isZip64 = true
-
-	doFirst {
-		val remapped = tasks.named<RemapJarTask>("remapJar").get().archiveFile.get().asFile
-		from(zipTree(remapped))
-	}
-
-	relocate("net.dv8tion.jda", "net.ririfa.shadowed.jda")
-	relocate("org.yaml.snakeyaml", "net.ririfa.shadowed.snakeyaml")
-
-	exclude("net/dv8tion/jda/api/audio/**")
-	exclude("net/dv8tion/jda/internal/audio/**")
-	exclude("tomp2p/**")
-	exclude("com/sun/jna/**")
-	exclude("kotlin/**")
-	exclude("org/jetbrains/kotlin/**")
-	exclude("kotlinx/**")
-	exclude("club/minnced/opus/**")
-	exclude("com/fasterxml/jackson/**")
-	exclude("org/apache/commons/**")
-	exclude("org/slf4j/**")
+    repositories {
+        mavenCentral()
+        maven("https://repo.swiftstorm.dev/maven2/") { name = "SwiftStorm" }
+        maven("https://maven.fabricmc.net") { name = "FabricMC" }
+    }
 }
