@@ -1,8 +1,10 @@
 [versions]
 kotlin = "2.3.20"
+fabric-loom = "1.16-SNAPSHOT"
 
 [libraries]
 
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+fabric-loom = { id = "net.fabricmc.fabric-loom", version.ref = "fabric-loom" }
