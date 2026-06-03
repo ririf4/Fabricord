@@ -1,10 +1,28 @@
 [versions]
 kotlin = "2.3.20"
 fabric-loom = "1.16-SNAPSHOT"
+akkara-plugin = "1.0.0-rc.2"
+
+yacla-core = "4.1.1"
+yacla-yaml = "4.1.0"
+
+langman-core = "2.1.0"
+langman-yaml = "2.1.0"
+
+snakeyaml = "2.6"
+
+akkaradb = "2026.1.1-rc.1"
 
 [libraries]
+yacla-core = { module = "net.ririfa:yacla-core", version.ref = "yacla-core" }
+yacla-yaml = { module = "net.ririfa:yacla-yaml", version.ref = "yacla-yaml" }
 
+langman-core = { module = "net.ririfa:langman-core" , version.ref = "langman-core" }
+langman-yaml = { module = "net.ririfa:langman-ext.yaml", version.ref = "langman-yaml" }
+
+yaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 fabric-loom = { id = "net.fabricmc.fabric-loom", version.ref = "fabric-loom" }
+akkara-plugin = { id = "dev.swiftstorm.akkaradb-plugin", version.ref = "akkara-plugin" }

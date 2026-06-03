@@ -1,29 +1,31 @@
 import java.util.Properties
+import org.gradle.accessors.dm.LibrariesForLibs
+import org.gradle.kotlin.dsl.the
+
+val lib = the<LibrariesForLibs>()
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.akkara.plugin)
     alias(libs.plugins.fabric.loom) apply false
 }
 
 allprojects {
+    group = "net.ririfa"
+
     repositories {
         mavenCentral()
 
-        group = "net.ririfa"
+        maven("https://repo.swiftstorm.dev/maven2/") { name = "SwiftStormStudio Repository" }
 
-        maven("https://repo.swiftstorm.dev/maven2/") {
-            name = "SwiftStorm"
-        }
-
-        maven("https://maven.fabricmc.net") {
-            name = "FabricMC"
-        }
+        maven("https://maven.fabricmc.net") { name = "FabricMC" }
     }
 }
 
 subprojects {
     plugins.apply("kotlin")
     plugins.apply("net.fabricmc.fabric-loom")
+    plugins.apply("dev.swiftstorm.akkaradb-plugin")
 
     val propertiesFile = file("version.properties")
 
@@ -83,6 +85,14 @@ subprojects {
 
     tasks.named("compileKotlin") {
         finalizedBy(incrementRevision)
+    }
+
+    dependencies {
+        compileOnly(lib.yacla.core)
+        compileOnly(lib.yacla.yaml)
+        compileOnly(lib.langman.core)
+        compileOnly(lib.langman.yaml)
+        compileOnly(lib.yaml)
     }
 
     when (name) {
