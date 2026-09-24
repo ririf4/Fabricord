@@ -1,13 +1,16 @@
 import java.util.Properties
 import org.gradle.accessors.dm.LibrariesForLibs
+import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.kotlin.dsl.the
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 val lib = the<LibrariesForLibs>()
 
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.akkara.plugin)
+    alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.fabric.loom) apply false
+    alias(libs.plugins.fabric.loom.remap) apply false
+    alias(libs.plugins.shadow) apply false
 }
 
 allprojects {
@@ -23,9 +26,31 @@ allprojects {
 }
 
 subprojects {
-    plugins.apply("kotlin")
-    plugins.apply("net.fabricmc.fabric-loom")
-    plugins.apply("dev.swiftstorm.akkaradb-plugin")
+    pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+        extensions.configure<KotlinJvmProjectExtension>("kotlin") {
+            sourceSets.named("main") {
+                kotlin.srcDir(rootProject.file("fabricord/common/src/main/kotlin"))
+            }
+            sourceSets.named("test") {
+                kotlin.srcDir(rootProject.file("fabricord/common/src/test/kotlin"))
+            }
+        }
+
+        extensions.configure<SourceSetContainer>("sourceSets") {
+            named("main") {
+                java.srcDir(rootProject.file("fabricord/common/src/main/java"))
+                resources.srcDir(rootProject.file("fabricord/common/src/main/resources"))
+            }
+        }
+
+        dependencies {
+            add("compileOnly", lib.yacla.core)
+            add("compileOnly", lib.yacla.yaml)
+            add("compileOnly", lib.langman.core)
+            add("compileOnly", lib.langman.yaml)
+            add("compileOnly", lib.yaml)
+        }
+    }
 
     val propertiesFile = file("version.properties")
 
@@ -53,7 +78,7 @@ subprojects {
 
     val publicVersion = "$major.$minor.$patch"
 
-    val deepVersion = "$major.$minor.$patch.r$currentRevision"
+    val deepVersion = "$major.$minor.$patch-r$currentRevision"
 
     extra["publicVersion"] = publicVersion
     extra["deepVersion"] = deepVersion
@@ -83,20 +108,12 @@ subprojects {
         }
     }
 
-    tasks.named("compileKotlin") {
+    tasks.matching { it.name == "compileKotlin" }.configureEach {
         finalizedBy(incrementRevision)
     }
 
-    dependencies {
-        compileOnly(lib.yacla.core)
-        compileOnly(lib.yacla.yaml)
-        compileOnly(lib.langman.core)
-        compileOnly(lib.langman.yaml)
-        compileOnly(lib.yaml)
-    }
-
     when (name) {
-        "26.1.2" -> {
+        "26.1.2", "1.21.11", "1.21.8", "1.21.5", "1.20.4" -> {
             val fullVersion = "$deepVersion+mc$name"
 
             version = fullVersion

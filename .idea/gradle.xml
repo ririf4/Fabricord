@@ -8,7 +8,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/versions/26.1.2" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.20.4" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.21.11" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.21.5" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.21.8" />
+            <option value="$PROJECT_DIR$/fabricord/versions/26.1.2" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="true" />
