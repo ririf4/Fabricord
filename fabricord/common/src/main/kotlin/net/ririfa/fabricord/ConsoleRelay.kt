@@ -25,12 +25,12 @@ object ConsoleRelay {
     }
 }
 
+@Suppress("DEPRECATION")
 private class FabricordConsoleAppender : AbstractAppender(
     "FabricordConsoleRelay",
     null,
     PatternLayout.createDefaultLayout(),
     false,
-    emptyArray(),
 ) {
     init {
         start()

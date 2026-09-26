@@ -1,6 +1,5 @@
 [versions]
 kotlin = "2.3.20"
-fabric-loom = "1.16-SNAPSHOT"
 shadow = "9.6.1"
 
 yacla-core = "4.1.1"
@@ -27,6 +26,4 @@ sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-fabric-loom = { id = "net.fabricmc.fabric-loom", version.ref = "fabric-loom" }
-fabric-loom-remap = { id = "net.fabricmc.fabric-loom-remap", version.ref = "fabric-loom" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

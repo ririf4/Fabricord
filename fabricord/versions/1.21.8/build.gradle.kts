@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.fabric.loom.remap)
+    id("net.fabricmc.fabric-loom-remap")
     alias(libs.plugins.shadow)
 }
 

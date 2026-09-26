@@ -8,21 +8,11 @@ val lib = the<LibrariesForLibs>()
 
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.fabric.loom) apply false
-    alias(libs.plugins.fabric.loom.remap) apply false
     alias(libs.plugins.shadow) apply false
 }
 
 allprojects {
     group = "net.ririfa"
-
-    repositories {
-        mavenCentral()
-
-        maven("https://repo.swiftstorm.dev/maven2/") { name = "SwiftStormStudio Repository" }
-
-        maven("https://maven.fabricmc.net") { name = "FabricMC" }
-    }
 }
 
 subprojects {
@@ -113,7 +103,7 @@ subprojects {
     }
 
     when (name) {
-        "26.1.2", "1.21.11", "1.21.8", "1.21.5", "1.20.4" -> {
+        "26.1.2", "1.21.11", "1.21.8", "1.21.5", "1.20.4", "1.20.2", "1.20.1", "1.19.4", "1.19.2", "1.19", "1.18.2", "1.17.1", "1.16.5", "1.15.2" -> {
             val fullVersion = "$deepVersion+mc$name"
 
             version = fullVersion

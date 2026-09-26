@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.fabric.loom)
+    id("net.fabricmc.fabric-loom")
     alias(libs.plugins.shadow)
 }
 
