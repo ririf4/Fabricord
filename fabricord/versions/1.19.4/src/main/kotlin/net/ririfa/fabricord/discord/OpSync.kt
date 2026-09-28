@@ -25,7 +25,9 @@ object OpSync {
     }
 
     fun syncOnLink(minecraftUuid: UUID) {
-        Fabricord.server.playerList.getPlayer(minecraftUuid)?.let(::syncOnJoin)
+        Fabricord.server.execute {
+            Fabricord.server.playerList.getPlayer(minecraftUuid)?.let(::syncOnJoin)
+        }
     }
 
     private fun apply(minecraftUuid: UUID, shouldBeOperator: Boolean) {

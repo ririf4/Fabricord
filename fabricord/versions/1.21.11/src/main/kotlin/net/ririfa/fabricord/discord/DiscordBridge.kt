@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package net.ririfa.fabricord.discord
 
 import net.dv8tion.jda.api.EmbedBuilder
@@ -17,6 +19,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.exceptions.InvalidTokenException
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
@@ -338,11 +341,14 @@ object DiscordBridge {
 
     private fun updatePlayerCountActivity(format: String) {
         if (!isRunning) return
-        val players = Fabricord.server.playerList
-        val message = format
-            .replace("{count}", players.playerCount.toString())
-            .replace("{max}", players.maxPlayers.toString())
-        jda?.presence?.activity = activity(Fabricord.config.botActivityStatus, message)
+        Fabricord.server.execute {
+            if (!isRunning) return@execute
+            val players = Fabricord.server.playerList
+            val message = format
+                .replace("{count}", players.playerCount.toString())
+                .replace("{max}", players.maxPlayers.toString())
+            jda?.presence?.activity = activity(Fabricord.config.botActivityStatus, message)
+        }
     }
 
     private fun sanitizeBlockedMentions(raw: String): String {
@@ -362,10 +368,7 @@ object DiscordBridge {
             val chatChannels = channels(LogChannelType.Chat).orEmpty()
             when {
                 event.channel.id in chatChannels -> sendDiscordChatToMinecraft(event)
-                event.channel.id == Fabricord.config.consoleLogChannelID && isLinkedOperator(event.author.idLong) == true -> {
-                    val command = event.message.contentRaw.trim().removePrefix("/")
-                    if (command.isNotEmpty()) executeServerCommand(command)
-                }
+                event.channel.id == Fabricord.config.consoleLogChannelID -> executeConsoleCommand(event)
             }
         }
 
@@ -407,16 +410,17 @@ object DiscordBridge {
                 append("] ").append(memberName).append(" » ")
             }
             val raw = event.message.contentDisplay
-            val mentioned = Fabricord.server.playerList.players.filter { player ->
-                raw.contains("@${player.name.string}", ignoreCase = true) ||
-                    raw.contains("@{${player.uuid}}", ignoreCase = true)
-            }.toSet()
-            val normalized = Fabricord.server.playerList.players.fold(raw) { message, player ->
-                message.replace("@{${player.uuid}}", "@${player.name.string}", ignoreCase = true)
-            }
 
             Fabricord.server.execute {
-                Fabricord.server.playerList.players.forEach { player ->
+                val players = Fabricord.server.playerList.players
+                val mentioned = players.filter { player ->
+                    raw.contains("@${player.name.string}", ignoreCase = true) ||
+                        raw.contains("@{${player.uuid}}", ignoreCase = true)
+                }.toSet()
+                val normalized = players.fold(raw) { message, player ->
+                    message.replace("@{${player.uuid}}", "@${player.name.string}", ignoreCase = true)
+                }
+                players.forEach { player ->
                     val message = Component.literal(prefix).withStyle(ChatFormatting.AQUA)
                         .append(Component.literal(normalized).withStyle(if (player in mentioned) ChatFormatting.BOLD else ChatFormatting.WHITE))
                     player.sendSystemMessage(message)
@@ -428,58 +432,66 @@ object DiscordBridge {
         }
 
         private fun playerList(event: SlashCommandInteractionEvent) {
-            val players = Fabricord.server.playerList.players
-            val description = if (players.isEmpty()) {
-                message(FMsgKey.Discord.Embed.PlayerList.ThereAreNoPlayersOnline, event.userLocale.locale)
-            } else {
-                val heading = Fabricord.langMan.getMessage(
-                    FMsgKey.Discord.Embed.PlayerList.Description,
-                    argsComplete = mapOf("playerCount" to players.size.toString()),
-                    lang = event.userLocale.locale,
-                ).string
-                "$heading\n${players.joinToString("\n") { it.name.string }}"
+            event.deferReply().queue { hook ->
+                Fabricord.server.execute {
+                    val players = Fabricord.server.playerList.players
+                    val description = if (players.isEmpty()) {
+                        message(FMsgKey.Discord.Embed.PlayerList.ThereAreNoPlayersOnline, event.userLocale.locale)
+                    } else {
+                        val heading = Fabricord.langMan.getMessage(
+                            FMsgKey.Discord.Embed.PlayerList.Description,
+                            argsComplete = mapOf("playerCount" to players.size.toString()),
+                            lang = event.userLocale.locale,
+                        ).string
+                        "$heading\n${players.joinToString("\n") { it.name.string }}"
+                    }
+                    hook.editOriginalEmbeds(
+                        EmbedBuilder()
+                            .setTitle(message(FMsgKey.Discord.Embed.PlayerList.Title, event.userLocale.locale))
+                            .setDescription(description)
+                            .setColor(Color(0x57F287))
+                            .build()
+                    ).queue()
+                }
             }
-            event.replyEmbeds(
-                EmbedBuilder()
-                    .setTitle(message(FMsgKey.Discord.Embed.PlayerList.Title, event.userLocale.locale))
-                    .setDescription(description)
-                    .setColor(Color(0x57F287))
-                    .build()
-            ).queue()
         }
 
         private fun status(event: SlashCommandInteractionEvent) {
-            val runtime = Runtime.getRuntime()
-            val usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
-            val maxMemory = runtime.maxMemory() / 1024 / 1024
-            val mspt = Fabricord.server.averageTickTimeNanos / 1_000_000.0
-            val tps = if (mspt <= 0.0) 20.0 else minOf(20.0, 1000.0 / mspt)
-            val uptime = System.currentTimeMillis() - Fabricord.serverStartTime
-            val loadedChunks = Fabricord.server.allLevels.sumOf { it.chunkSource.loadedChunksCount }
-            val players = Fabricord.server.playerList
-            val worldTime = Fabricord.server.overworld().dayTime % 24_000
-            val worldPeriod = if (worldTime < 13_000) {
-                FMsgKey.Discord.Embed.ServerStatus.Description.Day
-            } else {
-                FMsgKey.Discord.Embed.ServerStatus.Description.Night
-            }
-            val worldTimeDisplay = "${message(worldPeriod, event.userLocale.locale)} ($worldTime)"
+            event.deferReply().queue { hook ->
+                Fabricord.server.execute {
+                    val runtime = Runtime.getRuntime()
+                    val usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
+                    val maxMemory = runtime.maxMemory() / 1024 / 1024
+                    val mspt = Fabricord.server.averageTickTimeNanos / 1_000_000.0
+                    val tps = if (mspt <= 0.0) 20.0 else minOf(20.0, 1000.0 / mspt)
+                    val uptime = System.currentTimeMillis() - Fabricord.serverStartTime
+                    val loadedChunks = Fabricord.server.allLevels.sumOf { it.chunkSource.loadedChunksCount }
+                    val players = Fabricord.server.playerList
+                    val worldTime = Fabricord.server.overworld().dayTime % 24_000
+                    val worldPeriod = if (worldTime < 13_000) {
+                        FMsgKey.Discord.Embed.ServerStatus.Description.Day
+                    } else {
+                        FMsgKey.Discord.Embed.ServerStatus.Description.Night
+                    }
+                    val worldTimeDisplay = "${message(worldPeriod, event.userLocale.locale)} ($worldTime)"
 
-            event.replyEmbeds(
-                EmbedBuilder()
-                    .setTitle(message(FMsgKey.Discord.Embed.ServerStatus.Title, event.userLocale.locale))
-                    .setColor(if (tps >= 18) Color(0x57F287) else if (tps >= 15) Color(0xFEE75C) else Color(0xED4245))
-                    .setTimestamp(Instant.now())
-                    .addField("TPS", "%.2f".format(tps), true)
-                    .addField("MSPT", "%.2f ms".format(mspt), true)
-                    .addField("Players", "${players.playerCount}/${players.maxPlayers}", true)
-                    .addField(message(FMsgKey.Discord.Embed.ServerStatus.Description.MemoryUsage, event.userLocale.locale), "$usedMemory/$maxMemory MB", true)
-                    .addField(message(FMsgKey.Discord.Embed.ServerStatus.Description.Uptime, event.userLocale.locale), formatDuration(uptime), true)
-                    .addField(message(FMsgKey.Discord.Embed.ServerStatus.Description.Version, event.userLocale.locale), Fabricord.server.serverVersion, true)
-                    .addField(message(FMsgKey.Discord.Embed.ServerStatus.Description.WorldTime, event.userLocale.locale), worldTimeDisplay, true)
-                    .addField(message(FMsgKey.Discord.Embed.ServerStatus.Description.LoadedChunks, event.userLocale.locale), loadedChunks.toString(), true)
-                    .build()
-            ).queue()
+                    hook.editOriginalEmbeds(
+                        EmbedBuilder()
+                            .setTitle(message(FMsgKey.Discord.Embed.ServerStatus.Title, event.userLocale.locale))
+                            .setColor(if (tps >= 18) Color(0x57F287) else if (tps >= 15) Color(0xFEE75C) else Color(0xED4245))
+                            .setTimestamp(Instant.now())
+                            .addField("TPS", "%.2f".format(tps), true)
+                            .addField("MSPT", "%.2f ms".format(mspt), true)
+                            .addField("Players", "${players.playerCount}/${players.maxPlayers}", true)
+                            .addField(message(FMsgKey.Discord.Embed.ServerStatus.Description.MemoryUsage, event.userLocale.locale), "$usedMemory/$maxMemory MB", true)
+                            .addField(message(FMsgKey.Discord.Embed.ServerStatus.Description.Uptime, event.userLocale.locale), formatDuration(uptime), true)
+                            .addField(message(FMsgKey.Discord.Embed.ServerStatus.Description.Version, event.userLocale.locale), Fabricord.server.serverVersion, true)
+                            .addField(message(FMsgKey.Discord.Embed.ServerStatus.Description.WorldTime, event.userLocale.locale), worldTimeDisplay, true)
+                            .addField(message(FMsgKey.Discord.Embed.ServerStatus.Description.LoadedChunks, event.userLocale.locale), loadedChunks.toString(), true)
+                            .build()
+                    ).queue()
+                }
+            }
         }
 
         private fun link(event: SlashCommandInteractionEvent) {
@@ -498,23 +510,28 @@ object DiscordBridge {
         }
 
         private fun administrativeCommand(event: SlashCommandInteractionEvent) {
+            event.deferReply(true).queue { hook ->
+                Fabricord.server.execute {
+                    administrativeCommandOnServer(event, hook)
+                }
+            }
+        }
+
+        private fun administrativeCommandOnServer(
+            event: SlashCommandInteractionEvent,
+            hook: InteractionHook,
+        ) {
             if (Fabricord.accountLinks.findMinecraftUuid(event.user.idLong) == null) {
-                event.reply(message(FMsgKey.Discord.Command.NoLinkedAccount, event.userLocale.locale))
-                    .setEphemeral(true)
-                    .queue()
+                hook.editOriginal(message(FMsgKey.Discord.Command.NoLinkedAccount, event.userLocale.locale)).queue()
                 return
             }
             val isOperator = isLinkedOperator(event.user.idLong)
             if (isOperator == null) {
-                event.reply(message(FMsgKey.Discord.Command.CannotGetPlayerPerm, event.userLocale.locale))
-                    .setEphemeral(true)
-                    .queue()
+                hook.editOriginal(message(FMsgKey.Discord.Command.CannotGetPlayerPerm, event.userLocale.locale)).queue()
                 return
             }
             if (!isOperator) {
-                event.reply(noPermissionMessage(event))
-                    .setEphemeral(true)
-                    .queue()
+                hook.editOriginal(noPermissionMessage(event)).queue()
                 return
             }
 
@@ -526,14 +543,12 @@ object DiscordBridge {
                 else -> null
             }
             if (command.isNullOrBlank()) {
-                event.reply("Invalid command arguments.").setEphemeral(true).queue()
+                hook.editOriginal("Invalid command arguments.").queue()
                 return
             }
             val playerName = event.getOption("player")?.asString
             if (playerName != null && !playerTargetExists(event.name, playerName)) {
-                event.reply(message(FMsgKey.Discord.Command.PlayerNotFound, event.userLocale.locale))
-                    .setEphemeral(true)
-                    .queue()
+                hook.editOriginal(message(FMsgKey.Discord.Command.PlayerNotFound, event.userLocale.locale)).queue()
                 return
             }
 
@@ -546,13 +561,13 @@ object DiscordBridge {
             }
             val argumentName = if (event.name == "run") "command" else "player"
             val argumentValue = event.getOption(argumentName)?.asString ?: command
-            event.reply(
+            hook.editOriginal(
                 Fabricord.langMan.getMessage(
                     successKey,
                     argsComplete = mapOf(argumentName to argumentValue),
                     lang = event.userLocale.locale,
                 ).string
-            ).setEphemeral(true).queue()
+            ).queue()
         }
 
         private fun playerCommand(event: SlashCommandInteractionEvent, command: String, reasonOption: String?): String? {
@@ -576,6 +591,17 @@ object DiscordBridge {
         }
     }
 
+    private fun executeConsoleCommand(event: MessageReceivedEvent) {
+        val command = event.message.contentRaw.trim().removePrefix("/")
+        if (command.isEmpty()) return
+        val discordUserId = event.author.idLong
+        Fabricord.server.execute {
+            if (isLinkedOperator(discordUserId) == true) {
+                executeServerCommand(command)
+            }
+        }
+    }
+
     private fun isLinkedOperator(discordUserId: Long): Boolean? {
         val uuid = Fabricord.accountLinks.findMinecraftUuid(discordUserId) ?: return false
         return runCatching {
@@ -590,12 +616,10 @@ object DiscordBridge {
     }
 
     private fun executeServerCommand(command: String) {
-        Fabricord.server.execute {
-            Fabricord.server.commands.performPrefixedCommand(
-                Fabricord.server.createCommandSourceStack(),
-                command,
-            )
-        }
+        Fabricord.server.commands.performPrefixedCommand(
+            Fabricord.server.createCommandSourceStack(),
+            command,
+        )
     }
 
     private fun formatDuration(milliseconds: Long): String {

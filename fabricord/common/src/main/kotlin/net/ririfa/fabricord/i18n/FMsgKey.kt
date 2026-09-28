@@ -1,10 +1,9 @@
 package net.ririfa.fabricord.i18n
 
 
-import net.minecraft.network.chat.Component
 import net.ririfa.langman.MessageKey
 
-sealed class FMsgKey : MessageKey<FMsgProvider, Component> {
+sealed class FMsgKey : MessageKey<FMsgProvider, FText> {
     sealed class Discord : FMsgKey() {
         sealed class Bot : Discord() {
             object BotNowOnline : Bot()

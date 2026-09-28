@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -50,6 +52,11 @@ safeInclude("1.19", "fabricord/versions/1.19")
 safeInclude("1.18.2", "fabricord/versions/1.18.2")
 safeInclude("1.17.1", "fabricord/versions/1.17.1")
 safeInclude("1.16.5", "fabricord/versions/1.16.5")
+safeInclude("1.16.3", "fabricord/versions/1.16.3")
+safeInclude("1.16", "fabricord/versions/1.16")
 safeInclude("1.15.2", "fabricord/versions/1.15.2")
+safeInclude("1.14.4", "fabricord/versions/1.14.4")
+safeInclude("1.14.3", "fabricord/versions/1.14.3")
+safeInclude("1.14.2", "fabricord/versions/1.14.2")
 
 rootProject.name = "fabricord"

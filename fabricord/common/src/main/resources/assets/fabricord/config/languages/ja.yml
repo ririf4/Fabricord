@@ -1,0 +1,146 @@
+version: "2.0.0"
+
+# ----------------
+# Fabricordをインストールしていただきありがとうございます。
+# このModは、MinecraftサーバーのチャットとDiscordを連携します。
+#
+# リンク:
+#   GitHub            -> https://github.com/ririf4/Fabricord
+#   Modrinth          -> https://modrinth.com/mod/fabricord
+#   コミュニティDiscord -> https://discord.swiftstorm.dev
+# ----------------
+
+# Discord Botのトークン。
+# 以下のページでBotを作成し、トークンを取得してください:
+# https://discord.com/developers/applications
+# 導入手順: https://github.com/ririf4/Fabricord/tree/v5/BOT_INSTALL/JA.md
+BotToken: ""
+
+# サーバーログやチャットの送信先となるDiscordチャンネルID。
+# Discordへの送信を無効にする項目は空欄にしてください。
+# チャンネルIDの取得方法:
+# https://support.discord.com/hc/ja/articles/206346498
+LogChannels:
+  DEFAULT: [ "" ]
+  CHAT: [ "" ]
+  ADVANCEMENT: [ "" ]
+  DEATH: [ "" ]
+  JOIN: [ "" ]
+  LEAVE: [ "" ]
+  SERVER_START: [ "" ]
+  SERVER_STOP: [ "" ]
+
+# MinecraftからDiscordへ送信するメッセージの種類。
+# 選択肢: Chat, Advancement, Death, Join, Leave
+# 設定例:
+# WillSends:
+#   - "Chat"
+#   - "Join"
+WillSends:
+  - "Chat"
+  - "Advancement"
+  - "Death"
+  - "Join"
+  - "Leave"
+
+# -- Botの表示設定 --
+
+# Discordに表示するアクティビティの種類。
+# 選択肢: PLAYING, COMPETING, LISTENING, WATCHING
+# デフォルト: PLAYING
+BotActivityStatus: ""
+
+# アクティビティに表示するテキスト。
+# デフォルト: "Minecraft"
+BotActivityMessage: ""
+
+# Botのオンライン状態。
+# 選択肢: ONLINE, IDLE, DO_NOT_DISTURB
+# デフォルト: ONLINE
+BotOnlineStatus: ""
+
+# メッセージの表示形式。
+# 選択肢: classic, modern
+# デフォルト: classic
+MessageStyle: ""
+
+# -- メンション設定 --
+
+# MinecraftからDiscordへのすべてのメンションを無効にする。
+BlockAllMentions: false
+
+# Discordの権限に基づいてメンションを制限する。
+# trueの場合、適切なDiscord権限を持つユーザーだけがメンションできます。
+UseUserPermissionForMentions: false
+
+# メンションを送信しないDiscordユーザーIDの一覧。
+MentionBlockedUserIDs: [ ]
+
+# メンションを送信しないDiscordロールIDの一覧。
+MentionBlockedRoleIDs: [ ]
+
+# -- カスタムメッセージ設定 --
+
+# サーバーの起動時と停止時に送信するメッセージ。
+# 空欄にするとメッセージを無効にできます。
+# デフォルト: ""
+# 設定例:
+# ServerStartMessage: ":white_check_mark: **サーバーが起動しました！**"
+# ServerStopMessage: ":octagonal_sign: **サーバーが停止しました！**"
+# DiscordSRV形式のメッセージにも対応しています。
+ServerStartMessage: ""
+ServerStopMessage: ""
+
+# プレイヤーがサーバーに参加、退出したときに送信するメッセージ。
+# %player%はプレイヤー名に置き換えられます。
+# 空欄にするとメッセージを無効にできます。
+# デフォルト: ""
+# 設定例:
+# PlayerJoinMessage: "%player% がサーバーに参加しました"
+# PlayerLeaveMessage: "%player% がサーバーから退出しました"
+PlayerJoinMessage: ""
+PlayerLeaveMessage: ""
+
+# -- その他の設定 --
+
+# 死亡メッセージをDiscordへ送信しない。
+DisableDeathMessages: false
+
+# 進捗メッセージをDiscordへ送信しない。
+DisableAdvancementMessages: false
+
+# 送信しない進捗名の一覧（namespace:advancement形式で指定）。
+IgnoredAdvancements:
+  - ""
+
+# -- コンソール連携 --
+
+# コンソールログ、コマンド、実行結果を扱うDiscordチャンネルID。
+# 空欄にするとコンソール連携は無効になります。
+# デフォルト: ""
+ConsoleLogChannelID: ""
+
+# -- 動的アクティビティ --
+
+# 現在のプレイヤー数を使って、Botのアクティビティを30秒ごとに更新する。
+# {count}はオンラインのプレイヤー数、{max}はサーバーの最大人数に置き換えられます。
+# 設定例: "Minecraft | {count}/{max} 人"
+# 空欄にすると無効になり、BotActivityMessageが使用されます。
+PlayerCountActivityFormat: ""
+
+# -- OP同期設定 --
+
+# 該当ロールを持つプレイヤーにMinecraftのOP権限を自動付与するDiscordロールID。
+# Discord Developer Portalで「Server Members Intent」を有効にする必要があります。
+# MCへのログイン時、Discordロールの変更時（プレイヤーがオンラインの場合）、
+# アカウント連携時に同期されます。
+# 注意: プレイヤーが指定したすべてのロールを失うと、MinecraftのOP権限も削除されます。
+# 空のままにすると無効になります。
+# 設定例:
+# OpSyncRoleIDs:
+#   - "123456789012345678"
+OpSyncRoleIDs: [ ]
+
+# -- 実験的な設定 --
+
+# 現在、実験的な設定はありません。

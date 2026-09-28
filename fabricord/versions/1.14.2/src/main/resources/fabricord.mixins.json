@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "net.ririfa.fabricord.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "server": [
+    "ClientInformationMixin",
+    "ClientInformationPacketAccessor",
+    "PlayerAdvancementsMixin",
+    "ServerPlayerMixin",
+    "ServerChatMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

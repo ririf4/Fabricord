@@ -59,8 +59,8 @@ subprojects {
     propertiesFile.reader().use { versionProps.load(it) }
 
     val currentRevision = versionProps.getProperty("revision")
-            ?.toIntOrNull()
-            ?: 1
+        ?.toIntOrNull()
+        ?: 1
 
     val major = "2026"
     val minor = "1"
@@ -103,7 +103,7 @@ subprojects {
     }
 
     when (name) {
-        "26.1.2", "1.21.11", "1.21.8", "1.21.5", "1.20.4", "1.20.2", "1.20.1", "1.19.4", "1.19.2", "1.19", "1.18.2", "1.17.1", "1.16.5", "1.15.2" -> {
+        "26.1.2", "1.21.11", "1.21.8", "1.21.5", "1.20.4", "1.20.2", "1.20.1", "1.19.4", "1.19.2", "1.19", "1.18.2", "1.17.1", "1.16.5", "1.16.3", "1.16", "1.15.2", "1.14.4", "1.14.3", "1.14.2" -> {
             val fullVersion = "$deepVersion+mc$name"
 
             version = fullVersion
