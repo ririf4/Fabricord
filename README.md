@@ -36,6 +36,10 @@ The repository currently contains compatibility modules for:
 
 Modules are organized around Minecraft API compatibility boundaries. Each module combines its version-specific sources with the shared sources in `fabricord/common`.
 
+Fabricord bundles SQLite native libraries for 64-bit Windows, Linux (glibc and
+musl), and macOS on x86_64 and ARM64. Other operating systems and architectures
+are not supported.
+
 ## Installation
 
 1. Install Fabric Loader and Fabric API for the target Minecraft version.
@@ -68,7 +72,7 @@ Git revision, supported Minecraft range, and release commit SHA.
 
 ## Publishing
 
-Provide a Modrinth personal access token with the `CREATE_VERSION` scope using
+Provide a Modrinth personal access token with the `VERSION_CREATE` scope using
 the `MODRINTH_TOKEN` environment variable or the user Gradle properties file:
 
 ```properties

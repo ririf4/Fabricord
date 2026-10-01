@@ -1,6 +1,7 @@
 import com.modrinth.minotaur.ModrinthExtension
 import com.modrinth.minotaur.dependencies.DependencyType
 import com.modrinth.minotaur.dependencies.ModDependency
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.util.Properties
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
@@ -11,6 +12,18 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 val lib = the<LibrariesForLibs>()
 val modrinthToken = providers.environmentVariable("MODRINTH_TOKEN")
     .orElse(providers.gradleProperty("modrinthToken"))
+val excludedSqliteNativeTargets = listOf(
+    "FreeBSD",
+    "Linux/arm",
+    "Linux/armv6",
+    "Linux/armv7",
+    "Linux/ppc64",
+    "Linux/riscv64",
+    "Linux/x86",
+    "Linux-Musl/x86",
+    "Windows/armv7",
+    "Windows/x86",
+)
 
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
@@ -90,11 +103,20 @@ val publishModrinth = tasks.register("publishModrinth") {
     dependsOn(prepareModrinthPublication)
 }
 
+tasks.register<Delete>("clean") {
+    delete(layout.projectDirectory.dir("dist"))
+}
+
 allprojects {
     group = "net.ririfa"
 }
 
 subprojects {
+    configurations.configureEach {
+        exclude(group = "club.minnced", module = "opus-java")
+        exclude(group = "com.google.crypto.tink", module = "tink")
+    }
+
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
         extensions.configure<KotlinJvmProjectExtension>("kotlin") {
             sourceSets.named("main") {
@@ -214,6 +236,11 @@ subprojects {
     }
 
     pluginManager.withPlugin("com.gradleup.shadow") {
+        tasks.withType<ShadowJar>().configureEach {
+            excludedSqliteNativeTargets.forEach { target ->
+                exclude("org/sqlite/native/$target/**")
+            }
+        }
         if (pluginManager.hasPlugin("net.fabricmc.fabric-loom")) {
             configureReleaseJar("shadowJar")
         }
