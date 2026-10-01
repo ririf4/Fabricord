@@ -74,8 +74,6 @@ val shadowJarTask = tasks.named<ShadowJar>("shadowJar") {
     relocate("net.dv8tion.jda", "net.ririfa.fabricord.shadowed.jda")
     relocate("org.slf4j", "net.ririfa.fabricord.shadowed.slf4j")
 
-    exclude("net/dv8tion/jda/api/audio/**")
-    exclude("net/dv8tion/jda/internal/audio/**")
     exclude("club/minnced/opus/**")
     exclude("com/sun/jna/**")
     exclude("kotlin/**")

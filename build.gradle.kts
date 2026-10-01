@@ -48,7 +48,6 @@ fun gitOutput(vararg arguments: String): String =
     }.standardOutput.asText.get().trim()
 
 val gitRevision = gitOutput("rev-list", "--count", "HEAD").toInt()
-val gitSha = gitOutput("rev-parse", "--short=8", "HEAD").lowercase()
 val releaseYear = gitOutput("show", "-s", "--format=%cd", "--date=format:%Y", "HEAD").toInt()
 check(releaseYear in 1000..9999) { "Git commit year must use four digits" }
 
@@ -86,7 +85,7 @@ val validateModrinthCredentials = tasks.register("validateModrinthCredentials") 
             commandLine("git", "status", "--porcelain", "--untracked-files=normal")
         }.standardOutput.asText.get().trim()
         check(repositoryStatus.isEmpty()) {
-            "The repository must be clean before publishing so the Git SHA identifies the released sources."
+            "The repository must be clean before publishing so the Git revision identifies the released sources."
         }
     }
 }
@@ -173,13 +172,7 @@ subprojects {
     val shortYear = releaseYear.toString().takeLast(2)
     val preReleaseSuffix = preRelease?.let { "-$it" }.orEmpty()
     val deepVersion = "$generation$shortYear.$minor.$patch.r$gitRevision" +
-        "$preReleaseSuffix+env$minecraftVersionRange.sha$gitSha"
-    val modrinthPreReleaseSuffix = preRelease?.let { ".$it" }.orEmpty()
-    val modrinthVersion = "$generation$shortYear.$minor.$patch-r$gitRevision" +
-        "$modrinthPreReleaseSuffix+mc$minecraftVersionRange"
-    check(modrinthVersion.length <= 32) {
-        "Modrinth version number exceeds 32 characters: $modrinthVersion"
-    }
+        "$preReleaseSuffix+env$minecraftVersionRange"
     version = publicVersion
 
     fun configureReleaseJar(taskName: String) {
@@ -206,8 +199,8 @@ subprojects {
         extensions.configure<ModrinthExtension>("modrinth") {
             token.set(modrinthToken)
             projectId.set("fabricord")
-            versionNumber.set(modrinthVersion)
-            versionName.set("Fabricord $publicVersion for Minecraft $minecraftVersionRange")
+            versionNumber.set(publicVersion)
+            versionName.set("Fabricord $publicVersion")
             versionType.set("release")
             changelog.set(
                 "For the full changelog, see the " +
@@ -253,5 +246,16 @@ subprojects {
     }
     pluginManager.withPlugin("net.fabricmc.fabric-loom-remap") {
         configureReleaseJar("remapJar")
+    }
+}
+
+gradle.projectsEvaluated {
+    val modrinthPublicationTasks = modrinthGameVersions.keys.map { moduleName ->
+        project(":$moduleName").tasks.named("modrinth")
+    }
+    modrinthPublicationTasks.zipWithNext().forEach { (olderVersion, newerVersion) ->
+        newerVersion.configure {
+            mustRunAfter(olderVersion)
+        }
     }
 }

@@ -68,9 +68,8 @@ commit, while each compatibility module's `Minor.Patch` value is configured as
 `version.<Minecraft version range>` in `version.properties`. The public version
 is written to `fabric.mod.json`. Release JAR filenames use the full
 GenCal-SemVer deep version, including the product generation, Git revision,
-supported Minecraft range, and release commit SHA. Modrinth version numbers use
-a compact form without the SHA to fit Modrinth's 32-character limit; the
-uploaded filename retains the complete deep version.
+and supported Minecraft range. Modrinth version numbers use the public version,
+while the uploaded filename retains the complete deep version.
 
 ## Publishing
 
@@ -87,6 +86,10 @@ committed to the repository. Then publish every compatibility module:
 ```shell
 ./gradlew publishModrinth
 ```
+
+All compatibility modules are built and tested first. Their Modrinth versions
+are then published serially, starting with the oldest supported Minecraft
+version.
 
 Publish a single compatibility module with its `modrinth` task, for example:
 
