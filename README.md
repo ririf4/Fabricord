@@ -66,9 +66,11 @@ Release JARs are collected in `dist` and named `Fabricord-<version>.jar`.
 Public versions use `YYYY.Minor.Patch`. The year is taken from the release
 commit, while each compatibility module's `Minor.Patch` value is configured as
 `version.<Minecraft version range>` in `version.properties`. The public version
-is written to `fabric.mod.json`. Release JAR filenames and Modrinth version
-numbers use the GenCal-SemVer deep version, including the product generation,
-Git revision, supported Minecraft range, and release commit SHA.
+is written to `fabric.mod.json`. Release JAR filenames use the full
+GenCal-SemVer deep version, including the product generation, Git revision,
+supported Minecraft range, and release commit SHA. Modrinth version numbers use
+a compact form without the SHA to fit Modrinth's 32-character limit; the
+uploaded filename retains the complete deep version.
 
 ## Publishing
 
