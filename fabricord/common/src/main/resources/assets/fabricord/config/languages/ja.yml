@@ -1,4 +1,4 @@
-version: "2.0.0"
+version: "2.1.0"
 
 # ----------------
 # Fabricordをインストールしていただきありがとうございます。
@@ -51,11 +51,11 @@ WillSends:
 BotActivityStatus: ""
 
 # アクティビティに表示するテキスト。
-# デフォルト: "Minecraft"
+# 空欄にするとアクティビティを無効にします。
 BotActivityMessage: ""
 
 # Botのオンライン状態。
-# 選択肢: ONLINE, IDLE, DO_NOT_DISTURB
+# 選択肢: ONLINE, IDLE, DND, DO_NOT_DISTURB, INVISIBLE
 # デフォルト: ONLINE
 BotOnlineStatus: ""
 
@@ -140,6 +140,55 @@ PlayerCountActivityFormat: ""
 # OpSyncRoleIDs:
 #   - "123456789012345678"
 OpSyncRoleIDs: [ ]
+
+# -- メッセージテンプレート --
+
+# テンプレートでは、{placeholder}と従来の%placeholder%形式を使用できます。
+# サーバー情報: {count}, {max}, {tps}, {mspt}, {uptime}, {version},
+# {world_time}, {loaded_chunks}
+# メッセージ情報: {player}, {uuid}, {message}, {advancement},
+# {user}, {role}, {role_prefix}
+# チャット形式を空欄にすると、選択中の表示形式に応じた標準設定が使用されます。
+MinecraftToDiscordMessageFormat: ""
+DiscordToMinecraftMessageFormat: ""
+PlayerDeathMessage: "{message}"
+PlayerAdvancementMessage: "{player} が進捗「{advancement}」を達成しました"
+
+# -- Discordコマンド権限 --
+
+# 権限モード:
+# LINKED_OPERATOR: 連携されたMinecraftアカウントがOPの場合のみ許可
+# ALLOW_LIST: 下記のID一覧に含まれるユーザーまたはロールのみ許可
+# LINKED_OPERATOR_OR_ALLOW_LIST: 上記のどちらかを満たす場合に許可
+# EVERYONE: すべてのDiscordユーザーに許可
+# DISABLED: コマンドを無効化
+# accountsは、ほかのユーザーの連携照会・解除を制御します。
+# consoleは、ConsoleLogChannelIDからのコマンド実行を制御します。
+DiscordCommandPermissions:
+  kick:
+    Mode: "LINKED_OPERATOR"
+    AllowedRoleIDs: [ ]
+    AllowedUserIDs: [ ]
+  ban:
+    Mode: "LINKED_OPERATOR"
+    AllowedRoleIDs: [ ]
+    AllowedUserIDs: [ ]
+  pardon:
+    Mode: "LINKED_OPERATOR"
+    AllowedRoleIDs: [ ]
+    AllowedUserIDs: [ ]
+  run:
+    Mode: "LINKED_OPERATOR"
+    AllowedRoleIDs: [ ]
+    AllowedUserIDs: [ ]
+  console:
+    Mode: "LINKED_OPERATOR"
+    AllowedRoleIDs: [ ]
+    AllowedUserIDs: [ ]
+  accounts:
+    Mode: "LINKED_OPERATOR"
+    AllowedRoleIDs: [ ]
+    AllowedUserIDs: [ ]
 
 # -- 実験的な設定 --
 

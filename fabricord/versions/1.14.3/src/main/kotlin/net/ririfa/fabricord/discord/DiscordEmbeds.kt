@@ -5,13 +5,14 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.ririfa.fabricord.Fabricord
 import net.ririfa.fabricord.config.LogChannelType
+import net.ririfa.fabricord.util.MessageTemplate
 import java.awt.Color
 
 object DiscordEmbeds {
     @JvmStatic
     fun sendJoin(player: ServerPlayerEntity) {
         val message = Fabricord.config.playerJoinMessage
-            ?.replace("%player%", player.name.asString())
+            ?.let { MessageTemplate.render(it, playerValues(player)) }
             ?: return
         sendPlayerEmbed(player, message, Color.GREEN, LogChannelType.Join)
     }
@@ -19,25 +20,39 @@ object DiscordEmbeds {
     @JvmStatic
     fun sendLeave(player: ServerPlayerEntity) {
         val message = Fabricord.config.playerLeaveMessage
-            ?.replace("%player%", player.name.asString())
+            ?.let { MessageTemplate.render(it, playerValues(player)) }
             ?: return
         sendPlayerEmbed(player, message, Color.RED, LogChannelType.Leave)
     }
 
     @JvmStatic
     fun sendDeath(player: ServerPlayerEntity, message: Text) {
-        sendPlayerEmbed(player, message.asString(), Color(0x2B2D31), LogChannelType.Death)
+        val rendered = MessageTemplate.render(
+            Fabricord.config.playerDeathMessage ?: "{message}",
+            playerValues(player) + ("message" to message.asString()),
+        )
+        sendPlayerEmbed(player, rendered, Color(0x2B2D31), LogChannelType.Death)
     }
 
     @JvmStatic
     fun sendAdvancement(player: ServerPlayerEntity, title: String) {
+        val message = MessageTemplate.render(
+            Fabricord.config.playerAdvancementMessage ?: "{player} has made the advancement {advancement}",
+            playerValues(player) + ("advancement" to title),
+        )
         sendPlayerEmbed(
             player,
-            "${player.name.asString()} has made the advancement $title",
+            message,
             Color(0xFEE75C),
             LogChannelType.Advancement,
         )
     }
+
+    private fun playerValues(player: ServerPlayerEntity): Map<String, Any> =
+        MessageTemplate.serverValues(DiscordBridge.platform.snapshot()) + mapOf(
+            "player" to player.name.asString(),
+            "uuid" to player.uuid,
+        )
 
     private fun sendPlayerEmbed(
         player: ServerPlayerEntity,

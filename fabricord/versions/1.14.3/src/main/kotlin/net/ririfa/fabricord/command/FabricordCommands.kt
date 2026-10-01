@@ -67,6 +67,19 @@ object FabricordCommands {
         )
 
         dispatcher.register(
+            literal("unlink").executes { context ->
+                val player = context.source.player
+                val key = if (DiscordBridge.unlinkMinecraftAccount(player.uuid)) {
+                    FMsgKey.Command.UNLINK.Unlinked
+                } else {
+                    FMsgKey.Command.UNLINK.NotLinked
+                }
+                player.sendChatMessage(player.adapt().getMessage(key), MessageType.SYSTEM)
+                1
+            }
+        )
+
+        dispatcher.register(
             literal("fabricord")
                 .requires { source ->
                     source.hasPermissionLevel(2)

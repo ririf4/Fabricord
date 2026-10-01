@@ -40,6 +40,12 @@ Discord:
         LoadedChunks: "ロード済みチャンク"
 
   Command:
+    Account:
+      Unlinked: "%user% のMinecraftアカウント連携を解除しました"
+      NotLinked: "%user% はMinecraftアカウントと連携していません"
+      LinkedAs: "%user% は %player% (%uuid%) と連携しています"
+      NoPermission: "ほかのアカウント連携を管理する権限がありません"
+
     Kick:
       SentKickPacket: "%player%をキックしました。"
       NoPermission: "他のプレイヤーをキックする権限がありません。"
@@ -56,9 +62,7 @@ Discord:
       Executed: "実行しました: `%command%`"
       NoPermission: "Minecraftコマンドを実行する権限がありません。"
 
-    NoLinkedAccount: "リンクされたDiscordアカウントがありません。"
     PlayerNotFound: "プレイヤーが見つかりません。"
-    CannotGetPlayerPerm: "リンクされたMinecraftアカウントの権限を取得できませんでした。"
 
 Command:
   LC:
@@ -70,6 +74,10 @@ Command:
 
   LINK:
     IssuedCode: "Discordアカウントをリンクするためのコードを発行しました。コードは %code% です。有効期限は5分です。"
+
+  UNLINK:
+    Unlinked: "Discordアカウントとの連携を解除しました"
+    NotLinked: "MinecraftアカウントはDiscordと連携されていません"
 
 Chat:
   LinkDiscordAccountFirst: "チャットをする前に、MinecraftアカウントとDiscordアカウントを、'/link'コマンドからリンクしてください"

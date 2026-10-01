@@ -8,25 +8,25 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.14.2" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.14-1.14.2" />
             <option value="$PROJECT_DIR$/fabricord/versions/1.14.3" />
             <option value="$PROJECT_DIR$/fabricord/versions/1.14.4" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.15.2" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.15-1.15.2" />
             <option value="$PROJECT_DIR$/fabricord/versions/1.16" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.16.3" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.16.5" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.17.1" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.18.2" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.16.1-1.16.3" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.16.4-1.16.5" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.17-1.17.1" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.18-1.18.2" />
             <option value="$PROJECT_DIR$/fabricord/versions/1.19" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.19.2" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.19.4" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.20.1" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.19.1-1.19.2" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.19.3-1.19.4" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.20-1.20.1" />
             <option value="$PROJECT_DIR$/fabricord/versions/1.20.2" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.20.4" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.21.11" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.21.5" />
-            <option value="$PROJECT_DIR$/fabricord/versions/1.21.8" />
-            <option value="$PROJECT_DIR$/fabricord/versions/26.1.2" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.20.3-1.20.4" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.21.9-1.21.11" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.20.5-1.21.5" />
+            <option value="$PROJECT_DIR$/fabricord/versions/1.21.6-1.21.8" />
+            <option value="$PROJECT_DIR$/fabricord/versions/26.1-26.1.2" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="true" />

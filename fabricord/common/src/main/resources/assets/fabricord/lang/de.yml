@@ -40,6 +40,12 @@ Discord:
         LoadedChunks: "Geladene Chunks"
 
   Command:
+    Account:
+      Unlinked: "Die Verknüpfung des Minecraft-Kontos von %user% wurde aufgehoben"
+      NotLinked: "%user% hat kein verknüpftes Minecraft-Konto"
+      LinkedAs: "%user% ist mit %player% (%uuid%) verknüpft"
+      NoPermission: "Du hast keine Berechtigung, andere Kontoverknüpfungen zu verwalten"
+
     Kick:
       SentKickPacket: "%player% wurde gekickt"
       NoPermission: "Du hast keine Berechtigung, andere Spieler zu kicken"
@@ -56,9 +62,7 @@ Discord:
       Executed: "Ausgeführt: `%command%`"
       NoPermission: "Du hast keine Berechtigung, Minecraft-Befehle auszuführen"
 
-    NoLinkedAccount: "Kein verknüpftes Discord-Konto gefunden"
     PlayerNotFound: "Spieler nicht gefunden"
-    CannotGetPlayerPerm: "Die Berechtigungen des verknüpften Minecraft-Kontos konnten nicht ermittelt werden"
 
 Command:
   LC:
@@ -70,6 +74,10 @@ Command:
 
   LINK:
     IssuedCode: "Ein Code zur Verknüpfung deines Discord-Kontos wurde ausgestellt. Der Code lautet %code% und ist 5 Minuten gültig"
+
+  UNLINK:
+    Unlinked: "Die Verknüpfung mit deinem Discord-Konto wurde aufgehoben"
+    NotLinked: "Dein Minecraft-Konto ist nicht mit Discord verknüpft"
 
 Chat:
   LinkDiscordAccountFirst: "Bitte verknüpfe dein Minecraft-Konto mit deinem Discord-Konto über den '/link'-Befehl, bevor du chattest"

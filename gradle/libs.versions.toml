@@ -1,6 +1,7 @@
 [versions]
 kotlin = "2.3.20"
 shadow = "9.6.1"
+minotaur = "2.10.0"
 
 yacla-core = "4.1.1"
 yacla-yaml = "4.1.0"
@@ -27,3 +28,4 @@ sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }

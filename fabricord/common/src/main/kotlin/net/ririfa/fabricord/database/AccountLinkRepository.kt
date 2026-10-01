@@ -44,6 +44,17 @@ class AccountLinkRepository(private val databaseFile: Path) : AutoCloseable {
         val previousAutoCommit = db.autoCommit
         db.autoCommit = false
         try {
+            val displacedMinecraftUuids = db.prepareStatement(
+                "SELECT minecraft_uuid FROM account_links WHERE minecraft_uuid = ? OR discord_user_id = ?"
+            ).use { statement ->
+                statement.setString(1, minecraftUuid.toString())
+                statement.setLong(2, discordUserId)
+                statement.executeQuery().use { result ->
+                    buildSet {
+                        while (result.next()) add(UUID.fromString(result.getString("minecraft_uuid")))
+                    }
+                }
+            }
             db.prepareStatement(
                 "DELETE FROM account_links WHERE minecraft_uuid = ? OR discord_user_id = ?"
             ).use { statement ->
@@ -59,6 +70,7 @@ class AccountLinkRepository(private val databaseFile: Path) : AutoCloseable {
                 statement.executeUpdate()
             }
             db.commit()
+            displacedMinecraftUuids - minecraftUuid
         } catch (error: Exception) {
             db.rollback()
             throw error

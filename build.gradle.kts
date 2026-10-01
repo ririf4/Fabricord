@@ -1,14 +1,93 @@
+import com.modrinth.minotaur.ModrinthExtension
+import com.modrinth.minotaur.dependencies.DependencyType
+import com.modrinth.minotaur.dependencies.ModDependency
 import java.util.Properties
 import org.gradle.accessors.dm.LibrariesForLibs
+import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.kotlin.dsl.the
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 val lib = the<LibrariesForLibs>()
+val modrinthToken = providers.environmentVariable("MODRINTH_TOKEN")
+    .orElse(providers.gradleProperty("modrinthToken"))
 
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.minotaur) apply false
     alias(libs.plugins.shadow) apply false
+}
+
+val versionPropertiesFile = rootProject.file("version.properties")
+check(versionPropertiesFile.exists()) { "Missing version file: $versionPropertiesFile" }
+
+val versionProperties = Properties()
+versionPropertiesFile.reader().use { versionProperties.load(it) }
+
+val generation = requireNotNull(versionProperties.getProperty("generation")?.toIntOrNull()) {
+    "Missing or invalid generation in $versionPropertiesFile"
+}
+check(generation > 0) { "generation must be positive in $versionPropertiesFile" }
+
+fun gitOutput(vararg arguments: String): String =
+    providers.exec {
+        commandLine("git", *arguments)
+    }.standardOutput.asText.get().trim()
+
+val gitRevision = gitOutput("rev-list", "--count", "HEAD").toInt()
+val gitSha = gitOutput("rev-parse", "--short=8", "HEAD").lowercase()
+val releaseYear = gitOutput("show", "-s", "--format=%cd", "--date=format:%Y", "HEAD").toInt()
+check(releaseYear in 1000..9999) { "Git commit year must use four digits" }
+
+val modrinthGameVersions = mapOf(
+    "1.14-1.14.2" to listOf("1.14", "1.14.1", "1.14.2"),
+    "1.14.3" to listOf("1.14.3"),
+    "1.14.4" to listOf("1.14.4"),
+    "1.15-1.15.2" to listOf("1.15", "1.15.1", "1.15.2"),
+    "1.16" to listOf("1.16"),
+    "1.16.1-1.16.3" to listOf("1.16.1", "1.16.2", "1.16.3"),
+    "1.16.4-1.16.5" to listOf("1.16.4", "1.16.5"),
+    "1.17-1.17.1" to listOf("1.17", "1.17.1"),
+    "1.18-1.18.2" to listOf("1.18", "1.18.1", "1.18.2"),
+    "1.19" to listOf("1.19"),
+    "1.19.1-1.19.2" to listOf("1.19.1", "1.19.2"),
+    "1.19.3-1.19.4" to listOf("1.19.3", "1.19.4"),
+    "1.20-1.20.1" to listOf("1.20", "1.20.1"),
+    "1.20.2" to listOf("1.20.2"),
+    "1.20.3-1.20.4" to listOf("1.20.3", "1.20.4"),
+    "1.20.5-1.21.5" to listOf("1.20.5", "1.20.6", "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4", "1.21.5"),
+    "1.21.6-1.21.8" to listOf("1.21.6", "1.21.7", "1.21.8"),
+    "1.21.9-1.21.11" to listOf("1.21.9", "1.21.10", "1.21.11"),
+    "26.1-26.1.2" to listOf("26.1", "26.1.1", "26.1.2"),
+)
+
+val validateModrinthCredentials = tasks.register("validateModrinthCredentials") {
+    group = "publishing"
+    description = "Verify that Modrinth credentials are available."
+
+    doLast {
+        check(!modrinthToken.orNull.isNullOrBlank()) {
+            "Set MODRINTH_TOKEN or modrinthToken in the user Gradle properties before publishing."
+        }
+        val repositoryStatus = providers.exec {
+            commandLine("git", "status", "--porcelain", "--untracked-files=normal")
+        }.standardOutput.asText.get().trim()
+        check(repositoryStatus.isEmpty()) {
+            "The repository must be clean before publishing so the Git SHA identifies the released sources."
+        }
+    }
+}
+
+val prepareModrinthPublication = tasks.register("prepareModrinthPublication") {
+    group = "publishing"
+    description = "Build and test every compatibility module before publishing."
+    dependsOn(validateModrinthCredentials)
+}
+
+val publishModrinth = tasks.register("publishModrinth") {
+    group = "publishing"
+    description = "Build and publish every compatibility module to Modrinth."
+    dependsOn(prepareModrinthPublication)
 }
 
 allprojects {
@@ -42,72 +121,104 @@ subprojects {
         }
     }
 
-    val propertiesFile = file("version.properties")
-
-    if (!propertiesFile.exists()) {
-        propertiesFile.createNewFile()
-
-        val props = Properties()
-
-        props["revision"] = "1"
-
-        propertiesFile.writer().use { props.store(it, "Version Properties") }
+    val versionKey = "version.$name"
+    val versionParts = requireNotNull(
+        versionProperties.getProperty(versionKey)
+            ?.trim()
+            ?.let { Regex("(\\d+)\\.(\\d+)").matchEntire(it) },
+    ) {
+        "Missing or invalid $versionKey in $versionPropertiesFile; expected Minor.Patch (for example, 1.0)"
     }
-
-    val versionProps = Properties()
-
-    propertiesFile.reader().use { versionProps.load(it) }
-
-    val currentRevision = versionProps.getProperty("revision")
-        ?.toIntOrNull()
-        ?: 1
-
-    val major = "2026"
-    val minor = "1"
-    val patch = "1"
-
-    val publicVersion = "$major.$minor.$patch"
-
-    val deepVersion = "$major.$minor.$patch-r$currentRevision"
-
-    extra["publicVersion"] = publicVersion
-    extra["deepVersion"] = deepVersion
-    extra["revision"] = currentRevision
-
-    version = deepVersion
-
-    val incrementRevision = tasks.register("incrementRevision") {
-        group = "versioning"
-        description = "Increment revision for project $path"
-
-        doLast {
-            val latestProps = Properties()
-
-            propertiesFile.reader().use { latestProps.load(it) }
-
-            val latestRevision = latestProps.getProperty("revision")
-                ?.toIntOrNull()
-                ?: 1
-
-            val newRevision = latestRevision + 1
-
-            latestProps["revision"] = newRevision.toString()
-            propertiesFile.writer().use { latestProps.store(it, "Version Properties") }
-
-            println("[$path] Revision incremented -> r$newRevision")
+    val minor = versionParts.groupValues[1].toInt()
+    val patch = versionParts.groupValues[2].toInt()
+    check(minor >= 1 && patch >= 0) {
+        "$versionKey must have Minor >= 1 and Patch >= 0"
+    }
+    val publicVersion = "$releaseYear.$minor.$patch"
+    requireNotNull(modrinthGameVersions[name]) {
+        "Missing Modrinth game versions for $name"
+    }
+    val minecraftVersionRange = name
+    val preRelease = versionProperties.getProperty("preRelease.$name")
+        ?.trim()
+        ?.takeIf(String::isNotEmpty)
+    if (preRelease != null) {
+        check(preRelease.matches(Regex("[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*"))) {
+            "preRelease.$name contains invalid identifiers"
         }
     }
 
-    tasks.matching { it.name == "compileKotlin" }.configureEach {
-        finalizedBy(incrementRevision)
+    val shortYear = releaseYear.toString().takeLast(2)
+    val preReleaseSuffix = preRelease?.let { "-$it" }.orEmpty()
+    val deepVersion = "$generation$shortYear.$minor.$patch.r$gitRevision" +
+        "$preReleaseSuffix+env$minecraftVersionRange.sha$gitSha"
+    version = publicVersion
+
+    fun configureReleaseJar(taskName: String) {
+        val releaseJar = tasks.named<AbstractArchiveTask>(taskName) {
+            archiveFileName.set("Fabricord-$deepVersion.jar")
+        }
+        val copyReleaseJar = tasks.register<Copy>("copyReleaseJar") {
+            group = "distribution"
+            description = "Copy the release JAR to the root distribution directory."
+            dependsOn(releaseJar)
+            from(releaseJar.flatMap { it.archiveFile })
+            into(rootProject.layout.projectDirectory.dir("dist"))
+        }
+
+        val buildTask = tasks.named("build") {
+            dependsOn(copyReleaseJar)
+            mustRunAfter(validateModrinthCredentials)
+        }
+        prepareModrinthPublication.configure {
+            dependsOn(buildTask)
+        }
+
+        pluginManager.apply("com.modrinth.minotaur")
+        extensions.configure<ModrinthExtension>("modrinth") {
+            token.set(modrinthToken)
+            projectId.set("fabricord")
+            versionNumber.set(deepVersion)
+            versionName.set("Fabricord $publicVersion for Minecraft $minecraftVersionRange")
+            versionType.set("release")
+            changelog.set(
+                "For the full changelog, see the " +
+                    "[GitHub Releases page](https://github.com/ririf4/Fabricord/releases).",
+            )
+            file.set(releaseJar.flatMap { it.archiveFile })
+            gameVersions.set(requireNotNull(modrinthGameVersions[project.name]))
+            loaders.set(listOf("fabric"))
+            environment.set("dedicated_server_only")
+            detectLoaders.set(false)
+            debugMode.set(
+                providers.gradleProperty("modrinthDebug")
+                    .map(String::toBoolean)
+                    .orElse(false),
+            )
+            dependencies.set(
+                listOf(
+                    ModDependency("fabric-api", DependencyType.REQUIRED),
+                    ModDependency("fabric-language-kotlin", DependencyType.REQUIRED),
+                ),
+            )
+        }
+
+        val modrinthTask = tasks.named("modrinth") {
+            dependsOn(validateModrinthCredentials)
+            dependsOn(releaseJar)
+            mustRunAfter(prepareModrinthPublication)
+        }
+        publishModrinth.configure {
+            dependsOn(modrinthTask)
+        }
     }
 
-    when (name) {
-        "26.1.2", "1.21.11", "1.21.8", "1.21.5", "1.20.4", "1.20.2", "1.20.1", "1.19.4", "1.19.2", "1.19", "1.18.2", "1.17.1", "1.16.5", "1.16.3", "1.16", "1.15.2", "1.14.4", "1.14.3", "1.14.2" -> {
-            val fullVersion = "$deepVersion+mc$name"
-
-            version = fullVersion
-            extra["deepVersion"] = fullVersion
+    pluginManager.withPlugin("com.gradleup.shadow") {
+        if (pluginManager.hasPlugin("net.fabricmc.fabric-loom")) {
+            configureReleaseJar("shadowJar")
         }
+    }
+    pluginManager.withPlugin("net.fabricmc.fabric-loom-remap") {
+        configureReleaseJar("remapJar")
     }
 }

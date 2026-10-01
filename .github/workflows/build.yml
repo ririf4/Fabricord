@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v4
@@ -40,8 +42,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fabricord-jars
-          path: |
-            fabricord/versions/*/build/libs/*.jar
-            !fabricord/versions/*/build/libs/*-plain.jar
-            !fabricord/versions/*/build/libs/*-dev-shadow.jar
+          path: dist/*.jar
           if-no-files-found: error

@@ -50,6 +50,13 @@ sealed class FMsgKey : MessageKey<FMsgProvider, FText> {
         }
 
         sealed class Command : Bot() {
+            sealed class Account : Command() {
+                object Unlinked : Account()
+                object NotLinked : Account()
+                object LinkedAs : Account()
+                object NoPermission : Account()
+            }
+
             sealed class Kick : Command() {
                 object SentKickPacket : Kick()
 
@@ -74,8 +81,6 @@ sealed class FMsgKey : MessageKey<FMsgProvider, FText> {
             }
 
             object PlayerNotFound : Command()
-            object NoLinkedAccount : Command()
-            object CannotGetPlayerPerm : Command()
         }
     }
 
@@ -91,6 +96,11 @@ sealed class FMsgKey : MessageKey<FMsgProvider, FText> {
 
         sealed class LINK : Command() {
             object IssuedCode : LINK()
+        }
+
+        sealed class UNLINK : Command() {
+            object Unlinked : UNLINK()
+            object NotLinked : UNLINK()
         }
     }
 

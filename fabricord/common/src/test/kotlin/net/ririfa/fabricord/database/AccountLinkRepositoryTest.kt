@@ -23,7 +23,7 @@ class AccountLinkRepositoryTest {
             assertEquals(10L, repository.findDiscordId(firstMinecraftUser))
             assertEquals(firstMinecraftUser, repository.findMinecraftUuid(10L))
 
-            repository.link(secondMinecraftUser, 10L)
+            assertEquals(setOf(firstMinecraftUser), repository.link(secondMinecraftUser, 10L))
 
             assertNull(repository.findDiscordId(firstMinecraftUser))
             assertEquals(secondMinecraftUser, repository.findMinecraftUuid(10L))

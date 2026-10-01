@@ -3,6 +3,7 @@ package net.ririfa.fabricord.config
 import net.ririfa.fabricord.util.MessageStyle
 import net.ririfa.yacla.annotation.*
 import net.ririfa.yacla.loader.FieldLoader
+import java.util.Locale
 
 data class FConfig(
     @BlankToNull
@@ -44,8 +45,65 @@ data class FConfig(
     @BlankToNull @JvmField val playerCountActivityFormat: String? = null,
 
     @SetOf @JvmField val opSyncRoleIDs: Set<String>? = null,
+
+    @BlankToNull @JvmField val minecraftToDiscordMessageFormat: String? = null,
+    @BlankToNull @JvmField val discordToMinecraftMessageFormat: String? = null,
+    @BlankToNull @JvmField val playerDeathMessage: String? = null,
+    @BlankToNull @JvmField val playerAdvancementMessage: String? = null,
+
+    @Loader(DiscordCommandPermissionsLoader::class)
+    @JvmField val discordCommandPermissions: Map<String, DiscordCommandPermission>? = null,
 ) {
     fun sendChat(): Boolean = willSends?.contains(SendableEvent.Chat) == true
+
+    fun commandPermission(command: String): DiscordCommandPermission =
+        discordCommandPermissions
+            ?.entries
+            ?.firstOrNull { (name, _) -> name.equals(command, ignoreCase = true) }
+            ?.value
+            ?: DiscordCommandPermission()
+}
+
+data class DiscordCommandPermission(
+    val mode: DiscordCommandPermissionMode = DiscordCommandPermissionMode.LINKED_OPERATOR,
+    val allowedRoleIDs: Set<String> = emptySet(),
+    val allowedUserIDs: Set<String> = emptySet(),
+)
+
+enum class DiscordCommandPermissionMode {
+    LINKED_OPERATOR,
+    ALLOW_LIST,
+    LINKED_OPERATOR_OR_ALLOW_LIST,
+    EVERYONE,
+    DISABLED,
+}
+
+class DiscordCommandPermissionsLoader : FieldLoader {
+    override fun load(raw: Any?): Map<String, DiscordCommandPermission>? {
+        val permissions = raw as? Map<*, *> ?: return null
+        return permissions.mapNotNull { (rawCommand, rawPermission) ->
+            val command = rawCommand?.toString()?.trim()?.takeIf(String::isNotEmpty) ?: return@mapNotNull null
+            val fields = rawPermission as? Map<*, *> ?: return@mapNotNull null
+            val modeName = fields.value("Mode")?.toString()?.trim()?.uppercase(Locale.ROOT)
+            val mode = modeName
+                ?.let { name -> DiscordCommandPermissionMode.entries.firstOrNull { it.name == name } }
+                ?: DiscordCommandPermissionMode.LINKED_OPERATOR
+            command.lowercase(Locale.ROOT) to DiscordCommandPermission(
+                mode = mode,
+                allowedRoleIDs = fields.stringSet("AllowedRoleIDs"),
+                allowedUserIDs = fields.stringSet("AllowedUserIDs"),
+            )
+        }.toMap().takeIf(Map<*, *>::isNotEmpty)
+    }
+
+    private fun Map<*, *>.value(name: String): Any? =
+        entries.firstOrNull { (key, _) -> key?.toString()?.equals(name, ignoreCase = true) == true }?.value
+
+    private fun Map<*, *>.stringSet(name: String): Set<String> =
+        (value(name) as? Iterable<*>)
+            ?.mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+            ?.toSet()
+            .orEmpty()
 }
 
 class LogChannelsLoader : FieldLoader {

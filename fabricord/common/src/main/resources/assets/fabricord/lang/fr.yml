@@ -40,6 +40,12 @@ Discord:
         LoadedChunks: "Chunks chargés"
 
   Command:
+    Account:
+      Unlinked: "Le compte Minecraft de %user% a été dissocié"
+      NotLinked: "%user% n'a pas de compte Minecraft associé"
+      LinkedAs: "%user% est associé à %player% (%uuid%)"
+      NoPermission: "Vous n'avez pas la permission de gérer les associations des autres comptes"
+
     Kick:
       SentKickPacket: "%player% a été expulsé(e)"
       NoPermission: "Vous n'avez pas la permission d'expulser d'autres joueurs"
@@ -56,9 +62,7 @@ Discord:
       Executed: "Exécuté : `%command%`"
       NoPermission: "Vous n'avez pas la permission d'exécuter des commandes Minecraft"
 
-    NoLinkedAccount: "Aucun compte Discord lié trouvé"
     PlayerNotFound: "Joueur introuvable"
-    CannotGetPlayerPerm: "Impossible de déterminer les permissions du compte Minecraft associé"
 
 Command:
   LC:
@@ -70,6 +74,10 @@ Command:
 
   LINK:
     IssuedCode: "Un code pour lier votre compte Discord a été émis. Le code est %code% et est valide pendant 5 minutes"
+
+  UNLINK:
+    Unlinked: "Votre compte Discord a été dissocié"
+    NotLinked: "Votre compte Minecraft n'est pas associé à Discord"
 
 Chat:
   LinkDiscordAccountFirst: "Veuillez lier votre compte Minecraft à votre compte Discord avec la commande '/link' avant de discuter"

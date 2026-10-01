@@ -40,6 +40,12 @@ Discord:
         LoadedChunks: "Loaded Chunks"
 
   Command:
+    Account:
+      Unlinked: "Unlinked %user%'s Minecraft account"
+      NotLinked: "%user% does not have a linked Minecraft account"
+      LinkedAs: "%user% is linked to %player% (%uuid%)"
+      NoPermission: "You do not have permission to manage other linked accounts"
+
     Kick:
       SentKickPacket: "Kicked %player%"
       NoPermission: "You do not have permission to kick other players"
@@ -56,9 +62,7 @@ Discord:
       Executed: "Executed: `%command%`"
       NoPermission: "You do not have permission to run Minecraft commands"
 
-    NoLinkedAccount: "No linked Discord account found"
     PlayerNotFound: "Player not found"
-    CannotGetPlayerPerm: "Could not determine the linked Minecraft account's permissions"
 
 Command:
   LC:
@@ -70,6 +74,10 @@ Command:
 
   LINK:
     IssuedCode: "A code to link your Discord account has been issued. The code is %code% and is valid for 5 minutes"
+
+  UNLINK:
+    Unlinked: "Your Discord account has been unlinked"
+    NotLinked: "Your Minecraft account is not linked to Discord"
 
 Chat:
   LinkDiscordAccountFirst: "Please link your Minecraft account with your Discord account using the '/link' command before chatting"

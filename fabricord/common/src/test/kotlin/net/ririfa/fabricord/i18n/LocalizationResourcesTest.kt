@@ -8,7 +8,7 @@ class LocalizationResourcesTest {
     @Test
     fun `all languages provide the same message keys`() {
         val languages = listOf("en", "ja", "de", "fr")
-        val keysByLanguage = languages.associateWith(::loadKeys)
+        val keysByLanguage = languages.associateWith { loadValues(messageResource(it)).keys }
         val expected = keysByLanguage.getValue("en")
 
         keysByLanguage.forEach { (language, keys) ->
@@ -16,8 +16,29 @@ class LocalizationResourcesTest {
         }
     }
 
-    private fun loadKeys(language: String): Set<String> {
-        val resource = "/assets/fabricord/lang/$language.yml"
+    @Test
+    fun `all translations preserve message placeholders`() {
+        val languages = listOf("en", "ja", "de", "fr")
+        val valuesByLanguage = languages.associateWith { loadValues(messageResource(it)) }
+        val expected = valuesByLanguage.getValue("en").mapValues { (_, value) -> placeholders(value) }
+
+        valuesByLanguage.forEach { (language, values) ->
+            val actual = values.mapValues { (_, value) -> placeholders(value) }
+            assertEquals(expected, actual, "$language.yml changes a message placeholder")
+        }
+    }
+
+    @Test
+    fun `localized configuration templates have the same structure`() {
+        val english = loadValues("/assets/fabricord/config/languages/en.yml").keys
+        val japanese = loadValues("/assets/fabricord/config/languages/ja.yml").keys
+
+        assertEquals(english, japanese, "ja.yml does not match the English configuration template")
+    }
+
+    private fun messageResource(language: String): String = "/assets/fabricord/lang/$language.yml"
+
+    private fun loadValues(resource: String): Map<String, String> {
         val stream = checkNotNull(javaClass.getResourceAsStream(resource)) {
             "Missing localization resource: $resource"
         }
@@ -25,14 +46,22 @@ class LocalizationResourcesTest {
         return flatten(root)
     }
 
-    private fun flatten(map: Map<*, *>, prefix: String = ""): Set<String> = buildSet {
+    private fun flatten(map: Map<*, *>, prefix: String = ""): Map<String, String> = buildMap {
         map.forEach { (rawKey, value) ->
             val key = if (prefix.isEmpty()) rawKey.toString() else "$prefix.${rawKey}"
             if (value is Map<*, *>) {
-                addAll(flatten(value, key))
+                putAll(flatten(value, key))
             } else {
-                add(key)
+                put(key, value?.toString().orEmpty())
             }
         }
+    }
+
+    private fun placeholders(value: String): Set<String> = PLACEHOLDER.findAll(value)
+        .map { match -> match.groups[1]?.value ?: match.groups[2]!!.value }
+        .toSet()
+
+    private companion object {
+        val PLACEHOLDER = Regex("\\{([A-Za-z0-9_.-]+)}|%([A-Za-z0-9_.-]+)%")
     }
 }

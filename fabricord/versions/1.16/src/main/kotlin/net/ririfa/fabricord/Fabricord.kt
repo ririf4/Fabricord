@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package net.ririfa.fabricord
 
 import net.fabricmc.api.DedicatedServerModInitializer
@@ -17,6 +19,7 @@ import net.ririfa.fabricord.config.SendableEvent
 import net.ririfa.fabricord.database.AccountLinkRepository
 import net.ririfa.fabricord.discord.DiscordBridge
 import net.ririfa.fabricord.discord.DiscordEmbeds
+import net.ririfa.fabricord.discord.MinecraftDiscordPlatform
 import net.ririfa.fabricord.discord.OpSync
 import net.ririfa.fabricord.i18n.FMsgKey
 import net.ririfa.fabricord.i18n.FMsgProvider
@@ -77,7 +80,7 @@ class Fabricord : DedicatedServerModInitializer {
                 return false
             }
             if (config.sendChat() && player.uuid !in LocalChat.players) {
-                DiscordBridge.sendMinecraftChat(player, message)
+                DiscordBridge.sendMinecraftChat(player.uuid, player.name.string, message)
             }
             return true
         }
@@ -86,7 +89,7 @@ class Fabricord : DedicatedServerModInitializer {
             if (config.willSends?.contains(SendableEvent.Join) == true) {
                 DiscordEmbeds.sendJoin(player)
             }
-            OpSync.syncOnJoin(player)
+            OpSync.syncOnJoin(player.uuid)
         }
 
         fun handleDisconnect(player: ServerPlayer) {
@@ -110,6 +113,7 @@ class Fabricord : DedicatedServerModInitializer {
 
         config
         accountLinks.initialize()
+        DiscordBridge.installPlatform(MinecraftDiscordPlatform)
         registerEvents()
     }
 
