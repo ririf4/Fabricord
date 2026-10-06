@@ -173,6 +173,10 @@ subprojects {
     val preReleaseSuffix = preRelease?.let { "-$it" }.orEmpty()
     val deepVersion = "$generation$shortYear.$minor.$patch.r$gitRevision" +
         "$preReleaseSuffix+env$minecraftVersionRange"
+    val modrinthVersion = "$publicVersion+$minecraftVersionRange"
+    check(modrinthVersion.length <= 32) {
+        "Modrinth version number exceeds 32 characters: $modrinthVersion"
+    }
     version = publicVersion
 
     fun configureReleaseJar(taskName: String) {
@@ -199,7 +203,7 @@ subprojects {
         extensions.configure<ModrinthExtension>("modrinth") {
             token.set(modrinthToken)
             projectId.set("fabricord")
-            versionNumber.set(publicVersion)
+            versionNumber.set(modrinthVersion)
             versionName.set("Fabricord $publicVersion")
             versionType.set("release")
             changelog.set(

@@ -35,7 +35,8 @@ object FabricordCommands {
                         provider.getMessage(
                             FMsgKey.Command.LC.SwitchedLocalChatState,
                             mapOf("state" to provider.getMessage(stateKey)),
-                        )
+                        ),
+                        false,
                     )
                     1
                 }
@@ -58,7 +59,8 @@ object FabricordCommands {
                 val player = context.source.playerOrException
                 val code = Fabricord.linkCodes.issue(player.uuid)
                 player.sendSystemMessage(
-                    player.adapt().getMessage(FMsgKey.Command.LINK.IssuedCode, mapOf("code" to code))
+                    player.adapt().getMessage(FMsgKey.Command.LINK.IssuedCode, mapOf("code" to code)),
+                    false,
                 )
                 1
             }
@@ -72,7 +74,7 @@ object FabricordCommands {
                 } else {
                     FMsgKey.Command.UNLINK.NotLinked
                 }
-                player.sendSystemMessage(player.adapt().getMessage(key))
+                player.sendSystemMessage(player.adapt().getMessage(key), false)
                 1
             }
         )

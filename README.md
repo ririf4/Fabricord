@@ -68,8 +68,9 @@ commit, while each compatibility module's `Minor.Patch` value is configured as
 `version.<Minecraft version range>` in `version.properties`. The public version
 is written to `fabric.mod.json`. Release JAR filenames use the full
 GenCal-SemVer deep version, including the product generation, Git revision,
-and supported Minecraft range. Modrinth version numbers use the public version,
-while the uploaded filename retains the complete deep version.
+and supported Minecraft range. Modrinth version numbers combine the public
+version and supported Minecraft range, while the uploaded filename retains the
+complete deep version.
 
 ## Publishing
 

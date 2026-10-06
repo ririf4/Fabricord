@@ -21,7 +21,8 @@ object MinecraftDiscordPlatform : DiscordPlatform {
                         if (player.uuid in mentionedPlayers) ChatFormatting.BOLD else ChatFormatting.WHITE
                     )
                 )
-            player.sendSystemMessage(component)
+            // The one-argument overload has different intermediary names across this version range.
+            player.sendSystemMessage(component, false)
             if (player.uuid in mentionedPlayers) {
                 player.playSound(SoundEvents.NOTE_BLOCK_PLING.value(), 2.0f, 2.0f)
             }

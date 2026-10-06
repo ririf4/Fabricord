@@ -133,7 +133,7 @@ class Fabricord : DedicatedServerModInitializer {
                 config.useUserPermissionForMentions &&
                 !accountLinks.isLinked(player.uuid)
             ) {
-                player.sendSystemMessage(FMsgKey.Chat.LinkDiscordAccountFirst.t(player.adapt()))
+                player.sendSystemMessage(FMsgKey.Chat.LinkDiscordAccountFirst.t(player.adapt()), false)
                 false
             } else {
                 true
